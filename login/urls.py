@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+app_name = 'index'  # include() 需要设置app_name
 urlpatterns = [
     
 ]
