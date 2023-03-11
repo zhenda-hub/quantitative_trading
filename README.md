@@ -26,7 +26,9 @@
 
 #### 使用说明
 
-1.  xxxx
+1.  环境配置
+    * 导出当前环境的包：conda env export > freeze.yml
+    * 导入, 注意防止环境名重复：conda env create -f freeze.yml
 2.  xxxx
 3.  xxxx
 

@@ -1,0 +1,40 @@
+name: trad
+channels:
+  - defaults
+dependencies:
+  - ca-certificates=2023.01.10=haa95532_0
+  - certifi=2022.12.7=py39haa95532_0
+  - openssl=1.1.1t=h2bbff1b_0
+  - pip=23.0.1=py39haa95532_0
+  - python=3.9.16=h6244533_2
+  - setuptools=65.6.3=py39haa95532_0
+  - sqlite=3.40.1=h2bbff1b_0
+  - vc=14.2=h21ff451_1
+  - vs2015_runtime=14.27.29016=h5e58377_2
+  - wheel=0.38.4=py39haa95532_0
+  - wincertstore=0.2=py39haa95532_2
+  - pip:
+    - asgiref==3.6.0
+    - attrs==22.2.0
+    - beautifulsoup4==4.11.2
+    - bs4==0.0.1
+    - charset-normalizer==3.1.0
+    - colorama==0.4.6
+    - django==4.1.7
+    - idna==3.4
+    - lxml==4.9.2
+    - numpy==1.24.2
+    - pandas==1.5.3
+    - python-dateutil==2.8.2
+    - pytz==2022.7.1
+    - requests==2.28.2
+    - simplejson==3.18.3
+    - six==1.16.0
+    - soupsieve==2.4
+    - sqlparse==0.4.3
+    - tqdm==4.65.0
+    - tushare==1.2.89
+    - tzdata==2022.7
+    - urllib3==1.26.15
+    - websocket-client==0.57.0
+prefix: C:\Users\zhenda\.conda\envs\trad
