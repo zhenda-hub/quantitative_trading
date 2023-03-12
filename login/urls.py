@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from . import views
 
 app_name = 'index'  # include() 需要设置app_name
 urlpatterns = [
-    
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('register/', views.RegisterView.as_view(), name='register'),
 ]
