@@ -1,94 +1,132 @@
 {% extends 'layout2.html' %} {% block content %}
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">价值投资平台</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Navbar scroll</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarScroll"
+                aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">大盘数据</a>
+        <div class="collapse navbar-collapse" id="navbarScroll">
+            <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">行业板块</a>
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
+                       aria-expanded="false">
+                        zhenda
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">我的关注</a></li>
+                        <li><a class="dropdown-item" href="#">提醒设置</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">退出</a></li>
+                    </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">登录</a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link disabled">我的关注</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled">提醒设置</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled">交易策略</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled">交易回测</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled">敬请期待。。</a>
+                    <a class="nav-link disabled">Link</a>
                 </li>
             </ul>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="请输入搜索内容" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">搜索</button>
+            <form class="d-flex">
+                <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                   aria-expanded="false">
-                    zhenda
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">
-                        <a class="nav-link disabled">我的关注</a></li>
-                    <li><a class="dropdown-item" href="#">提醒设置</a></li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item" href="#">退出</a></li>
-                </ul>
-            </li>
-
         </div>
-    </div>
-</nav>
+    </nav>
+    {#    <nav class="navbar navbar-expand-lg bg-body-tertiary">#}
+    {#        <div class="container-fluid">#}
+    {#            <a class="navbar-brand" href="#">价值投资平台</a>#}
+    {#            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"#}
+    {#                    data-bs-target="#navbarSupportedContent"#}
+    {#                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">#}
+    {#                <span class="navbar-toggler-icon"></span>#}
+    {#            </button>#}
+    {#            <div class="collapse navbar-collapse" id="navbarSupportedContent">#}
+    {#                <ul class="navbar-nav me-auto mb-2 mb-lg-0">#}
+    {#                    <li class="nav-item">#}
+    {#                        <a class="nav-link active" aria-current="page" href="#">大盘数据</a>#}
+    {#                    </li>#}
+    {#                    <li class="nav-item">#}
+    {#                        <a class="nav-link" href="#">行业板块</a>#}
+    {#                    </li>#}
+    {#                    <li class="nav-item">#}
+    {##}
+    {#                    </li>#}
+    {#                    <li class="nav-item">#}
+    {#                        <a class="nav-link disabled">交易策略</a>#}
+    {#                    </li>#}
+    {#                    <li class="nav-item">#}
+    {#                        <a class="nav-link disabled">交易回测</a>#}
+    {#                    </li>#}
+    {#                    <li class="nav-item">#}
+    {#                        <a class="nav-link disabled">敬请期待。。</a>#}
+    {#                    </li>#}
+    {#                </ul>#}
+    {#                <form class="d-flex" role="search">#}
+    {#                    <input class="form-control me-2" type="search" placeholder="请输入搜索内容" aria-label="Search">#}
+    {#                    <button class="btn btn-outline-success" type="submit">搜索</button>#}
+    {#                </form>#}
+    {##}
+    {##}
+    {#                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">#}
+    {#                <button class="btn btn-outline-success" type="submit">Search</button>#}
+    {##}
+    {#                <a class="nav-link" href="#">登录</a>#}
+    {#                <li class="nav-item dropdown">#}
+    {#                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"#}
+    {#                       aria-expanded="false">zhenda#}
+    {#                    </a>#}
+    {#                    <ul class="dropdown-menu">#}
+    {#                        <li><a class="dropdown-item" href="#"></a>#}
+    {#                            <a class="nav-link disabled">我的关注</a>#}
+    {#                        </li>#}
+    {#                        <li><a class="dropdown-item" href="#">提醒设置</a></li>#}
+    {#                        <li>#}
+    {#                            <hr class="dropdown-divider">#}
+    {#                        </li>#}
+    {#                        <li><a class="dropdown-item" href="#">退出</a></li>#}
+    {#                    </ul>#}
+    {#                </li>#}
+    {##}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </nav>#}
 
-<div class="container-fluid">
-    <div class="row">
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky pt-3 sidebar-sticky">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">
-                            <span data-feather="home" class="align-text-bottom"></span>
-                            基金
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file" class="align-text-bottom"></span>
-                            行业
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="shopping-cart" class="align-text-bottom"></span>
-                            股票
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="users" class="align-text-bottom"></span>
-                            我的关注
-                        </a>
-                    </li>
-                    {% comment %}
+    <div class="container-fluid">
+        <div class="row">
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3 sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">
+                                <span data-feather="home" class="align-text-bottom"></span>
+                                基金
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file" class="align-text-bottom"></span>
+                                行业
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="shopping-cart" class="align-text-bottom"></span>
+                                股票
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="users" class="align-text-bottom"></span>
+                                我的关注
+                            </a>
+                        </li>
+                        {% comment %}
                     <li class="nav-item">
                         <a class="nav-link" href="#">
                             <span data-feather="bar-chart-2" class="align-text-bottom"></span>
@@ -140,67 +178,67 @@
                         </a>
                     </li>
                     {% endcomment %}
-                </ul>
-            </div>
-        </nav>
-
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">看板区</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <div class="btn-group me-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                        <span data-feather="calendar" class="align-text-bottom"></span>
-                        年
-                    </button>
+                    </ul>
                 </div>
-            </div>
+            </nav>
 
-            <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">看板区</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                            <span data-feather="calendar" class="align-text-bottom"></span>
+                            年
+                        </button>
+                    </div>
+                </div>
 
-            <h2>Section title</h2>
-            <div class="table-responsive">
-                <table class="table table-sm table-hover">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Header</th>
-                        <th scope="col">Header</th>
-                        <th scope="col">Header</th>
-                        <th scope="col">Header</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>1,001</td>
-                        <td>random</td>
-                        <td>data</td>
-                        <td>placeholder</td>
-                        <td>text</td>
-                    </tr>
-                    <tr>
-                        <td>1,002</td>
-                        <td>placeholder</td>
-                        <td>irrelevant</td>
-                        <td>visual</td>
-                        <td>layout</td>
-                    </tr>
-                    <tr>
-                        <td>1,003</td>
-                        <td>data</td>
-                        <td>rich</td>
-                        <td>dashboard</td>
-                        <td>tabular</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
-                
-            </div>
-        </main>
+                <h2>Section title</h2>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Header</th>
+                            <th scope="col">Header</th>
+                            <th scope="col">Header</th>
+                            <th scope="col">Header</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>1,001</td>
+                            <td>random</td>
+                            <td>data</td>
+                            <td>placeholder</td>
+                            <td>text</td>
+                        </tr>
+                        <tr>
+                            <td>1,002</td>
+                            <td>placeholder</td>
+                            <td>irrelevant</td>
+                            <td>visual</td>
+                            <td>layout</td>
+                        </tr>
+                        <tr>
+                            <td>1,003</td>
+                            <td>data</td>
+                            <td>rich</td>
+                            <td>dashboard</td>
+                            <td>tabular</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+
+                </div>
+            </main>
+        </div>
     </div>
-</div>
 {% endblock %}
