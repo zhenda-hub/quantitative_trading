@@ -183,7 +183,11 @@ LOGGING = {
         'django': {             # 默认的logger应用如下配置
             'handlers': ['default', 'console', 'error'],  # 上线之后可以把'console'移除
             'level': 'INFO',
-            'propagate': True,  # 向不向更高级别的logger传递
+            'propagate': False,  # 向不向 父logger传递
         },
     },
+    'root': {
+            'handlers': ['default', 'console', 'error'],  # 上线之后可以把'console'移除
+            'level': 'INFO',
+    }
 }
