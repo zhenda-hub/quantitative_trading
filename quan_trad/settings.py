@@ -37,9 +37,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "login",
-    "update_notice",
-    "web",
+    "user",  # 用户模块
+    "update_notice",  # 更新公告模块
+    "web",  # 主应用模块
 ]
 
 MIDDLEWARE = [

@@ -18,7 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("login/", include('login.urls', namespace='login')),  # 登录模块
+    path("user/", include('user.urls', namespace='user')),  # 登录模块
     path("update_notice/", include('update_notice.urls', namespace='update_notice')),  # 更新公告模块
     path("", include('web.urls', namespace='web')),  # 主应用模块
 ]

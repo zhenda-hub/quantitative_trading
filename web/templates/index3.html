@@ -34,18 +34,26 @@
             </form>
 
             <ul class="navbar-nav justify-content-end">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login:login' %}">登录</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
-                       aria-expanded="false">zhenda</a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">我的关注</a>
-                        <a class="dropdown-item" href="#">提醒设置</a>
-                        <a class="dropdown-item" href="#">退出</a>
-                    </div>
-                </li>
+                {% if not cur_user %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:register' %}">注册</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:login' %}">登录</a>
+                    </li>
+                {% else %}
+{#                    fsdfsdsdfsdf{{ cur_user }}#}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
+                           aria-expanded="false">zhenda</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">我的关注</a>
+                            <a class="dropdown-item" href="#">提醒设置</a>
+                            <a class="dropdown-item" href="{% url 'user:logout' %}">退出</a>
+                        </div>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </nav>
