@@ -164,7 +164,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
             'filename': LOG_PATH / "all.log",  # 日志文件
-            'maxBytes': 1024 * 1024 * 50,                    # 日志大小 50M
+            'maxBytes': 1024 * 1024 * 5,                    # 日志大小 5M
             'backupCount': 3,                                # 最多备份几个
             'formatter': 'simple',
             'encoding': 'utf-8',
@@ -173,7 +173,7 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
             'filename': LOG_PATH / "error.log",  # 日志文件
-            'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+            'maxBytes': 1024 * 1024 * 5,  # 日志大小 5M
             'backupCount': 5,
             'formatter': 'simple',
             'encoding': 'utf-8',
