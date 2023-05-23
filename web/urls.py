@@ -20,4 +20,6 @@ from . import views
 app_name = 'web'
 urlpatterns = [
     path("", views.index),
+    path("large_plate/", views.large_plate, name='large_plate'),
+    path("industry/", views.industry, name='industry'),
 ]

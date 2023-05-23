@@ -1,0 +1,21 @@
+{% extends 'index3.html' %}
+{% load static %}
+
+
+{% block body-left %}
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link active" href="#">图片</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">数据</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">估值指标</a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block body-right %}
+    {{ df_html }}
+{% endblock %}
