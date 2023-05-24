@@ -20,7 +20,7 @@ def get_all_stock_eq():
     quotation = easyquotation.use('sina')  # 新浪 ['sina'] 腾讯 ['tencent', 'qq']
     d1 = quotation.market_snapshot(prefix=True)  # prefix 参数指定返回的行情字典中的股票代码 key 是否带 sz/sh 前缀
     df = pd.DataFrame(d1).T
-    df.to_excel('all_data_by_eq.xlsx')
+    df.to_excel('useful_datas/all_data_by_eq.xlsx')
     d2 = quotation.real('162411')  # 支持直接指定前缀，如 'sh000001'
 
 
