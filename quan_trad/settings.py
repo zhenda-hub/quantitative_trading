@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "web",  # 主应用模块
 ]
 
+# from django.contrib.sessions.middleware import SessionMiddleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

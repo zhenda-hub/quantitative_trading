@@ -3,6 +3,7 @@ import pdb
 from django.shortcuts import render, redirect
 import pandas_datareader as pdr
 from django.utils.timezone import now
+from django.http.response import HttpResponseBase
 
 
 # Create your views here.
