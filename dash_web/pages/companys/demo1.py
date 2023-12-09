@@ -31,7 +31,7 @@ layout = html.Div(
 )
 def display_candlestick(value):
     # "https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv"
-    df = pd.read_excel("datas/gegu_stock_ak.xlsx")
+    df = pd.read_excel("datas/stocks/gegu_stock_ak.xlsx")
 
     fig = go.Figure(
         go.Candlestick(
@@ -46,5 +46,5 @@ def display_candlestick(value):
     return fig
 
 
-if __name__ == "__main__":
-    app.run_server(debug=True)
+# if __name__ == "__main__":
+#     app.run_server(debug=True)

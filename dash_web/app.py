@@ -7,7 +7,7 @@ external_stylesheets = [dbc.themes.BOOTSTRAP]
 app = Dash(__name__, use_pages=True, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
-    html.H1('Multi-page app with Dash Pages'),
+    html.H1("Zhenda's quan"),
     # dbc.Row(
     #     [
     #         dbc.Col(
