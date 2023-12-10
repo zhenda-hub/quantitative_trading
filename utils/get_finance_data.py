@@ -33,7 +33,23 @@ MAIN_INDEX_SYMBOL_NAME_DICT = {
     # '^TSX': "加拿大",
 }
 
+VIRTUAL_SYMBOL_NAME_DICT = {
+    'BTC': "比特币",
+    'ETH': "以太坊",
+    'USDT': "泰达币",
+    'XRP': "XRP",
+    'BNB': "BNB",
+    'SOL': "Solana",
+}
 
+CPI_NAME_FILE_DICT = {
+    'australia': "macro_australia_cpi_yearly.csv",
+    'canada': "macro_canada_cpi_yearly.csv",
+    'china': "macro_china_cpi_yearly.csv",
+    'euro': "macro_euro_cpi_yoy.csv",
+    'japan': "macro_japan_cpi_yearly.csv",
+    'usa': "macro_usa_cpi_yoy.csv",
+}
 # funcs = {
 #     # 大盘 宽基
 #     'wide_base': [
@@ -44,11 +60,24 @@ MAIN_INDEX_SYMBOL_NAME_DICT = {
 #
 #         ak.stock_hk_index_spot_em(),
 #         ak.stock_hk_index_daily_em(symbol="HSI"),  # 恒生指数
-#
+#         ak.crypto_hist  # 虚拟货币历史NG
+#         'https://cn.investing.com/crypto/currencies'  # 虚拟货币url
+
+        # ak.macro_china_pmi_yearly, # pmi(宏观经济好不好)
+        # ak.macro_china_money_supply,  # 中国货币供应量
+        # # ppi生产者物价指数(生产成本)
+        # # ak.macro_china_cpi_yearly,  # cpi消费者物价指数
+        # ak.macro_usa_cpi_yoy,  # cpi 美国
+        # ak.macro_euro_cpi_yoy,  # cpi 欧元区
+        #
+        # ak.macro_australia_cpi_yearly,
+        # ak.macro_canada_cpi_yearly,
+        # ak.macro_japan_cpi_yearly,
+
+
 #         ak.fund_portfolio_hold_em,  # 基金持仓1
 #         ak.fund_portfolio_industry_allocation_em,  # 基金持仓2
 #
-#         ak.crypto_hist,  # 虚拟货币
 #
 #         ak.stock_zh_index_spot,  # 大盘指数
 #         ak.stock_zh_index_daily,  # 大盘指数
@@ -104,8 +133,6 @@ MAIN_INDEX_SYMBOL_NAME_DICT = {
 
 def get_maotai():
     # 定义起始日期和结束日期
-    datetime.datetime()
-
     start_date = datetime.datetime.now() - datetime.timedelta(days=5 * 365)
     end_date = datetime.datetime.now()
 
@@ -125,43 +152,84 @@ def get_all_stock_eq():
     pdb.set_trace()
 
 
-# def get_index_ak():
-#     for func in funcs['wide_base']:
-#         df = func()
-#         pdb.set_trace()
-#         time.sleep(2)
-#
-#
-# def get_stock_ak():
-#     for func in funcs['stocks']:
-#         df = func()
-#         pdb.set_trace()
-#         time.sleep(2)
-
-
 def merge_indexes():
-    indexes_path = Path('datas/indexes')
-    csv_paths = [indexes_path / f'{k}.csv' for k in MAIN_INDEX_SYMBOL_NAME_DICT]
-    df_list = [pd.read_csv(csv_path) for csv_path in csv_paths]
-    df_list_close = []
-    for df in df_list:
-        if '日期' in df.columns:
-            df.rename(columns={'日期': 'date', '收盘': 'close'}, inplace=True)
-        df_list_close.append(df[['date', 'close']])
-
+    base_path = Path('datas/indexes')
+    csv_paths = [base_path / f'{k}.csv' for k in MAIN_INDEX_SYMBOL_NAME_DICT]
 
     new_columns = list(MAIN_INDEX_SYMBOL_NAME_DICT.values())
     new_columns.insert(0, 'date')
-    # breakpoint()
+    target_columns = ['date', 'close']
+    addr = merge_res(csv_paths, target_columns, new_columns, 'datas/indexes/all_indexes_data.csv')
+    print('addr:', addr)
 
-    df_m = pd.merge(df_list_close[0], df_list_close[1], how='outer', on='date')
-    for i, df in enumerate(df_list_close[2:]):
-        df_m = df_m.merge(df, how='outer', on='date', suffixes=(f'_{i}', f'_{i+1}'))
+
+def merge_virtuals():
+    base_path = Path('datas/virtual')
+    csv_paths = [base_path / f'{v}历史数据.csv' for v in VIRTUAL_SYMBOL_NAME_DICT.values()]
+
+    new_columns = list(VIRTUAL_SYMBOL_NAME_DICT.values())
+    new_columns.insert(0, 'date')
+    target_columns = ['date', 'close']
+
+    addr = merge_res(csv_paths, target_columns, new_columns, 'datas/virtual/all_virtual_data.csv')
+    print('addr:', addr)
+
+
+def merge_cpis():
+    """
+    消费者物价指数年率
+    """
+    base_path = Path('datas/cpis')
+    csv_paths = [base_path / v for v in CPI_NAME_FILE_DICT.values()]
+
+    new_columns = list(CPI_NAME_FILE_DICT.keys())
+    new_columns.insert(0, 'date')
+
+    target_columns = ['时间', '现值']
+    breakpoint()
+    addr = merge_res(csv_paths, target_columns, new_columns, 'datas/cpis/all_cpi_data.csv')
+    print('addr:', addr)
+
+
+def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_csv: str):
+    """
+
+    Args:
+        csv_paths:
+        target_columns: first must be time , will convert to datetime, sorted
+        new_columns:
+        output_csv:
+
+    Returns:
+
+    """
+
+    df_list = [pd.read_csv(csv_path) for csv_path in csv_paths]
+    df_list_target = []  # target df
+    for df in df_list:
+        # if '日期' in df.columns:
+        #     df.rename(columns={'日期': 'date', '收盘': 'close'}, inplace=True)
+        # breakpoint()
+        try:
+            df[target_columns[0]] = pd.to_datetime(df[target_columns[0]])
+        except:
+            df[target_columns[0]] = pd.to_datetime(df[target_columns[0]], format='%Y年%m月')
+        df_list_target.append(df[target_columns])
+    breakpoint()
+    df_m = pd.merge(df_list_target[0], df_list_target[1], how='outer', on=target_columns[0])
+    for i, df in enumerate(df_list_target[2:]):
+        df_m = df_m.merge(df, how='outer', on=target_columns[0], suffixes=(f'_{i}', f'_{i+1}'))
 
     df_m.columns = new_columns
+
+
     df_m.sort_values('date', inplace=True)
+
+    print(df_m.dtypes)
     breakpoint()
-    df_m.to_csv('datas/indexes/all_indexes_data.csv', index=False)
+    # pd.to_numeric()
+    df_m.to_csv(output_csv, index=False)
+    return output_csv
 
 
 def get_industries():
@@ -177,18 +245,29 @@ def get_other_indexes():
     nikkei = yf.Ticker("^N225")
 
     # 获取历史数据时间范围
-    hist = nikkei.history(start="2010-01-01", end="2023-02-28")
+    hist = nikkei.history(start="2010-01-01", end="2023-02-28")  # FIXME: not work
 
     # 将数据转换为DataFrame
     df = pd.DataFrame(hist)
+    breakpoint()
+
+
+def get_datas_from_url(url: str):
+    df = pd.read_html(url)
+    breakpoint()
 
 
 if __name__ == '__main__':
+    # merge_virtuals()
+    # merge_cpis()
     breakpoint()
     # ak.index_investing_global_from_url('https://www.investing.com/indices/germany-30-futures', end_date='20550102')
     # ak.index_investing_global(area="德国", symbol ="德国DAX30指数", period ="每日", start_date ="20050101", end_date ="20550605")
 
     # df['Date'] = df['Date'].map(lambda x: x.strftime('%Y-%m-%d'))
+    # df_m['比特币'] = df_m['比特币'].str.replace(',', '')
+    # df_m['比特币'] = df_m['比特币'].astype(float)
+    # df_m['以太坊'] = df_m['以太坊'].str.replace(',', '')
+    # df_m['以太坊'] = df_m['以太坊'].astype(float)
 
-
-    merge_indexes()
+    # merge_indexes()
