@@ -13,24 +13,25 @@ import dash
 dash.register_page(__name__)
 # app = Dash(__name__, use_pages=True, pages_folder="my_apps")
 
-df = pd.read_csv("datas/indexes/all_indexes_data.csv")
+df = pd.read_csv("datas/cpis/all_cpi_data.csv")
 # breakpoint()
-fig = px.line(
+# fig = px.line(
+fig = px.scatter(
     df,
     x="date",
     y=df.columns,
     hover_data={"date": "|%B %d, %Y"},
-    title='indexes chart',
+    title='cpis chart',
 
 )
 fig.update_layout(
     height=1000,
     # xaxis_title='花萼宽度（cm）',
-    yaxis_title='CNY(人民币)',
+    yaxis_title='cpi年率(e.g., 数值为2.5，意味着物价一年涨2.5%)',
 
 )
-print('fig.layout.height', fig.layout.height)
-print('fig.layout.width', fig.layout.width)
+# print('fig.layout.height', fig.layout.height)
+# print('fig.layout.width', fig.layout.width)
 
 fig.update_xaxes(
     # dtick="M1",
@@ -56,7 +57,7 @@ fig.update_xaxes(
 
 layout = html.Div(
     [
-        html.H4("全球经济走势，关注变化，而不是价格"),
+        html.H4("全球cpi年率，反应物价波动状况"),
         # dcc.Checklist(
         #     id="toggle-rangeslider",
         #     options=[{"label": "Include Rangeslider", "value": "slider"}],
