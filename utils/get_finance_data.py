@@ -15,9 +15,9 @@ MAIN_INDEX_SYMBOL_NAME_DICT = {
     'DJI':  "道琼斯工业平均指数",
     'IXIC': "纳斯达克综合指数",
 
-    'HSI': "香港恒生指数",
+    'HSI': "香港恒生指数",  # * 0.128 = 美元
 
-    '000001': "中国上证指数",
+    '000001': "中国上证指数",  # *0.145=美元
     '399001': "中国深证指数",
     '000300': "沪深300指数",
     '000016': "上证50",
@@ -25,12 +25,13 @@ MAIN_INDEX_SYMBOL_NAME_DICT = {
     '000015': "上证红利",
     '000922': "中证红利",
 
-    # '^N225': "日经225",
-    # '^KS11': "韩国KOSPI",
-    # '^STI': "富时新加波",
-    # '^GDAXI': "德国DAX30",
-    # '^FTSE': "英国富时100",
-    # '^TSX': "加拿大",
+    '日经225指数历史数据': "日经225指数",  # *0.008=美元
+    '韩国KOSPI指数历史数据': "韩国KOSPI指数",  # *0.0008=美元
+
+    'MSCI新加坡指数历史数据': "MSCI新加坡指数",  # *1.36=美元
+    'MSCI加拿大指数历史数据': "MSCI加拿大指数",  # *0.76=美元
+
+    'MSCI欧盟指数历史数据': "MSCI欧盟指数",  # *1.1=美元
 }
 
 VIRTUAL_SYMBOL_NAME_DICT = {
@@ -75,8 +76,9 @@ CPI_NAME_FILE_DICT = {
         # ak.macro_japan_cpi_yearly,
 
 
-#         ak.fund_portfolio_hold_em,  # 基金持仓1
-#         ak.fund_portfolio_industry_allocation_em,  # 基金持仓2
+        # ak.fund_portfolio_hold_em,  # 基金持仓
+        # ak.fund_portfolio_industry_allocation_em,  # 基金行业配置
+        # ak.fund_report_industry_allocation_cninfo,  # 基金行业配置2
 #
 #
 #         ak.stock_zh_index_spot,  # 大盘指数
@@ -158,7 +160,8 @@ def merge_indexes():
 
     new_columns = list(MAIN_INDEX_SYMBOL_NAME_DICT.values())
     new_columns.insert(0, 'date')
-    target_columns = ['date', 'close']
+    # target_columns = ['date', 'close']
+    target_columns = ["日期", "收盘"]
     addr = merge_res(csv_paths, target_columns, new_columns, 'datas/indexes/all_indexes_data.csv')
     print('addr:', addr)
 
@@ -227,6 +230,10 @@ def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_c
 
     print(df_m.dtypes)
     breakpoint()
+    # df_m['比特币'] = df_m['比特币'].str.replace(',', '')
+    # df_m['比特币'] = df_m['比特币'].astype(float)
+    # df_m['以太坊'] = df_m['以太坊'].str.replace(',', '')
+    # df_m['以太坊'] = df_m['以太坊'].astype(float)
     # pd.to_numeric()
     df_m.to_csv(output_csv, index=False)
     return output_csv
@@ -260,14 +267,12 @@ def get_datas_from_url(url: str):
 if __name__ == '__main__':
     # merge_virtuals()
     # merge_cpis()
+    # merge_indexes()
     breakpoint()
     # ak.index_investing_global_from_url('https://www.investing.com/indices/germany-30-futures', end_date='20550102')
     # ak.index_investing_global(area="德国", symbol ="德国DAX30指数", period ="每日", start_date ="20050101", end_date ="20550605")
 
     # df['Date'] = df['Date'].map(lambda x: x.strftime('%Y-%m-%d'))
-    # df_m['比特币'] = df_m['比特币'].str.replace(',', '')
-    # df_m['比特币'] = df_m['比特币'].astype(float)
-    # df_m['以太坊'] = df_m['以太坊'].str.replace(',', '')
-    # df_m['以太坊'] = df_m['以太坊'].astype(float)
+
 
     # merge_indexes()

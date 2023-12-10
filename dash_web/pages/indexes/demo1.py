@@ -13,20 +13,26 @@ import dash
 dash.register_page(__name__)
 # app = Dash(__name__, use_pages=True, pages_folder="my_apps")
 
-df = pd.read_csv("datas/indexes/all_indexes_data.csv")
+
+# breakpoint()
+
+df = pd.read_csv("datas/indexes/all_indexes_data_usd.csv")
 # breakpoint()
 fig = px.line(
+# fig = px.area(
+# fig = px.scatter(
     df,
     x="date",
     y=df.columns,
     hover_data={"date": "|%B %d, %Y"},
     title='indexes chart',
+    color_discrete_sequence=px.colors.qualitative.Dark24,  # Alphabet, Light24, Dark24
 
 )
 fig.update_layout(
     height=1000,
     # xaxis_title='花萼宽度（cm）',
-    yaxis_title='CNY(人民币)',
+    yaxis_title='USD(美元)',
 
 )
 print('fig.layout.height', fig.layout.height)
@@ -37,6 +43,7 @@ fig.update_xaxes(
     # tickformat="%b\n%Y",
     # tickformat="%Y",
     rangeslider_visible=True,  # 添加滑动块
+    minor=dict(ticks="inside", showgrid=True),  # 辅助刻度
     # 范围选择器按钮
     rangeselector=dict(
         buttons=list([
