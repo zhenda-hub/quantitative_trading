@@ -42,7 +42,31 @@ def display_candlestick(value):
             close=df["close"],
         )
     )
-    fig.update_layout(xaxis_rangeslider_visible="slider" in value)
+    fig.update_layout(
+        xaxis_rangeslider_visible="slider" in value,
+        height=1000,
+    )
+    fig.update_xaxes(
+        # dtick="M1",
+        # tickformat="%b\n%Y",
+        # tickformat="%Y",
+        rangeslider_visible=True,  # 添加滑动块
+        # 范围选择器按钮
+        rangeselector=dict(
+            buttons=list([
+                dict(count=1, label="1month", step="month", stepmode="backward"),
+                dict(count=6, label="6month", step="month", stepmode="backward"),
+                # dict(count=1, label="YTD", step="year", stepmode="todate"),
+                dict(count=1, label="1year", step="year", stepmode="backward"),
+                dict(count=3, label="3year", step="year", stepmode="backward"),
+                dict(count=5, label="5year", step="year", stepmode="backward"),
+                dict(count=10, label="10year", step="year", stepmode="backward"),
+                dict(count=20, label="20year", step="year", stepmode="backward"),
+                dict(step="all")
+            ])
+        )
+        # ticklabelmode="period"
+    )
     return fig
 
 
