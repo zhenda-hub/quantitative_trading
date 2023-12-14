@@ -51,6 +51,28 @@ CPI_NAME_FILE_DICT = {
     'japan': "macro_japan_cpi_yearly.csv",
     'usa': "macro_usa_cpi_yoy.csv",
 }
+
+UNEMP_NAME_FILE_DICT = {
+    'australia': "australia_unemps.csv",
+    'canada': "canada_unemps.csv",
+    'china': "china_unemps.csv",
+    'euro': "euro_unemps.csv",
+    'japan': "japan_unemps.csv",
+    'usa': "usa_unemps.csv",
+}
+
+GDP_NAME_FILE_DICT = {
+    'china': "china_gdp.csv",
+    'euro': "euro_gdp.csv",
+    'usa': "usa_gdp.csv",
+}
+
+PERIOD_ACTION = {
+    '上升': ['持续买股票'],
+    '高点': ['卖出股票', '买债券，黄金'],
+    '下降': ['买债券，黄金', '不碰股票'],
+    '低点': ['买股票', '卖债券，黄金'],
+}
 # funcs = {
 #     # 大盘 宽基
 #     'wide_base': [
@@ -64,13 +86,30 @@ CPI_NAME_FILE_DICT = {
 #         ak.crypto_hist  # 虚拟货币历史NG
 #         'https://cn.investing.com/crypto/currencies'  # 虚拟货币url
 
+        # gdp
+        # ak.macro_china_gdp_yearly,  # gdp
+        # ak.macro_china_gdp,  # gdp
+        # ak.macro_china_hk_gbp()  # FIXME: not work
+        # ak.macro_usa_gdp_monthly()  # usa gdp
+        # ak.macro_euro_gdp_yoy()  # euro gdp
+
+        # unemp
+        # ak.macro_china_urban_unemployment,  # china
+        # ak.macro_china_hk_rate_of_unemployment, # hk unemp FIXME: not work
+        # ak.macro_usa_unemployment_rate, # usa unemp
+        # ak.macro_euro_unemployment_rate_mom,  # euro
+        # ak.macro_japan_unemployment_rate,  # japan
+        # ak.macro_australia_unemployment_rate,  # australia
+        # ak.macro_canada_unemployment_rate,  # canada
+
         # ak.macro_china_pmi_yearly, # pmi(宏观经济好不好)
         # ak.macro_china_money_supply,  # 中国货币供应量
         # # ppi生产者物价指数(生产成本)
-        # # ak.macro_china_cpi_yearly,  # cpi消费者物价指数
+
+        # cpi
+        # ak.macro_china_cpi_yearly,  # cpi消费者物价指数
         # ak.macro_usa_cpi_yoy,  # cpi 美国
         # ak.macro_euro_cpi_yoy,  # cpi 欧元区
-        #
         # ak.macro_australia_cpi_yearly,
         # ak.macro_canada_cpi_yearly,
         # ak.macro_japan_cpi_yearly,
@@ -92,15 +131,26 @@ CPI_NAME_FILE_DICT = {
 #         ak.google_index,  # 谷歌指数
 #         ak.fund_aum_em,
 #     ],
-#     # 行业 窄基
+#     # 行业 窄基, 看5年即可
 #     'narrow_base': [
-#         ak.stock_board_concept_name_ths,  # 概念板块-名称
-#         ak.stock_board_industry_name_em,  # 行业板块-名称
-#         ak.stock_board_industry_info_ths,  # 行业板块-板块简介
+#         ak.stock_fund_flow_industry
+#         ak.stock_sector_fund_flow_hist,
+#         ak.fund_fh_rank_em,  # 分红排行榜， FIXME: not work
+
+#         ak.stock_board_concept_name_ths,  # 概念板块-名称， 容易炒作
 #         ak.stock_board_concept_info_ths,  # 概念板块-板块简介
+
+        # ak.stock_board_industry_name_em,  # 行业板块-名称， 推荐
+        # ak.stock_board_industry_cons_em,  # 东财行业成分股， 推荐
+#         ak.stock_board_industry_summary_ths,  # 同花顺行业一览表
+
+#         ak.stock_board_cons_ths,  #  同花顺行业成分股， FIXME: not work
+
+        # ak.stock_board_industry_info_ths,  # 行业板块-板块简介, 信息很少，没用
+#         ak.stock_board_industry_index_ths,  # 行业指数
+
 #         ak.stock_industry_pe_ratio_cninfo,  # 行业市盈率
 #         ak.stock_classify_sina,  # 按 symbol 分类后的股票
-#         ak.stock_board_industry_summary_ths,  # 同花顺行业一览表
 #     ],
 #     'stocks': [
 #         # 个股
@@ -133,25 +183,25 @@ CPI_NAME_FILE_DICT = {
 # }
 
 
-def get_maotai():
-    # 定义起始日期和结束日期
-    start_date = datetime.datetime.now() - datetime.timedelta(days=5 * 365)
-    end_date = datetime.datetime.now()
-
-    # 使用yfinance获取贵州茅台股票数据
-    df = yf.download('600519.SS', start=start_date, end=end_date)
-    pdb.set_trace()
-
-
-def get_all_stock_eq():
-    """
-    使用 easyquotation 获取所有数据
-    """
-    quotation = easyquotation.use('sina')  # 新浪 ['sina'] 腾讯 ['tencent', 'qq']
-    d1 = quotation.market_snapshot(prefix=True)  # prefix 参数指定返回的行情字典中的股票代码 key 是否带 sz/sh 前缀
-    df = pd.DataFrame(d1).T
-    d2 = quotation.real('162411')  # 支持直接指定前缀，如 'sh000001'
-    pdb.set_trace()
+# def get_maotai():
+#     # 定义起始日期和结束日期
+#     start_date = datetime.datetime.now() - datetime.timedelta(days=5 * 365)
+#     end_date = datetime.datetime.now()
+#
+#     # 使用yfinance获取贵州茅台股票数据
+#     df = yf.download('600519.SS', start=start_date, end=end_date)
+#     pdb.set_trace()
+#
+#
+# def get_all_stock_eq():
+#     """
+#     使用 easyquotation 获取所有数据
+#     """
+#     quotation = easyquotation.use('sina')  # 新浪 ['sina'] 腾讯 ['tencent', 'qq']
+#     d1 = quotation.market_snapshot(prefix=True)  # prefix 参数指定返回的行情字典中的股票代码 key 是否带 sz/sh 前缀
+#     df = pd.DataFrame(d1).T
+#     d2 = quotation.real('162411')  # 支持直接指定前缀，如 'sh000001'
+#     pdb.set_trace()
 
 
 def merge_indexes():
@@ -191,6 +241,38 @@ def merge_cpis():
     target_columns = ['时间', '现值']
     breakpoint()
     addr = merge_res(csv_paths, target_columns, new_columns, 'datas/cpis/all_cpi_data.csv')
+    print('addr:', addr)
+
+
+def merge_unemps():
+    """
+    失业率
+    """
+    base_path = Path('datas/unemps')
+    csv_paths = [base_path / v for v in UNEMP_NAME_FILE_DICT.values()]
+
+    new_columns = list(UNEMP_NAME_FILE_DICT.keys())
+    new_columns.insert(0, 'date')
+
+    target_columns = ['时间', '现值']
+    # breakpoint()
+    addr = merge_res(csv_paths, target_columns, new_columns, 'datas/unemps/all_unemps_data.csv')
+    print('addr:', addr)
+
+
+def merge_gdps():
+    """
+    GDP
+    """
+    base_path = Path('datas/gdps')
+    csv_paths = [base_path / v for v in GDP_NAME_FILE_DICT.values()]
+
+    new_columns = list(GDP_NAME_FILE_DICT.keys())
+    new_columns.insert(0, 'date')
+
+    target_columns = ['日期', '今值']
+    # breakpoint()
+    addr = merge_res(csv_paths, target_columns, new_columns, 'datas/gdps/all_gdps_data.csv')
     print('addr:', addr)
 
 
@@ -239,11 +321,11 @@ def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_c
     return output_csv
 
 
-def get_industries():
+def get_top_industries():
     pass
 
 
-def get_top_10_by_industry(industry: str):
+def get_top_3_by_industry(industry: str):
     pass
 
 
@@ -264,11 +346,33 @@ def get_datas_from_url(url: str):
     breakpoint()
 
 
+def get_period(unemp_month_on_month: float, cpi_month_on_month: float, threshold=0.05):
+    print(f'unemp: {unemp_month_on_month}， cpi： {cpi_month_on_month}')
+
+    if unemp_month_on_month > 0 and cpi_month_on_month > 0:
+        if unemp_month_on_month > threshold and cpi_month_on_month > threshold:
+            return '上升'
+        else:
+            return '高点'
+    if unemp_month_on_month < 0 and cpi_month_on_month < 0:
+        if abs(unemp_month_on_month) > threshold and abs(cpi_month_on_month) > threshold:
+            return '下降'
+        else:
+            return '低点'
+
+    return '未知'
+
+
 if __name__ == '__main__':
     # merge_virtuals()
     # merge_cpis()
     # merge_indexes()
+    # merge_unemps()
+    # merge_gdps()
     breakpoint()
+    # ak.stock_board_industry_info_ths
+    # pd.DataFrame().sort_values()
+
     # ak.index_investing_global_from_url('https://www.investing.com/indices/germany-30-futures', end_date='20550102')
     # ak.index_investing_global(area="德国", symbol ="德国DAX30指数", period ="每日", start_date ="20050101", end_date ="20550605")
 
