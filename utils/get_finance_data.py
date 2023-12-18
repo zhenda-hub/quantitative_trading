@@ -115,6 +115,10 @@ PERIOD_ACTION = {
         # ak.macro_japan_cpi_yearly,
 
 
+        # 可转债
+        # ak.bond_zh_cov_value_analysis,  # 可转债价值分析
+#         ak.bond_zh_us_rate,  # 国债收益率
+
         # ak.fund_portfolio_hold_em,  # 基金持仓
         # ak.fund_portfolio_industry_allocation_em,  # 基金行业配置
         # ak.fund_report_industry_allocation_cninfo,  # 基金行业配置2
@@ -124,7 +128,6 @@ PERIOD_ACTION = {
 #         ak.stock_zh_index_daily,  # 大盘指数
 #         # ak.reits_realtime_em,  # reits
 #         # ak.index_value_name_funddb,  # 指数
-#         ak.bond_zh_us_rate,  # 国债收益率
 #         ak.stock_a_ttm_lyr,  # 中位数市盈率
 #         ak.fund_aum_hist_em,  # 基金规模
 #         ak.fund_report_industry_allocation_cninfo,  # 基金行业配置

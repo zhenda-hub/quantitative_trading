@@ -32,7 +32,8 @@ app.layout = html.Div([
     html.Div([
         html.Div(
             dcc.Link(f"{page['name']} - {page['path']}", href=page["relative_path"])
-        ) for page in dash.page_registry.values()
+            # dcc.Link(f"{page['name']}", href=page["relative_path"])
+        ) for page in dash.page_registry.values()  # TODO: set title
     ]),
     dash.page_container
 ])

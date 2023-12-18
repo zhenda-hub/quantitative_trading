@@ -10,7 +10,7 @@ import dash
 # BASE_DIR = Path(__file__).resolve().parent.parent
 # sys.path.append(str(BASE_DIR))
 
-dash.register_page(__name__)
+dash.register_page(__name__, name='period')
 # app = Dash(__name__, use_pages=True, pages_folder="my_apps")
 
 
@@ -44,7 +44,7 @@ def gene_fig(csv_path: str, yaxis_title: str, title: str):
         rangeselector=dict(
             buttons=list([
                 dict(count=1, label="1month", step="month", stepmode="backward"),
-                dict(count=6, label="6month", step="month", stepmode="backward"),
+                dict(count=6, label="6month", step="month", stepmode="backward"),  # TODO: set default
                 # dict(count=1, label="YTD", step="year", stepmode="todate"),
                 dict(count=1, label="1year", step="year", stepmode="backward"),
                 dict(count=3, label="3year", step="year", stepmode="backward"),
