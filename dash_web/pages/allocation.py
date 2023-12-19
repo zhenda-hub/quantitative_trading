@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import dash
+from plotly.subplots import make_subplots
 # from pathlib import Path
 # import sys
 #
@@ -21,7 +22,8 @@ layout = html.Div(
         #     options=[{"label": "Include Rangeslider", "value": "slider"}],
         #     value=["slider"],
         # ),
-        dcc.Graph(id="graph_p",),
+        # dcc.Graph(id="graph_p",),
+        dcc.Graph(id="graph_p2",),
         # html.Label("输入5个数据（用逗号分隔）："),
         # text = '股票'
         html.P('股票'),
@@ -46,10 +48,10 @@ layout = html.Div(
             type='number',
             value=1000
         ),
-        html.P('零钱'),
+        html.P('货币基金'),
         dcc.Input(
             id='input_4',
-            placeholder='零钱',
+            placeholder='货币基金',
             type='number',
             value=1000
         ),
@@ -65,38 +67,69 @@ layout = html.Div(
 )
 
 
+# @callback(
+#     Output("graph_p", "figure"),
+#     Input("input_1", "value"),
+#     Input("input_2", "value"),
+#     Input("input_3", "value"),
+#     Input("input_4", "value"),
+# )
+# def display_alloc(*args, **kwargs):
+#     # "https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv"
+#     # df = pd.read_csv("datas/indexes/all_indexes_data.csv")
+#     # breakpoint()
+#     labels = ['股票', '指数基金', '债券', '货币基金']
+#     df = pd.DataFrame(dict(
+#         labels=labels,
+#         category=['激进', '激进', '稳定', '稳定'],
+#         values=list(args)
+#     ))
+#     print('df', df)
+#
+#     fig = px.sunburst(df, path=['category', 'labels'], values='values')
+#     # fig = px.sunburst(df, path=['category', 'labels'], values='values', color='labels')
+#
+#     fig.update_layout(
+#         title=f'资产配置旭日图， 总计: {sum(args)}',
+#         height=600,
+#     )
+#     return fig
+
+
 @callback(
-    Output("graph_p", "figure"),
+    Output("graph_p2", "figure"),
     Input("input_1", "value"),
     Input("input_2", "value"),
     Input("input_3", "value"),
     Input("input_4", "value"),
 )
-def display_alloc(*args, **kwargs):
+def display_alloc2(*args, **kwargs):
     # "https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv"
     # df = pd.read_csv("datas/indexes/all_indexes_data.csv")
     # breakpoint()
-    labels = ['股票', '指数基金', '债券', '零钱']
+    labels = ['股票', '指数基金', '债券', '货币基金']
     df = pd.DataFrame(dict(
         labels=labels,
         category=['激进', '激进', '稳定', '稳定'],
         values=list(args)
     ))
     print('df', df)
-    # dct = {}
-    # df = px.data.tips()
-    # return px.sunburst(df, path=['day', 'time', 'sex'], values='total_bill')
 
-    # fig = px.sunburst(df, path=['category', 'labels'], values='values', color='labels')
-    fig = px.sunburst(df, path=['category', 'labels'], values='values')
     # fig = go.Figure(data=[go.Pie(values=list(args), labels=labels)])
+    fig = px.pie(
+        df,
+        values='values',
+        names='labels',
+        hover_data=['category']
+    )
+    fig.update_traces(textinfo='percent+value')  # 设置显示内容
+    # fig.update_traces(textposition='inside')
 
     fig.update_layout(
-        title='资产配置分布图',
+        title=f'资产配置饼图， 总计: {sum(args)}',
         height=600,
     )
     return fig
-
 
 # # if __name__ == "__main__":
 # #     app.run_server(debug=True)
