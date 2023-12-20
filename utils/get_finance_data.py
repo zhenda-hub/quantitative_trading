@@ -366,12 +366,23 @@ def get_period(unemp_month_on_month: float, cpi_month_on_month: float, threshold
     return '未知'
 
 
+def get_bond():
+    # get_datas_from_url('https://app.jisilu.cn/web/data/cb/list')
+    df = ak.bond_cb_jsl(cookie="kbzw__Session=s81b1un9m9187t896kt8mlg1c2; Hm_lvt_164fe01b1433a19b507595a43bf58262=1703006843; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZiglKSprJ6uopido7a41dCjrt_b3eXhyqihpZKWic7g4dzQ59SUx8mJqpylkrGBzuDhrpWrgeyvqZKZrefS4sbO3NXDyuSQqaysl6yil4rBqcvEv6SB3Mrf3pWw3s_i0Z-But_l587VkKWrpZepmqeQpoHK2NnZ09mQqaysl6yil6fayKaopaiPoI-kp6U.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1703008180; SERVERID=0e73f01634e37a9af0b56dfcd9143ef3|1703008222|1703006836")
+    breakpoint()
+    df.to_csv(f'datas/bonds/conv_{datetime.datetime.now().strftime("%Y%m%d")}.csv', index=False)
+
+    # df.sort_values(by=['现价', '转股价值', '转股溢价率'], ascending=[True, False, True])
+    # df.sort_values(by=['双低'], ascending=[True])
+
+
 if __name__ == '__main__':
     # merge_virtuals()
     # merge_cpis()
     # merge_indexes()
     # merge_unemps()
     # merge_gdps()
+    # get_bond()
     breakpoint()
     # ak.stock_board_industry_info_ths
     # pd.DataFrame().sort_values()
