@@ -372,8 +372,8 @@ def get_bond():
     breakpoint()
     df.to_csv(f'datas/bonds/conv_{datetime.datetime.now().strftime("%Y%m%d")}.csv', index=False)
 
-    # df.sort_values(by=['现价', '转股价值', '转股溢价率'], ascending=[True, False, True])
-    # df.sort_values(by=['双低'], ascending=[True])
+
+# df2 = ak.bond_cb_redeem_jsl()  # 强赎df
 
 
 if __name__ == '__main__':
