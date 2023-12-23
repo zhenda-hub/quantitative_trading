@@ -368,12 +368,14 @@ def get_period(unemp_month_on_month: float, cpi_month_on_month: float, threshold
 
 def get_bond():
     # get_datas_from_url('https://app.jisilu.cn/web/data/cb/list')
-    df = ak.bond_cb_jsl(cookie="kbzw__Session=s81b1un9m9187t896kt8mlg1c2; Hm_lvt_164fe01b1433a19b507595a43bf58262=1703006843; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZiglKSprJ6uopido7a41dCjrt_b3eXhyqihpZKWic7g4dzQ59SUx8mJqpylkrGBzuDhrpWrgeyvqZKZrefS4sbO3NXDyuSQqaysl6yil4rBqcvEv6SB3Mrf3pWw3s_i0Z-But_l587VkKWrpZepmqeQpoHK2NnZ09mQqaysl6yil6fayKaopaiPoI-kp6U.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1703008180; SERVERID=0e73f01634e37a9af0b56dfcd9143ef3|1703008222|1703006836")
+    # df = ak.bond_cb_jsl(cookie="kbzw__Session=s81b1un9m9187t896kt8mlg1c2; Hm_lvt_164fe01b1433a19b507595a43bf58262=1703006843; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZiglKSprJ6uopido7a41dCjrt_b3eXhyqihpZKWic7g4dzQ59SUx8mJqpylkrGBzuDhrpWrgeyvqZKZrefS4sbO3NXDyuSQqaysl6yil4rBqcvEv6SB3Mrf3pWw3s_i0Z-But_l587VkKWrpZepmqeQpoHK2NnZ09mQqaysl6yil6fayKaopaiPoI-kp6U.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1703008180; SERVERID=0e73f01634e37a9af0b56dfcd9143ef3|1703008222|1703006836")
+    df = ak.bond_cb_jsl(cookie="kbzw__Session=s81b1un9m9187t896kt8mlg1c2; Hm_lvt_164fe01b1433a19b507595a43bf58262=1703006843; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZiglKSprJ6uopido7a41dCjrt_b3eXhyqihpZKWic7g4dzQ59SUx8mJqpylkrGBzuDhrpWrgeyvqZKZrefS4sbO3NXDyuSQqaysl6yil4rBqcvEv6SB3Mrf3pWw3s_i0Z-But_l587VkKWrpZepmqeQpoHK2NnZ09mQqaysl6yil6fayKaopaiPoI-kp6U.; kbz__Session=3ktlma07vpd2kan6ss1si7e5a2; kbz__user_login=1ubd08_P1ebax9aX8dzaz9WZnJ3R1ezo4Oje28DTjKWrxNOYpKzZod6f2JfYltmwxdOR1d-qmqmj3ZfaktmpgquO6eLZx9aXqJasmauwlJGcobrJx9aXqJmmlKask6KXppqwls6t1b-hruLyytzN1aiql6mMn7nfz9fn2OOBws2Vmqmap52WuNzml6SclPGrnaKMuNLmzdjPxtKs3e2knqyjpZWsgZvDqcSuwKWV1eLX3IK9xtbj0JmBt-Hn2ObRppOokaGoj6CPpJnIyt_N6cullqavj6OXlL7Z0KidqZKkkaGoj6A.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1703342263; SERVERID=5452564f5a1004697d0be99a0a2e3803|1703342408|1703338327")
     breakpoint()
     df.to_csv(f'datas/bonds/conv_{datetime.datetime.now().strftime("%Y%m%d")}.csv', index=False)
 
 
 # df2 = ak.bond_cb_redeem_jsl()  # 强赎df
+# ak.bond_zh_cov()  # 申购债券
 
 
 if __name__ == '__main__':

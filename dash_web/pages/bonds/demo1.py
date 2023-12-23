@@ -1,15 +1,17 @@
 from datetime import datetime, timedelta
 
 import pandas as pd
+from dash import Dash, dcc, html, Input, Output, callback, dash_table
+import plotly.graph_objects as go
+import plotly.express as px
+import dash
 
 
-# TODO: 定期更新数据
+# TODO: 12天，更新一次数据
 
-
-# TODO: 展示表格
 
 def common_logic():
-    df = pd.read_csv('datas/bonds/conv_20231220.csv')
+    df = pd.read_csv('datas/bonds/conv_20231223.csv')
 
     # 去掉未来半年到期的
     df['到期时间'] = pd.to_datetime(df['到期时间'])
@@ -20,6 +22,7 @@ def common_logic():
     df = df[~df['正股名称'].str.contains(r'ST|\*')]
 
     # TODO: 不买银行的
+    print(f"转股溢价率平均值： {df['转股溢价率'].mean()}, 双低平均值： {df['双低'].mean()}")
     return df
     # df.sort_values(by=['现价', '转股价值', '转股溢价率'], ascending=[True, False, True])
 
@@ -72,7 +75,34 @@ def get_final_list():
     return final_df
 
 
+dash.register_page(__name__)
+
+df = get_final_list()
+
+layout = html.Div(
+    [
+        html.H4("国内可转债"),
+        html.H6("不买银行的"),
+        # dcc.Checklist(
+        #     id="toggle-rangeslider",
+        #     options=[{"label": "Include Rangeslider", "value": "slider"}],
+        #     value=["slider"],
+        # ),
+        # dash_table.DataTable(data=df.to_dict('records'), page_size=12, style_table={'overflowX': 'auto'})
+        dash_table.DataTable(
+            data=df.to_dict('records'),
+            style_table={'overflowX': 'auto'},
+            sort_action='native',
+        )
+    ]
+)
+
+
 if __name__ == '__main__':
-    df = get_final_list()
-    print(df)
-    # breakpoint()
+    # df = get_final_list()
+    # print(df)
+    breakpoint()
+    # df2 = common_logic()
+    # df2['双低'].mean()
+    # df2['双低'].median()
+
