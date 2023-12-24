@@ -1,17 +1,20 @@
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pandas as pd
 from dash import Dash, dcc, html, Input, Output, callback, dash_table
+import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import plotly.express as px
+
 import dash
 
 
 # TODO: 12天，更新一次数据
 
 
-def common_logic():
-    df = pd.read_csv('datas/bonds/conv_20231223.csv')
+def common_logic(csv_file: str):
+    df = pd.read_csv(csv_file)
 
     # 去掉未来半年到期的
     df['到期时间'] = pd.to_datetime(df['到期时间'])
@@ -27,49 +30,49 @@ def common_logic():
     # df.sort_values(by=['现价', '转股价值', '转股溢价率'], ascending=[True, False, True])
 
 
-def double_common_logic():
-    df = common_logic()
+def double_common_logic(csv_file: str):
+    df = common_logic(csv_file)
     df = df[df['双低'] < 125]
     return df
 
 
-def get_double_low(num: int = 30):
+def get_double_low(csv_file: str, num: int = 30):
     """
     双低
     """
-    df = double_common_logic()
+    df = double_common_logic(csv_file)
     df = df.sort_values(by=['双低'], ascending=[True]).head(num)
     return df
 
 
-def get_double_low_and_low_premium_rate(num: int = 30):
+def get_double_low_and_low_premium_rate(csv_file: str, num: int = 30):
     """
     双低, 低溢价率
     """
-    df = double_common_logic()
+    df = double_common_logic(csv_file)
     df = df.sort_values(by=['转股溢价率'], ascending=[True]).head(num)
     return df
 
 
-def get_low_premium_rate_and_double_low(num: int = 30):
+def get_low_premium_rate_and_double_low(csv_file: str, num: int = 30):
     """
     低溢价率, 双低
     """
-    df = common_logic()
+    df = common_logic(csv_file)
     df = df.sort_values(by=['转股溢价率'], ascending=[True]).head(40)
     df = df.sort_values(by=['双低'], ascending=[True]).head(num)
 
     return df
 
 
-def get_final_list():
+def get_final_list(csv_file: str):
     """
     最终名单
     """
-    df1 = get_double_low()
-    df2 = get_double_low_and_low_premium_rate()
-    df3 = get_low_premium_rate_and_double_low()
-    final_df = df1.merge(df2).merge(df3)
+    df1 = get_double_low(csv_file)
+    df2 = get_double_low_and_low_premium_rate(csv_file)
+    df3 = get_low_premium_rate_and_double_low(csv_file)
+    final_df = df1.merge(df2).merge(df3)  # 全合并
 
     final_df = final_df.sort_values(by=['转股价值'], ascending=[False])
     return final_df
@@ -77,32 +80,56 @@ def get_final_list():
 
 dash.register_page(__name__)
 
-df = get_final_list()
+path = Path('datas/bonds/conv_20231223.csv')
+path_old = Path('datas/bonds/conv_20231220.csv')
 
-layout = html.Div(
+df = get_final_list(str(path))
+df_old = get_final_list(str(path_old))
+# breakpoint()
+
+
+layout = dbc.Container(
     [
-        html.H4("国内可转债"),
-        html.H6("不买银行的"),
-        # dcc.Checklist(
-        #     id="toggle-rangeslider",
-        #     options=[{"label": "Include Rangeslider", "value": "slider"}],
-        #     value=["slider"],
-        # ),
-        # dash_table.DataTable(data=df.to_dict('records'), page_size=12, style_table={'overflowX': 'auto'})
-        dash_table.DataTable(
-            data=df.to_dict('records'),
-            style_table={'overflowX': 'auto'},
-            sort_action='native',
+        dbc.Row(
+            [
+                dbc.Col(html.Div(""), width=1),
+                dbc.Col(html.Div(
+                    children=[
+                        html.H4("国内可转债， 不买银行的"),
+                        html.H6(f"{path.name}结果："),
+                        dash_table.DataTable(
+                            data=df.to_dict('records'),
+                            style_table={'overflowX': 'auto'},
+                            sort_action='native',
+                        ),
+                        html.H6(f"{path_old.name}结果："),
+                        dash_table.DataTable(
+                            data=df_old.to_dict('records'),
+                            style_table={'overflowX': 'auto'},
+                            sort_action='native',
+                        ),
+                        html.H6("需要买入："),
+                        dash_table.DataTable(
+                            data=df.merge(df_old, on='代码', suffixes=('', '_old'), how='outer', indicator=True).query('_merge == "left_only"').drop('_merge', axis=1).to_dict('records'),
+                            style_table={'overflowX': 'auto'},
+                            sort_action='native',
+                        ),
+                        html.H6("需要卖出："),
+                        dash_table.DataTable(
+                            data=df.merge(df_old, on='代码', suffixes=('', '_old'), how='outer', indicator=True).query('_merge == "right_only"').drop('_merge', axis=1).to_dict('records'),
+                            style_table={'overflowX': 'auto'},
+                            sort_action='native',
+                        ),
+                        html.H6("继续持有："),
+                        dash_table.DataTable(
+                            data=df.merge(df_old, on='代码', suffixes=('', '_old')).to_dict('records'),
+                            style_table={'overflowX': 'auto'},
+                            sort_action='native',
+                        ),
+                    ]
+                ), width=10),
+                dbc.Col(html.Div(""), width=1),
+            ]
         )
     ]
 )
-
-
-if __name__ == '__main__':
-    # df = get_final_list()
-    # print(df)
-    breakpoint()
-    # df2 = common_logic()
-    # df2['双低'].mean()
-    # df2['双低'].median()
-
