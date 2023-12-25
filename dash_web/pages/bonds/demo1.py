@@ -12,20 +12,41 @@ import dash
 
 # TODO: 12天，更新一次数据
 
+def judge_bonds(csv_file: str):
+    df = pd.read_csv(csv_file)
+    avg_low = df['双低'].mean()
+    msg = f"转股溢价率平均值： {df['转股溢价率'].mean()}, 双低平均值： {avg_low}"
+    print(msg)
+
+    res = ''
+    if avg_low < 150:
+        res = '100%仓位'
+    elif avg_low < 155:
+        res = '60%仓位'
+    elif avg_low < 160:
+        res = '30%仓位'
+    elif avg_low < 165:
+        res = '正常交易'
+    elif avg_low < 170:
+        res = '减仓'
+    else:
+        res = '清仓'
+    print(res)
+    return msg, res
+
 
 def common_logic(csv_file: str):
     df = pd.read_csv(csv_file)
 
-    # 去掉未来半年到期的
+    # 去掉未来1年到期的
     df['到期时间'] = pd.to_datetime(df['到期时间'])
-    half_year = datetime.now() + timedelta(days=365//2)
+    half_year = datetime.now() + timedelta(days=365)
     df = df[df['到期时间'] > half_year]
 
     # ST 有退市风险
     df = df[~df['正股名称'].str.contains(r'ST|\*')]
 
     # TODO: 不买银行的
-    print(f"转股溢价率平均值： {df['转股溢价率'].mean()}, 双低平均值： {df['双低'].mean()}")
     return df
     # df.sort_values(by=['现价', '转股价值', '转股溢价率'], ascending=[True, False, True])
 
@@ -83,6 +104,7 @@ dash.register_page(__name__)
 path = Path('datas/bonds/conv_20231223.csv')
 path_old = Path('datas/bonds/conv_20231220.csv')
 
+msg, res = judge_bonds(str(path))
 df = get_final_list(str(path))
 df_old = get_final_list(str(path_old))
 # breakpoint()
@@ -96,6 +118,8 @@ layout = dbc.Container(
                 dbc.Col(html.Div(
                     children=[
                         html.H4("国内可转债， 不买银行的"),
+                        html.H5(f"{msg}"),
+                        html.H5(f"推荐操作：{res}"),
                         html.H6(f"{path.name}结果："),
                         dash_table.DataTable(
                             data=df.to_dict('records'),
