@@ -25,8 +25,11 @@ MAIN_INDEX_SYMBOL_NAME_DICT = {
     '000015': "上证红利",
     '000922': "中证红利",
 
+    # get from https://cn.investing.com/indices/msci-india-historical-data
+
     '日经225指数历史数据': "日经225指数",  # *0.008=美元
     '韩国KOSPI指数历史数据': "韩国KOSPI指数",  # *0.0008=美元
+    'MSCI印度指数历史数据': 'MSCI印度指数',  # *0.012=美元
 
     'MSCI新加坡指数历史数据': "MSCI新加坡指数",  # *1.36=美元
     'MSCI加拿大指数历史数据': "MSCI加拿大指数",  # *0.76=美元
@@ -298,10 +301,7 @@ def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_c
         # if '日期' in df.columns:
         #     df.rename(columns={'日期': 'date', '收盘': 'close'}, inplace=True)
         # breakpoint()
-        try:
-            df[target_columns[0]] = pd.to_datetime(df[target_columns[0]])
-        except:
-            df[target_columns[0]] = pd.to_datetime(df[target_columns[0]], format='%Y年%m月')
+        df = convert_time(df, target_columns[0])
         df_list_target.append(df[target_columns])
     breakpoint()
     df_m = pd.merge(df_list_target[0], df_list_target[1], how='outer', on=target_columns[0])
@@ -309,7 +309,6 @@ def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_c
         df_m = df_m.merge(df, how='outer', on=target_columns[0], suffixes=(f'_{i}', f'_{i+1}'))
 
     df_m.columns = new_columns
-
 
     df_m.sort_values('date', inplace=True)
 
@@ -322,6 +321,51 @@ def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_c
     # pd.to_numeric()
     df_m.to_csv(output_csv, index=False)
     return output_csv
+
+
+def clean_one_index(new_csv: str, target_new_columns: dict, usd_rate: float) -> pd.DataFrame:
+    # {'日期':'date', '收盘':'MSCI印度指数'}
+
+    df = pd.read_csv(new_csv)
+    df.rename(columns=target_new_columns, inplace=True)
+    target_columns = list(target_new_columns.values())
+
+    df = convert_time(df, target_columns[0])
+
+    # 转为object
+    # df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+    # df[target_columns[0]] = df[target_columns[0]].astype('object')
+
+    valid_df = df[target_columns]
+    if pd.api.types.is_string_dtype(valid_df[target_columns[1]]):
+        valid_df[target_columns[1]] = valid_df[target_columns[1]].str.replace(',', '')
+        valid_df[target_columns[1]] = valid_df[target_columns[1]].astype(float)
+
+    valid_df[target_columns[1]] *= usd_rate
+
+    return valid_df
+
+
+def update_one(old_all_csv: str, new_csv: str, target_new_columns: dict, output_csv: str):
+    old_all_df = pd.read_csv(old_all_csv)
+    old_all_df = convert_time(old_all_df, 'date')
+
+    df = clean_one_index(new_csv, target_new_columns, 0.012)
+    df_m = pd.merge(old_all_df, df, how='outer', on='date')
+
+    df_m.sort_values('date', inplace=True)
+
+    print(df_m.dtypes)
+    df_m.to_csv(output_csv, index=False)
+    return output_csv
+
+
+def convert_time(df, target_column: str):
+    try:
+        df[target_column] = pd.to_datetime(df[target_column])
+    except:
+        df[target_column] = pd.to_datetime(df[target_column], format='%Y年%m月')
+    return df
 
 
 def get_top_industries():
@@ -385,7 +429,14 @@ if __name__ == '__main__':
     # merge_unemps()
     # merge_gdps()
     # get_bond()
-    breakpoint()
+    # clean_one_index('datas/indexes/MSCI印度指数历史数据.csv', ["日期", "收盘"])
+    update_one(
+        'datas/indexes/all_indexes_data_usd.csv',
+        'datas/indexes/MSCI印度指数历史数据.csv',
+        {'日期': 'date', '收盘': 'MSCI印度指数'},
+        'datas/indexes/all_indexes_data_usd2.csv'
+    )
+    # breakpoint()
     # ak.stock_board_industry_info_ths
     # pd.DataFrame().sort_values()
 
@@ -393,6 +444,5 @@ if __name__ == '__main__':
     # ak.index_investing_global(area="德国", symbol ="德国DAX30指数", period ="每日", start_date ="20050101", end_date ="20550605")
 
     # df['Date'] = df['Date'].map(lambda x: x.strftime('%Y-%m-%d'))
-
 
     # merge_indexes()
