@@ -38,3 +38,9 @@ pip install pipdeptree
 pipdeptree
 ```
 
+
+
+```bash
+streamlit run your_app.py
+
+```
