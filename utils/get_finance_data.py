@@ -4,10 +4,11 @@ import pdb
 from pathlib import Path
 
 import pandas as pd
-from pandas_datareader import data
 import yfinance as yf  # 国际
 import akshare as ak  # 国内
-import easyquotation
+
+# from pandas_datareader import data
+# import easyquotation
 
 
 MAIN_INDEX_SYMBOL_NAME_DICT = {
@@ -96,7 +97,7 @@ PERIOD_ACTION = {
         # ak.macro_usa_gdp_monthly()  # usa gdp
         # ak.macro_euro_gdp_yoy()  # euro gdp
 
-        # unemp
+        # unemp 失业率
         # ak.macro_china_urban_unemployment,  # china
         # ak.macro_china_hk_rate_of_unemployment, # hk unemp FIXME: not work
         # ak.macro_usa_unemployment_rate, # usa unemp
@@ -119,7 +120,7 @@ PERIOD_ACTION = {
 
 
         # 可转债
-        # ak.bond_zh_cov_value_analysis,  # 可转债价值分析
+        # ak.bond_zh_cov_value_analysis('113045'),  # 可转债价值分析
 #         ak.bond_zh_us_rate,  # 国债收益率
 
         # ak.fund_portfolio_hold_em,  # 基金持仓
@@ -412,12 +413,20 @@ def get_period(unemp_month_on_month: float, cpi_month_on_month: float, threshold
 
 def get_bond():
     # get_datas_from_url('https://app.jisilu.cn/web/data/cb/list')
-    # df = ak.bond_cb_jsl(cookie="kbzw__Session=s81b1un9m9187t896kt8mlg1c2; Hm_lvt_164fe01b1433a19b507595a43bf58262=1703006843; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZiglKSprJ6uopido7a41dCjrt_b3eXhyqihpZKWic7g4dzQ59SUx8mJqpylkrGBzuDhrpWrgeyvqZKZrefS4sbO3NXDyuSQqaysl6yil4rBqcvEv6SB3Mrf3pWw3s_i0Z-But_l587VkKWrpZepmqeQpoHK2NnZ09mQqaysl6yil6fayKaopaiPoI-kp6U.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1703008180; SERVERID=0e73f01634e37a9af0b56dfcd9143ef3|1703008222|1703006836")
-    df = ak.bond_cb_jsl(cookie="kbzw__Session=s81b1un9m9187t896kt8mlg1c2; Hm_lvt_164fe01b1433a19b507595a43bf58262=1703006843; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZiglKSprJ6uopido7a41dCjrt_b3eXhyqihpZKWic7g4dzQ59SUx8mJqpylkrGBzuDhrpWrgeyvqZKZrefS4sbO3NXDyuSQqaysl6yil4rBqcvEv6SB3Mrf3pWw3s_i0Z-But_l587VkKWrpZepmqeQpoHK2NnZ09mQqaysl6yil6fayKaopaiPoI-kp6U.; kbz__Session=3ktlma07vpd2kan6ss1si7e5a2; kbz__user_login=1ubd08_P1ebax9aX8dzaz9WZnJ3R1ezo4Oje28DTjKWrxNOYpKzZod6f2JfYltmwxdOR1d-qmqmj3ZfaktmpgquO6eLZx9aXqJasmauwlJGcobrJx9aXqJmmlKask6KXppqwls6t1b-hruLyytzN1aiql6mMn7nfz9fn2OOBws2Vmqmap52WuNzml6SclPGrnaKMuNLmzdjPxtKs3e2knqyjpZWsgZvDqcSuwKWV1eLX3IK9xtbj0JmBt-Hn2ObRppOokaGoj6CPpJnIyt_N6cullqavj6OXlL7Z0KidqZKkkaGoj6A.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1703342263; SERVERID=5452564f5a1004697d0be99a0a2e3803|1703342408|1703338327")
+    
+    cookies = 'kbzw__Session=18u6be043iqed4vqm08chapmf1; Hm_lvt_164fe01b1433a19b507595a43bf58262=1756115514; HMACCOUNT=F1F1BCE8B9EF311A; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZill6Wqq5mupJido7a41dCjrt_b3eXhyqihpZKWic-opLOBvMri7u2J8aStwayVoJe06NHcxsve17Ti4KaXqZilqqmYibupyMbBlZnY4M3bgb7c1uPQmYG34efY5tGmk6mZpaehqI-ggcfa28rr1aaXqZilqqk.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1756116321; mp_9c85fda7212d269ea46c3f6a57ba69ca_mixpanel=%7B%22distinct_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%2C%22%24device_id%22%3A%20%22198e0a433d8e7e-01696a675d5a0b8-1f462c6e-3e8000-198e0a433d9e7e%22%2C%22%24search_engine%22%3A%20%22google%22%2C%22%24initial_referrer%22%3A%20%22https%3A%2F%2Fwww.google.com%2F%22%2C%22%24initial_referring_domain%22%3A%20%22www.google.com%22%2C%22__mps%22%3A%20%7B%7D%2C%22__mpso%22%3A%20%7B%7D%2C%22__mpus%22%3A%20%7B%7D%2C%22__mpa%22%3A%20%7B%7D%2C%22__mpu%22%3A%20%7B%7D%2C%22__mpr%22%3A%20%5B%5D%2C%22__mpap%22%3A%20%5B%5D%2C%22%24user_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%7D'
+    df = ak.bond_cb_jsl(cookie=cookies)
+    
     breakpoint()
     df.to_csv(f'datas/bonds/conv_{datetime.datetime.now().strftime("%Y%m%d")}.csv', index=False)
 
 
+def ana_bonds(bond_id2names: dict):
+    for bond_id, bond_name in bond_id2names.items():
+        df_detail = ak.bond_zh_cov_value_analysis(bond_id)
+        breakpoint()
+        df_detail.to_csv(f'datas/bonds/details/{bond_name}.csv', index=False)
+    
 # df2 = ak.bond_cb_redeem_jsl()  # 强赎df
 # ak.bond_zh_cov()  # 申购债券
 
@@ -429,13 +438,14 @@ if __name__ == '__main__':
     # merge_unemps()
     # merge_gdps()
     # get_bond()
+    ana_bonds({118036: '力合转债'})
     # clean_one_index('datas/indexes/MSCI印度指数历史数据.csv', ["日期", "收盘"])
-    update_one(
-        'datas/indexes/all_indexes_data_usd.csv',
-        'datas/indexes/MSCI印度指数历史数据.csv',
-        {'日期': 'date', '收盘': 'MSCI印度指数'},
-        'datas/indexes/all_indexes_data_usd2.csv'
-    )
+    # update_one(
+    #     'datas/indexes/all_indexes_data_usd.csv',
+    #     'datas/indexes/MSCI印度指数历史数据.csv',
+    #     {'日期': 'date', '收盘': 'MSCI印度指数'},
+    #     'datas/indexes/all_indexes_data_usd2.csv'
+    # )
     # breakpoint()
     # ak.stock_board_industry_info_ths
     # pd.DataFrame().sort_values()
