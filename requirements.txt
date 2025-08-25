@@ -52,6 +52,10 @@ click==8.2.1
 curl-cffi==0.13.0
     # via yfinance
 dash==3.2.0
+    # via
+    #   -r requirements.in
+    #   dash-bootstrap-components
+dash-bootstrap-components==2.0.4
     # via -r requirements.in
 decorator==5.2.1
     # via akshare
@@ -93,7 +97,6 @@ jsonschema-specifications==2025.4.1
 lxml==6.0.1
     # via
     #   akshare
-    #   pandas-datareader
     #   tushare
 markupsafe==3.0.2
     # via
@@ -132,12 +135,9 @@ packaging==25.0
 pandas==2.3.2
     # via
     #   akshare
-    #   pandas-datareader
     #   streamlit
     #   tushare
     #   yfinance
-pandas-datareader==0.10.0
-    # via -r requirements.in
 peewee==3.18.2
     # via yfinance
 pillow==11.3.0
@@ -184,7 +184,6 @@ requests==2.32.5
     # via
     #   akshare
     #   dash
-    #   pandas-datareader
     #   streamlit
     #   tushare
     #   yfinance

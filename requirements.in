@@ -1,8 +1,7 @@
-pipdeptree
+akshare
+dash_bootstrap_components
 pip-tools
-dash
+pipdeptree
 streamlit
 tushare
-akshare
 yfinance
-pandas_datareader
