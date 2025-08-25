@@ -1,0 +1,8 @@
+pipdeptree
+pip-tools
+dash
+streamlit
+tushare
+akshare
+yfinance
+pandas_datareader
