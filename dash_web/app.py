@@ -2,6 +2,10 @@ import dash
 from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
 
+from loguru import logger
+from utils.set_log import set_log
+set_log()
+
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 
 app = Dash(__name__, use_pages=True, external_stylesheets=external_stylesheets)
@@ -39,4 +43,5 @@ app.layout = html.Div([
 ])
 
 if __name__ == '__main__':
+    logger.info("start dash")
     app.run(debug=True)

@@ -6,9 +6,9 @@ from dash import Dash, dcc, html, Input, Output, callback, dash_table
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import plotly.express as px
-
 import dash
 
+from loguru import logger
 
 # TODO: 12天，更新一次数据
 
@@ -17,8 +17,8 @@ def judge_bonds(csv_file: str):
     avg_low = df['双低'].mean()
     msg1 = f"转股溢价率平均值： {df['转股溢价率'].mean():.2f}, 双低平均值： {avg_low:.2f}"
     msg2 = f"转股溢价率中位数： {df['转股溢价率'].median():.2f}, 双低中位数： {df['双低'].median():.2f}"
-    print(msg1)
-    print(msg2)
+    logger.info(msg1)
+    logger.info(msg2)
 
     res = ''
     if avg_low < 150:
@@ -33,7 +33,7 @@ def judge_bonds(csv_file: str):
         res = '减仓'
     else:
         res = '清仓'
-    print(res)
+    logger.info(res)
     return msg1, msg2, res
 
 
