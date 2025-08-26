@@ -1,6 +1,7 @@
 akshare
 dash_bootstrap_components
 dash_mantine_components
+gradio
 pip-tools
 pipdeptree
 streamlit
