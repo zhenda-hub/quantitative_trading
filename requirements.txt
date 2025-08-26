@@ -57,8 +57,6 @@ dash==3.2.0
     #   dash-mantine-components
 dash-bootstrap-components==2.0.4
     # via -r requirements.in
-dash-design-kit==0.0.1
-    # via -r requirements.in
 dash-mantine-components==2.2.1
     # via -r requirements.in
 decorator==5.2.1
