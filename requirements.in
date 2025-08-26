@@ -2,8 +2,10 @@ akshare
 dash_bootstrap_components
 dash_mantine_components
 gradio
+loguru
 pip-tools
 pipdeptree
+python-dotenv
 streamlit
 tushare
 yfinance
