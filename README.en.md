@@ -2,18 +2,6 @@
 
 ## pip-tools
 
-```bash
-pip install pip-tools
-
-pip-compile requirements.in
-
-# 会删除多余包, 包严格一致
-pip-sync requirements.txt
-pip-compile --upgrade
-
-
-```
-
 
 
 ```dockerfile
@@ -31,6 +19,20 @@ CMD ["python", "main.py"]
 
 ```
 
+
+
+```bash
+pip install pip-tools
+
+pip-compile requirements.in
+
+# 会删除多余包, 包严格一致
+pip-sync requirements.txt
+pip-compile --upgrade
+
+
+```
+
 ## pipdeptree
 
 ```bash
@@ -40,6 +42,7 @@ pipdeptree
 
 
 
+## st
 ```bash
 streamlit run your_app.py
 
