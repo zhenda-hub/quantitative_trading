@@ -2,6 +2,9 @@
 
 ## pip-tools
 
+```cmd
+.venv\Scripts\activate
+```
 
 
 ```dockerfile
