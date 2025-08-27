@@ -1,6 +1,8 @@
 akshare
 dash_bootstrap_components
 dash_mantine_components
+easyquotation
+efinance
 gradio
 loguru
 pip-tools
