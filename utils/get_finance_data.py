@@ -3,80 +3,18 @@ import time
 import pdb
 from pathlib import Path
 
+from loguru import logger
 import pandas as pd
-import yfinance as yf  # 国际
 import akshare as ak  # 国内
+import efinance as ef  # 国内
+# import easyquotation as eq  # 国内
+# import yfinance as yf  # 国际
 
-# from pandas_datareader import data
-# import easyquotation
+from .constants import *
 
 
-MAIN_INDEX_SYMBOL_NAME_DICT = {
-    'INX': "标普500指数",
-    'DJI':  "道琼斯工业平均指数",
-    'IXIC': "纳斯达克综合指数",
 
-    'HSI': "香港恒生指数",  # * 0.128 = 美元
 
-    '000001': "中国上证指数",  # *0.145=美元
-    '399001': "中国深证指数",
-    '000300': "沪深300指数",
-    '000016': "上证50",
-    '000905': "中证500",
-    '000015': "上证红利",
-    '000922': "中证红利",
-
-    # get from https://cn.investing.com/indices/msci-india-historical-data
-
-    '日经225指数历史数据': "日经225指数",  # *0.008=美元
-    '韩国KOSPI指数历史数据': "韩国KOSPI指数",  # *0.0008=美元
-    'MSCI印度指数历史数据': 'MSCI印度指数',  # *0.012=美元
-
-    'MSCI新加坡指数历史数据': "MSCI新加坡指数",  # *1.36=美元
-    'MSCI加拿大指数历史数据': "MSCI加拿大指数",  # *0.76=美元
-
-    'MSCI欧盟指数历史数据': "MSCI欧盟指数",  # *1.1=美元
-}
-
-VIRTUAL_SYMBOL_NAME_DICT = {
-    'BTC': "比特币",
-    'ETH': "以太坊",
-    'USDT': "泰达币",
-    'XRP': "XRP",
-    'BNB': "BNB",
-    'SOL': "Solana",
-}
-
-CPI_NAME_FILE_DICT = {
-    'australia': "macro_australia_cpi_yearly.csv",
-    'canada': "macro_canada_cpi_yearly.csv",
-    'china': "macro_china_cpi_yearly.csv",
-    'euro': "macro_euro_cpi_yoy.csv",
-    'japan': "macro_japan_cpi_yearly.csv",
-    'usa': "macro_usa_cpi_yoy.csv",
-}
-
-UNEMP_NAME_FILE_DICT = {
-    'australia': "australia_unemps.csv",
-    'canada': "canada_unemps.csv",
-    'china': "china_unemps.csv",
-    'euro': "euro_unemps.csv",
-    'japan': "japan_unemps.csv",
-    'usa': "usa_unemps.csv",
-}
-
-GDP_NAME_FILE_DICT = {
-    'china': "china_gdp.csv",
-    'euro': "euro_gdp.csv",
-    'usa': "usa_gdp.csv",
-}
-
-PERIOD_ACTION = {
-    '上升': ['持续买股票'],
-    '高点': ['卖出股票', '买债券，黄金'],
-    '下降': ['买债券，黄金', '不碰股票'],
-    '低点': ['买股票', '卖债券，黄金'],
-}
 # funcs = {
 #     # 大盘 宽基
 #     'wide_base': [
@@ -377,16 +315,16 @@ def get_top_3_by_industry(industry: str):
     pass
 
 
-def get_other_indexes():
-    # 下载日经225指数数据
-    nikkei = yf.Ticker("^N225")
+# def get_other_indexes():
+#     # 下载日经225指数数据
+#     nikkei = yf.Ticker("^N225")
 
-    # 获取历史数据时间范围
-    hist = nikkei.history(start="2010-01-01", end="2023-02-28")  # FIXME: not work
+#     # 获取历史数据时间范围
+#     hist = nikkei.history(start="2010-01-01", end="2023-02-28")  # FIXME: not work
 
-    # 将数据转换为DataFrame
-    df = pd.DataFrame(hist)
-    breakpoint()
+#     # 将数据转换为DataFrame
+#     df = pd.DataFrame(hist)
+#     breakpoint()
 
 
 def get_datas_from_url(url: str):
@@ -395,7 +333,10 @@ def get_datas_from_url(url: str):
 
 
 def get_period(unemp_month_on_month: float, cpi_month_on_month: float, threshold=0.05):
-    print(f'unemp: {unemp_month_on_month}， cpi： {cpi_month_on_month}')
+    """
+    根据失业率和CPI的环比变化判断经济周期阶段
+    """
+    logger.info(f'unemp: {unemp_month_on_month}， cpi： {cpi_month_on_month}')
 
     if unemp_month_on_month > 0 and cpi_month_on_month > 0:
         if unemp_month_on_month > threshold and cpi_month_on_month > threshold:
@@ -411,17 +352,23 @@ def get_period(unemp_month_on_month: float, cpi_month_on_month: float, threshold
     return '未知'
 
 
-def get_bond():
+def get_bond(cookies: str):
     # get_datas_from_url('https://app.jisilu.cn/web/data/cb/list')
     
-    cookies = 'kbzw__Session=18u6be043iqed4vqm08chapmf1; Hm_lvt_164fe01b1433a19b507595a43bf58262=1756115514; HMACCOUNT=F1F1BCE8B9EF311A; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZill6Wqq5mupJido7a41dCjrt_b3eXhyqihpZKWic-opLOBvMri7u2J8aStwayVoJe06NHcxsve17Ti4KaXqZilqqmYibupyMbBlZnY4M3bgb7c1uPQmYG34efY5tGmk6mZpaehqI-ggcfa28rr1aaXqZilqqk.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1756116321; mp_9c85fda7212d269ea46c3f6a57ba69ca_mixpanel=%7B%22distinct_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%2C%22%24device_id%22%3A%20%22198e0a433d8e7e-01696a675d5a0b8-1f462c6e-3e8000-198e0a433d9e7e%22%2C%22%24search_engine%22%3A%20%22google%22%2C%22%24initial_referrer%22%3A%20%22https%3A%2F%2Fwww.google.com%2F%22%2C%22%24initial_referring_domain%22%3A%20%22www.google.com%22%2C%22__mps%22%3A%20%7B%7D%2C%22__mpso%22%3A%20%7B%7D%2C%22__mpus%22%3A%20%7B%7D%2C%22__mpa%22%3A%20%7B%7D%2C%22__mpu%22%3A%20%7B%7D%2C%22__mpr%22%3A%20%5B%5D%2C%22__mpap%22%3A%20%5B%5D%2C%22%24user_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%7D'
+    # cookies = 'kbzw__Session=18u6be043iqed4vqm08chapmf1; Hm_lvt_164fe01b1433a19b507595a43bf58262=1756115514; HMACCOUNT=F1F1BCE8B9EF311A; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZill6Wqq5mupJido7a41dCjrt_b3eXhyqihpZKWic-opLOBvMri7u2J8aStwayVoJe06NHcxsve17Ti4KaXqZilqqmYibupyMbBlZnY4M3bgb7c1uPQmYG34efY5tGmk6mZpaehqI-ggcfa28rr1aaXqZilqqk.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1756116321; mp_9c85fda7212d269ea46c3f6a57ba69ca_mixpanel=%7B%22distinct_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%2C%22%24device_id%22%3A%20%22198e0a433d8e7e-01696a675d5a0b8-1f462c6e-3e8000-198e0a433d9e7e%22%2C%22%24search_engine%22%3A%20%22google%22%2C%22%24initial_referrer%22%3A%20%22https%3A%2F%2Fwww.google.com%2F%22%2C%22%24initial_referring_domain%22%3A%20%22www.google.com%22%2C%22__mps%22%3A%20%7B%7D%2C%22__mpso%22%3A%20%7B%7D%2C%22__mpus%22%3A%20%7B%7D%2C%22__mpa%22%3A%20%7B%7D%2C%22__mpu%22%3A%20%7B%7D%2C%22__mpr%22%3A%20%5B%5D%2C%22__mpap%22%3A%20%5B%5D%2C%22%24user_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%7D'
     df = ak.bond_cb_jsl(cookie=cookies)
     
-    breakpoint()
+    ef.bond.get_all_base_info()
+    ef.bond.get_realtime_quotes()
+    
+    # breakpoint()
     df.to_csv(f'datas/bonds/conv_{datetime.datetime.now().strftime("%Y%m%d")}.csv', index=False)
 
 
 def ana_bonds(bond_id2names: dict):
+    """
+    对特定债券进行分析
+    """
     for bond_id, bond_name in bond_id2names.items():
         df_detail = ak.bond_zh_cov_value_analysis(bond_id)
         breakpoint()
@@ -431,6 +378,11 @@ def ana_bonds(bond_id2names: dict):
 # ak.bond_zh_cov()  # 申购债券
 
 
+# ak.index_investing_global_from_url('https://www.investing.com/indices/germany-30-futures', end_date='20550102')
+# ak.index_investing_global(area="德国", symbol ="德国DAX30指数", period ="每日", start_date ="20050101", end_date ="20550605")
+# df['Date'] = df['Date'].map(lambda x: x.strftime('%Y-%m-%d'))
+
+
 if __name__ == '__main__':
     # merge_virtuals()
     # merge_cpis()
@@ -438,7 +390,8 @@ if __name__ == '__main__':
     # merge_unemps()
     # merge_gdps()
     # get_bond()
-    ana_bonds({118036: '力合转债'})
+    
+    # ana_bonds({118036: '力合转债'})
     # clean_one_index('datas/indexes/MSCI印度指数历史数据.csv', ["日期", "收盘"])
     # update_one(
     #     'datas/indexes/all_indexes_data_usd.csv',
@@ -447,12 +400,9 @@ if __name__ == '__main__':
     #     'datas/indexes/all_indexes_data_usd2.csv'
     # )
     # breakpoint()
-    # ak.stock_board_industry_info_ths
+    ak.stock_board_industry_info_ths()
     # pd.DataFrame().sort_values()
 
-    # ak.index_investing_global_from_url('https://www.investing.com/indices/germany-30-futures', end_date='20550102')
-    # ak.index_investing_global(area="德国", symbol ="德国DAX30指数", period ="每日", start_date ="20050101", end_date ="20550605")
-
-    # df['Date'] = df['Date'].map(lambda x: x.strftime('%Y-%m-%d'))
+    
 
     # merge_indexes()

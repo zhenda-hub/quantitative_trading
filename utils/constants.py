@@ -1,0 +1,67 @@
+
+MAIN_INDEX_SYMBOL_NAME_DICT = {
+    'INX': "标普500指数",
+    'DJI':  "道琼斯工业平均指数",
+    'IXIC': "纳斯达克综合指数",
+
+    'HSI': "香港恒生指数",  # * 0.128 = 美元
+
+    '000001': "中国上证指数",  # *0.145=美元
+    '399001': "中国深证指数",
+    '000300': "沪深300指数",
+    '000016': "上证50",
+    '000905': "中证500",
+    '000015': "上证红利",
+    '000922': "中证红利",
+
+    # get from https://cn.investing.com/indices/msci-india-historical-data
+
+    '日经225指数历史数据': "日经225指数",  # *0.008=美元
+    '韩国KOSPI指数历史数据': "韩国KOSPI指数",  # *0.0008=美元
+    'MSCI印度指数历史数据': 'MSCI印度指数',  # *0.012=美元
+
+    'MSCI新加坡指数历史数据': "MSCI新加坡指数",  # *1.36=美元
+    'MSCI加拿大指数历史数据': "MSCI加拿大指数",  # *0.76=美元
+
+    'MSCI欧盟指数历史数据': "MSCI欧盟指数",  # *1.1=美元
+}
+
+VIRTUAL_SYMBOL_NAME_DICT = {
+    'BTC': "比特币",
+    'ETH': "以太坊",
+    'USDT': "泰达币",
+    'XRP': "XRP",
+    'BNB': "BNB",
+    'SOL': "Solana",
+}
+
+CPI_NAME_FILE_DICT = {
+    'australia': "macro_australia_cpi_yearly.csv",
+    'canada': "macro_canada_cpi_yearly.csv",
+    'china': "macro_china_cpi_yearly.csv",
+    'euro': "macro_euro_cpi_yoy.csv",
+    'japan': "macro_japan_cpi_yearly.csv",
+    'usa': "macro_usa_cpi_yoy.csv",
+}
+
+UNEMP_NAME_FILE_DICT = {
+    'australia': "australia_unemps.csv",
+    'canada': "canada_unemps.csv",
+    'china': "china_unemps.csv",
+    'euro': "euro_unemps.csv",
+    'japan': "japan_unemps.csv",
+    'usa': "usa_unemps.csv",
+}
+
+GDP_NAME_FILE_DICT = {
+    'china': "china_gdp.csv",
+    'euro': "euro_gdp.csv",
+    'usa': "usa_gdp.csv",
+}
+
+PERIOD_ACTION = {
+    '上升': ['持续买股票'],
+    '高点': ['卖出股票', '买债券，黄金'],
+    '下降': ['买债券，黄金', '不碰股票'],
+    '低点': ['买股票', '卖债券，黄金'],
+}
