@@ -239,7 +239,29 @@ def get_ef_futures_data():
         logger.error(f"获取期货数据失败: {str(e)}")
 
 
-# ...existing code...
+
+
+def get_bond(cookies: str):
+    # get_datas_from_url('https://app.jisilu.cn/web/data/cb/list')
+    
+    # cookies = 'kbzw__Session=18u6be043iqed4vqm08chapmf1; Hm_lvt_164fe01b1433a19b507595a43bf58262=1756115514; HMACCOUNT=F1F1BCE8B9EF311A; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZill6Wqq5mupJido7a41dCjrt_b3eXhyqihpZKWic-opLOBvMri7u2J8aStwayVoJe06NHcxsve17Ti4KaXqZilqqmYibupyMbBlZnY4M3bgb7c1uPQmYG34efY5tGmk6mZpaehqI-ggcfa28rr1aaXqZilqqk.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1756116321; mp_9c85fda7212d269ea46c3f6a57ba69ca_mixpanel=%7B%22distinct_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%2C%22%24device_id%22%3A%20%22198e0a433d8e7e-01696a675d5a0b8-1f462c6e-3e8000-198e0a433d9e7e%22%2C%22%24search_engine%22%3A%20%22google%22%2C%22%24initial_referrer%22%3A%20%22https%3A%2F%2Fwww.google.com%2F%22%2C%22%24initial_referring_domain%22%3A%20%22www.google.com%22%2C%22__mps%22%3A%20%7B%7D%2C%22__mpso%22%3A%20%7B%7D%2C%22__mpus%22%3A%20%7B%7D%2C%22__mpa%22%3A%20%7B%7D%2C%22__mpu%22%3A%20%7B%7D%2C%22__mpr%22%3A%20%5B%5D%2C%22__mpap%22%3A%20%5B%5D%2C%22%24user_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%7D'
+    df = ak.bond_cb_jsl(cookie=cookies)
+    
+    ef.bond.get_all_base_info()
+    ef.bond.get_realtime_quotes()
+    
+    # breakpoint()
+    df.to_csv(f'datas/bonds/conv_{datetime.datetime.now().strftime("%Y%m%d")}.csv', index=False)
+
+
+def ana_bonds(bond_id2names: dict):
+    """
+    对特定债券进行分析
+    """
+    for bond_id, bond_name in bond_id2names.items():
+        df_detail = ak.bond_zh_cov_value_analysis(bond_id)
+        breakpoint()
+        df_detail.to_csv(f'datas/bonds/details/{bond_name}.csv', index=False)
 
 
 if __name__ == "__main__":
