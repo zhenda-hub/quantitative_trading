@@ -1,4 +1,259 @@
+import os
+from datetime import datetime
+
+from loguru import logger
+from dotenv import load_dotenv
+import akshare as ak
+import efinance as ef  # 国内
+import yfinance as yf  # 国际
+import pandas as pd
+
+load_dotenv()
 
 
-def update_datas():
-    ...
+def ensure_dir(file_path):
+    """确保目录存在"""
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+
+def get_ak_stock_data():
+    """获取 akshare 股票数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        # A股个股列表
+        stock_info = ak.stock_info_a_code_name()
+        filename = f"datas/stocks/ak_stock_list_{date_str}.csv"
+        ensure_dir(filename)
+        stock_info.to_csv(filename, index=False)
+        logger.info("A股列表数据已更新")
+
+        # 行业分类数据
+        industry_list = ak.stock_sector_spot()
+        filename = f"datas/n_indexes/ak_industry_list_{date_str}.csv"
+        ensure_dir(filename)
+        industry_list.to_csv(filename, index=False)
+        logger.info("行业分类数据已更新")
+
+    except Exception as e:
+        logger.error(f"获取akshare股票数据失败: {str(e)}")
+
+
+def get_ak_bond_data():
+    """获取 akshare 债券数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        
+        # 可转债数据
+        conv_bond = ak.bond_zh_cov()
+        filename = f"datas/bonds/ak_convert_bond_{date_str}.csv"
+        ensure_dir(filename)
+        conv_bond.to_csv(filename, index=False)
+        logger.info("可转债数据已更新")
+
+        # 国债收益率数据
+        try:
+            bond_rate = ak.bond_zh_us_rate()
+            filename = f"datas/bonds/ak_cn_us_rate_{date_str}.csv"
+            ensure_dir(filename)
+            bond_rate.to_csv(filename, index=False)
+            logger.info("中美债券收益率数据已更新")
+        except Exception as e:
+            logger.error(f"获取中美债券收益率失败: {str(e)}")
+
+    except Exception as e:
+        logger.error(f"获取akshare债券数据失败: {str(e)}")
+        
+        
+def get_ak_fund_data():
+    """获取 akshare 基金数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        
+        # ETF基金列表
+        etf_list = ak.fund_etf_category_sina()
+        filename = f"datas/funds/ak_etf_list_{date_str}.csv"
+        ensure_dir(filename)
+        etf_list.to_csv(filename, index=False)
+        logger.info("ETF基金列表已更新")
+
+        # 基金规模数据
+        fund_aum = ak.fund_aum_em()
+        filename = f"datas/funds/ak_fund_aum_{date_str}.csv"
+        ensure_dir(filename)
+        fund_aum.to_csv(filename, index=False)
+        logger.info("基金规模数据已更新")
+
+    except Exception as e:
+        logger.error(f"获取akshare基金数据失败: {str(e)}")
+
+
+def get_ak_macro_data():
+    """获取 akshare 宏观经济数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        
+        # 中国CPI数据
+        cpi_data = ak.macro_china_cpi_yearly()
+        filename = f"datas/cpis/ak_china_cpi_{date_str}.csv"
+        ensure_dir(filename)
+        cpi_data.to_csv(filename, index=False)
+        logger.info("中国CPI数据已更新")
+
+        # 中国GDP数据
+        gdp_data = ak.macro_china_gdp_yearly()
+        filename = f"datas/gdps/ak_china_gdp_{date_str}.csv"
+        ensure_dir(filename)
+        gdp_data.to_csv(filename, index=False)
+        logger.info("中国GDP数据已更新")
+
+        # 中国PMI数据
+        pmi_data = ak.macro_china_pmi_yearly()
+        filename = f"datas/macro/ak_china_pmi_{date_str}.csv"
+        ensure_dir(filename)
+        pmi_data.to_csv(filename, index=False)
+        logger.info("中国PMI数据已更新")
+
+    except Exception as e:
+        logger.error(f"获取akshare宏观数据失败: {str(e)}")
+
+
+# def get_eq_stock_data():
+#     """获取 easyquotation 股票数据 - 暂时停用"""
+#     pass
+
+
+def get_yf_market_data():
+    """获取 yfinance 市场数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        
+        # 主要市场指数
+        tickers = {
+            '^GSPC': 'SP500',
+            '^DJI': 'DowJones',
+            '^IXIC': 'NASDAQ',
+            '^N225': 'Nikkei225',
+            '^FTSE': 'FTSE100',
+            '^GDAXI': 'DAX',
+            '000001.SS': 'SSE',
+            '399001.SZ': 'SZSE'
+        }
+        
+        for symbol, name in tickers.items():
+            try:
+                ticker = yf.Ticker(symbol)
+                # 获取历史数据
+                hist = ticker.history(period="1y")
+                filename = f"datas/indexes/yf_{name}_{date_str}.csv"
+                ensure_dir(filename)
+                hist.to_csv(filename)
+                logger.info(f"{name}指数数据已更新")
+                
+                # 获取基本信息
+                info = pd.Series(ticker.info)
+                filename = f"datas/indexes/yf_{name}_info_{date_str}.csv"
+                ensure_dir(filename)
+                info.to_csv(filename)
+                logger.info(f"{name}指数信息已更新")
+                
+            except Exception as e:
+                logger.error(f"获取{name}数据失败: {str(e)}")
+
+    except Exception as e:
+        logger.error(f"获取yfinance数据失败: {str(e)}")
+
+
+def get_ef_stock_data():
+    """获取股票相关数据"""
+    try:
+        # 获取所有A股列表
+        date_str = datetime.now().strftime('%Y%m%d')
+        stock_list = ef.stock.get_realtime_quotes()
+        filename = f"datas/stocks/ef_stock_list_{date_str}.csv"
+        stock_list.to_csv(filename, index=False)
+        logger.info("股票列表数据已更新")
+
+        # 获取上证50、沪深300、中证500成分股
+        index_codes = {
+            'sh000016': '上证50',
+            'sh000300': '沪深300',
+            'sh000905': '中证500'
+        }
+        
+        for code, name in index_codes.items():
+            try:
+                df_dict = ef.stock.get_quote_history(code)
+                for period, df in df_dict.items():
+                    fname = f"ef_{name}_{period}_{date_str}.csv"
+                    filename = f"datas/stocks/{fname}"
+                    df.to_csv(filename, index=False)
+                logger.info(f"{name}历史数据已更新")
+            except Exception as e:
+                logger.error(f"获取{name}历史数据失败: {str(e)}")
+
+    except Exception as e:
+        logger.error(f"获取股票数据失败: {str(e)}")
+
+
+def get_ef_fund_data():
+    """获取基金相关数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        # 获取所有基金列表
+        fund_list = ef.fund.get_quote_history('159949')  # 获取华安创业板50ETF作为示例
+        filename = f"datas/funds/ef_fund_list_{date_str}.csv"
+        fund_list.to_csv(filename, index=False)
+        logger.info("基金数据已更新")
+
+    except Exception as e:
+        logger.error(f"获取基金数据失败: {str(e)}")
+
+
+def get_ef_bond_data():
+    """获取债券相关数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        # 获取可转债数据
+        bond_list = ef.bond.get_realtime_quotes()
+        filename = f"datas/bonds/ef_bond_list_{date_str}.csv"
+        bond_list.to_csv(filename, index=False)
+        logger.info("债券数据已更新")
+
+    except Exception as e:
+        logger.error(f"获取债券数据失败: {str(e)}")
+
+
+def get_ef_futures_data():
+    """获取期货相关数据"""
+    try:
+        # 获取期货合约列表
+        date_str = datetime.now().strftime('%Y%m%d')
+        futures_list = ef.futures.get_realtime_quotes()
+        filename = f"datas/futures/ef_futures_list_{date_str}.csv"
+        futures_list.to_csv(filename, index=False)
+        logger.info("期货合约列表数据已更新")
+
+    except Exception as e:
+        logger.error(f"获取期货数据失败: {str(e)}")
+
+
+# ...existing code...
+
+
+if __name__ == "__main__":
+    # 更新 akshare 数据
+    get_ak_stock_data()
+    get_ak_bond_data()
+    get_ak_fund_data()
+    get_ak_macro_data()
+    
+    # 更新 efinance 数据
+    get_ef_stock_data()
+    get_ef_fund_data()
+    get_ef_bond_data()
+    get_ef_futures_data()
+    
+    # 更新 yfinance 数据
+    get_yf_market_data()
