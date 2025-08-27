@@ -3,7 +3,7 @@ dash_bootstrap_components
 dash_mantine_components
 easyquotation
 efinance
-gradio
+# gradio
 loguru
 pip-tools
 pipdeptree
