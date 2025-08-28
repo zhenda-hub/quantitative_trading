@@ -11,6 +11,8 @@ import pandas as pd
 load_dotenv()
 
 
+# TODO: 目录改为日期
+
 def ensure_dir(file_path):
     """确保目录存在"""
     directory = os.path.dirname(file_path)
@@ -24,21 +26,37 @@ def get_ak_stock_data():
         date_str = datetime.now().strftime('%Y%m%d')
         # A股个股列表
         stock_info = ak.stock_info_a_code_name()
-        filename = f"datas/stocks/ak_stock_list_{date_str}.csv"
+        filename = f"datas/raw/stocks/ak_stock_list_{date_str}.csv"
         ensure_dir(filename)
         stock_info.to_csv(filename, index=False)
         logger.info("A股列表数据已更新")
 
-        # 行业分类数据
-        industry_list = ak.stock_sector_spot()
-        filename = f"datas/n_indexes/ak_industry_list_{date_str}.csv"
-        ensure_dir(filename)
-        industry_list.to_csv(filename, index=False)
-        logger.info("行业分类数据已更新")
-
     except Exception as e:
         logger.error(f"获取akshare股票数据失败: {str(e)}")
 
+
+def get_ak_industry_data():
+    """获取 akshare 行业数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        
+        # 行业分类数据
+        
+        industry_list = ak.stock_sector_spot()
+        filename = f"datas/raw/n_indexes/ak_industry_list_{date_str}.csv"
+        ensure_dir(filename)
+        industry_list.to_csv(filename, index=False)
+        logger.info("行业分类数据已更新")
+        
+        # industry_list_dfcf = ak.stock_board_industry_name_em()  # 行业板块-名称， 推荐
+        # industry_list_ths = ak.stock_board_industry_summary_ths()  # 同花顺行业一览表
+        # ak.stock_fund_flow_industry()
+        # industry_list_xl = ak.stock_sector_spot()
+        logger.info("行业分类数据已更新")
+
+    except Exception as e:
+        logger.error(f"获取akshare行业数据失败: {str(e)}")
+        
 
 def get_ak_bond_data():
     """获取 akshare 债券数据"""
@@ -47,7 +65,7 @@ def get_ak_bond_data():
         
         # 可转债数据
         conv_bond = ak.bond_zh_cov()
-        filename = f"datas/bonds/ak_convert_bond_{date_str}.csv"
+        filename = f"datas/raw/bonds/ak_bond_zh_cov_{date_str}.csv"
         ensure_dir(filename)
         conv_bond.to_csv(filename, index=False)
         logger.info("可转债数据已更新")
@@ -55,7 +73,7 @@ def get_ak_bond_data():
         # 国债收益率数据
         try:
             bond_rate = ak.bond_zh_us_rate()
-            filename = f"datas/bonds/ak_cn_us_rate_{date_str}.csv"
+            filename = f"datas/raw/bonds/ak_cn_us_rate_{date_str}.csv"
             ensure_dir(filename)
             bond_rate.to_csv(filename, index=False)
             logger.info("中美债券收益率数据已更新")
@@ -73,52 +91,122 @@ def get_ak_fund_data():
         
         # ETF基金列表
         etf_list = ak.fund_etf_category_sina()
-        filename = f"datas/funds/ak_etf_list_{date_str}.csv"
+        filename = f"datas/raw/funds/ak_etf_list_{date_str}.csv"
         ensure_dir(filename)
         etf_list.to_csv(filename, index=False)
         logger.info("ETF基金列表已更新")
 
         # 基金规模数据
         fund_aum = ak.fund_aum_em()
-        filename = f"datas/funds/ak_fund_aum_{date_str}.csv"
+        filename = f"datas/raw/funds/ak_fund_aum_{date_str}.csv"
         ensure_dir(filename)
         fund_aum.to_csv(filename, index=False)
         logger.info("基金规模数据已更新")
 
+        # ak.fund_portfolio_industry_allocation_em()  # 基金行业配置
     except Exception as e:
         logger.error(f"获取akshare基金数据失败: {str(e)}")
-
-
+    
+    
 def get_ak_macro_data():
     """获取 akshare 宏观经济数据"""
     try:
-        date_str = datetime.now().strftime('%Y%m%d')
         
-        # 中国CPI数据
-        cpi_data = ak.macro_china_cpi_yearly()
-        filename = f"datas/cpis/ak_china_cpi_{date_str}.csv"
-        ensure_dir(filename)
-        cpi_data.to_csv(filename, index=False)
-        logger.info("中国CPI数据已更新")
+        # CPI数据
+        get_ak_cpi_data()
 
-        # 中国GDP数据
-        gdp_data = ak.macro_china_gdp_yearly()
-        filename = f"datas/gdps/ak_china_gdp_{date_str}.csv"
-        ensure_dir(filename)
-        gdp_data.to_csv(filename, index=False)
-        logger.info("中国GDP数据已更新")
+        # GDP数据
+        get_ak_gdp_data()
 
         # 中国PMI数据
         pmi_data = ak.macro_china_pmi_yearly()
-        filename = f"datas/macro/ak_china_pmi_{date_str}.csv"
+        filename = f"datas/raw/macro/ak_china_pmi_{date_str}.csv"
         ensure_dir(filename)
         pmi_data.to_csv(filename, index=False)
         logger.info("中国PMI数据已更新")
+        
+        # 中国货币供应量
+        money_supply = ak.macro_china_money_supply()
+        filename = f"datas/raw/macro/ak_china_money_supply_{date_str}.csv"
+        ensure_dir(filename)
+        money_supply.to_csv(filename, index=False)
+        logger.info("中国货币供应量数据已更新")
 
     except Exception as e:
         logger.error(f"获取akshare宏观数据失败: {str(e)}")
 
 
+def get_ak_cpi_data():
+    
+    date_str = datetime.now().strftime('%Y%m%d')
+    
+    # cpi消费者物价指数
+    cpi_cn_data = ak.macro_china_cpi_yearly()
+    filename = f"datas/raw/cpis/ak_china_cpi_{date_str}.csv"
+    ensure_dir(filename)
+    cpi_cn_data.to_csv(filename, index=False)
+    logger.info("中国CPI数据已更新")
+    
+    # cpi 美国
+    cpi_usa = ak.macro_usa_cpi_yoy()
+    filename = f"datas/raw/cpis/ak_usa_cpi_{date_str}.csv"
+    ensure_dir(filename)
+    cpi_usa.to_csv(filename, index=False)
+    logger.info("美国CPI数据已更新")
+    # cpi 欧元区
+    cpi_enro = ak.macro_euro_cpi_yoy()
+    filename = f"datas/raw/cpis/ak_euro_cpi_{date_str}.csv"
+    ensure_dir(filename)
+    cpi_enro.to_csv(filename, index=False)
+    logger.info("欧元区CPI数据已更新")
+    
+    # cpi 澳大利亚
+    cpi_australia = ak.macro_australia_cpi_yearly()
+    filename = f"datas/raw/cpis/ak_australia_cpi_{date_str}.csv"
+    ensure_dir(filename)
+    cpi_australia.to_csv(filename, index=False)
+    logger.info("澳大利亚CPI数据已更新")
+    
+    # cpi 加拿大
+    cpi_canada = ak.macro_canada_cpi_yearly()
+    filename = f"datas/raw/cpis/ak_canada_cpi_{date_str}.csv"
+    ensure_dir(filename)
+    cpi_canada.to_csv(filename, index=False)
+    logger.info("加拿大CPI数据已更新")
+    
+    # cpi 日本
+    cpi_japan = ak.macro_japan_cpi_yearly()
+    filename = f"datas/raw/cpis/ak_japan_cpi_{date_str}.csv"
+    ensure_dir(filename)
+    cpi_japan.to_csv(filename, index=False)
+    logger.info("日本CPI数据已更新")
+    
+    
+def get_ak_gdp_data():
+    
+    date_str = datetime.now().strftime('%Y%m%d')
+    # china gdp
+    china_gdp = ak.macro_china_gdp_yearly()
+    filename = f"datas/raw/gdps/ak_china_gdp_{date_str}.csv"
+    ensure_dir(filename)
+    china_gdp.to_csv(filename, index=False)
+    logger.info("中国GDP数据已更新")
+    
+    # usa gdp
+    usa_gdp = ak.macro_usa_gdp_monthly()  # usa gdp
+    filename = f"datas/raw/gdps/ak_usa_gdp_{date_str}.csv"
+    ensure_dir(filename)
+    usa_gdp.to_csv(filename, index=False)
+    logger.info("美国GDP数据已更新")
+    
+    # euro gdp
+    enro_gdp = ak.macro_euro_gdp_yoy()  # euro gdp
+    filename = f"datas/raw/gdps/ak_euro_gdp_{date_str}.csv"
+    ensure_dir(filename)
+    enro_gdp.to_csv(filename, index=False)
+    logger.info("欧元区GDP数据已更新")
+    
+    
 # def get_eq_stock_data():
 #     """获取 easyquotation 股票数据 - 暂时停用"""
 #     pass
@@ -146,14 +234,14 @@ def get_yf_market_data():
                 ticker = yf.Ticker(symbol)
                 # 获取历史数据
                 hist = ticker.history(period="1y")
-                filename = f"datas/indexes/yf_{name}_{date_str}.csv"
+                filename = f"datas/raw/indexes/yf_{name}_{date_str}.csv"
                 ensure_dir(filename)
                 hist.to_csv(filename)
                 logger.info(f"{name}指数数据已更新")
                 
                 # 获取基本信息
                 info = pd.Series(ticker.info)
-                filename = f"datas/indexes/yf_{name}_info_{date_str}.csv"
+                filename = f"datas/raw/indexes/yf_{name}_info_{date_str}.csv"
                 ensure_dir(filename)
                 info.to_csv(filename)
                 logger.info(f"{name}指数信息已更新")
@@ -171,7 +259,7 @@ def get_ef_stock_data():
         # 获取所有A股列表
         date_str = datetime.now().strftime('%Y%m%d')
         stock_list = ef.stock.get_realtime_quotes()
-        filename = f"datas/stocks/ef_stock_list_{date_str}.csv"
+        filename = f"datas/raw/stocks/ef_stock_list_{date_str}.csv"
         stock_list.to_csv(filename, index=False)
         logger.info("股票列表数据已更新")
 
@@ -182,16 +270,16 @@ def get_ef_stock_data():
             'sh000905': '中证500'
         }
         
-        for code, name in index_codes.items():
-            try:
-                df_dict = ef.stock.get_quote_history(code)
-                for period, df in df_dict.items():
-                    fname = f"ef_{name}_{period}_{date_str}.csv"
-                    filename = f"datas/stocks/{fname}"
-                    df.to_csv(filename, index=False)
-                logger.info(f"{name}历史数据已更新")
-            except Exception as e:
-                logger.error(f"获取{name}历史数据失败: {str(e)}")
+        df_dict = ef.stock.get_quote_history(code)
+        # for code, name in index_codes.items():
+        #     try:
+            #     for period, df in df_dict.items():
+            #         fname = f"ef_{name}_{period}_{date_str}.csv"
+            #         filename = f"datas/raw/stocks/{fname}"
+            #         df.to_csv(filename, index=False)
+            #     logger.info(f"{name}历史数据已更新")
+            # except Exception as e:
+            #     logger.error(f"获取{name}历史数据失败: {str(e)}")
 
     except Exception as e:
         logger.error(f"获取股票数据失败: {str(e)}")
@@ -203,7 +291,7 @@ def get_ef_fund_data():
         date_str = datetime.now().strftime('%Y%m%d')
         # 获取所有基金列表
         fund_list = ef.fund.get_quote_history('159949')  # 获取华安创业板50ETF作为示例
-        filename = f"datas/funds/ef_fund_list_{date_str}.csv"
+        filename = f"datas/raw/funds/ef_fund_list_{date_str}.csv"
         fund_list.to_csv(filename, index=False)
         logger.info("基金数据已更新")
 
@@ -217,8 +305,12 @@ def get_ef_bond_data():
         date_str = datetime.now().strftime('%Y%m%d')
         # 获取可转债数据
         bond_list = ef.bond.get_realtime_quotes()
-        filename = f"datas/bonds/ef_bond_list_{date_str}.csv"
+        filename = f"datas/raw/bonds/ef_bond_list_{date_str}.csv"
         bond_list.to_csv(filename, index=False)
+        
+        bond_base_info = ef.bond.get_all_base_info()
+        filename = f"datas/raw/bonds/ef_bond_base_info_{date_str}.csv"
+        bond_base_info.to_csv(filename, index=False)
         logger.info("债券数据已更新")
 
     except Exception as e:
@@ -231,7 +323,8 @@ def get_ef_futures_data():
         # 获取期货合约列表
         date_str = datetime.now().strftime('%Y%m%d')
         futures_list = ef.futures.get_realtime_quotes()
-        filename = f"datas/futures/ef_futures_list_{date_str}.csv"
+        filename = f"datas/raw/futures/ef_futures_list_{date_str}.csv"
+        ensure_dir(filename)
         futures_list.to_csv(filename, index=False)
         logger.info("期货合约列表数据已更新")
 
@@ -247,11 +340,8 @@ def get_bond(cookies: str):
     # cookies = 'kbzw__Session=18u6be043iqed4vqm08chapmf1; Hm_lvt_164fe01b1433a19b507595a43bf58262=1756115514; HMACCOUNT=F1F1BCE8B9EF311A; kbz_newcookie=1; kbzw__user_login=7Obd08_P1ebax9aX8dzaz9mYrqXR0dTn8OTb3crUjaiU2tqqqJTUmdms1p7bod2a2sSn2NmtkqCY2q7Zmt-dmJ2j1uDb0dWMoZWqsa2hrI2yj7e11dSeqZill6Wqq5mupJido7a41dCjrt_b3eXhyqihpZKWic-opLOBvMri7u2J8aStwayVoJe06NHcxsve17Ti4KaXqZilqqmYibupyMbBlZnY4M3bgb7c1uPQmYG34efY5tGmk6mZpaehqI-ggcfa28rr1aaXqZilqqk.; Hm_lpvt_164fe01b1433a19b507595a43bf58262=1756116321; mp_9c85fda7212d269ea46c3f6a57ba69ca_mixpanel=%7B%22distinct_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%2C%22%24device_id%22%3A%20%22198e0a433d8e7e-01696a675d5a0b8-1f462c6e-3e8000-198e0a433d9e7e%22%2C%22%24search_engine%22%3A%20%22google%22%2C%22%24initial_referrer%22%3A%20%22https%3A%2F%2Fwww.google.com%2F%22%2C%22%24initial_referring_domain%22%3A%20%22www.google.com%22%2C%22__mps%22%3A%20%7B%7D%2C%22__mpso%22%3A%20%7B%7D%2C%22__mpus%22%3A%20%7B%7D%2C%22__mpa%22%3A%20%7B%7D%2C%22__mpu%22%3A%20%7B%7D%2C%22__mpr%22%3A%20%5B%5D%2C%22__mpap%22%3A%20%5B%5D%2C%22%24user_id%22%3A%20%22bc3f7cfa-2cfd-481e-8841-302721d0d13c%22%7D'
     df = ak.bond_cb_jsl(cookie=cookies)
     
-    ef.bond.get_all_base_info()
-    ef.bond.get_realtime_quotes()
-    
     # breakpoint()
-    df.to_csv(f'datas/bonds/conv_{datetime.datetime.now().strftime("%Y%m%d")}.csv', index=False)
+    df.to_csv(f'datas/raw/bonds/conv_{datetime.datetime.now().strftime("%Y%m%d")}.csv', index=False)
 
 
 def ana_bonds(bond_id2names: dict):
@@ -261,7 +351,7 @@ def ana_bonds(bond_id2names: dict):
     for bond_id, bond_name in bond_id2names.items():
         df_detail = ak.bond_zh_cov_value_analysis(bond_id)
         breakpoint()
-        df_detail.to_csv(f'datas/bonds/details/{bond_name}.csv', index=False)
+        df_detail.to_csv(f'datas/raw/bonds/details/{bond_name}.csv', index=False)
 
 
 if __name__ == "__main__":
