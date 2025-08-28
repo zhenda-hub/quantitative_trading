@@ -13,7 +13,7 @@ import dash
 dash.register_page(__name__)
 # app = Dash(__name__, use_pages=True, pages_folder="my_apps")
 
-df = pd.read_csv("datas/virtual/all_virtual_data.csv")
+df = pd.read_csv("datas/processed/virtual/all_virtual_data.csv")
 # breakpoint()
 fig = px.line(
     df,

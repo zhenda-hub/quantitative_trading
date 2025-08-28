@@ -60,9 +60,9 @@ def gene_fig(csv_path: str, yaxis_title: str, title: str):
     return fig
 
 
-fig_gdp = gene_fig("datas/gdps/all_gdps_data.csv", 'GDP年率', 'GDP年率')
-fig_cpi = gene_fig("datas/cpis/all_cpi_data.csv", 'CPI年率', 'CPI年率(e.g., 数值为2.5，意味着物价一年涨2.5%)')
-fig_unemp = gene_fig("datas/unemps/all_unemps_data.csv", '失业率', '失业率')
+fig_gdp = gene_fig("datas/processed/gdps/all_gdps_data.csv", 'GDP年率', 'GDP年率')
+fig_cpi = gene_fig("datas/processed/cpis/all_cpi_data.csv", 'CPI年率', 'CPI年率(e.g., 数值为2.5，意味着物价一年涨2.5%)')
+fig_unemp = gene_fig("datas/processed/unemps/all_unemps_data.csv", '失业率', '失业率')
 
 
 layout = html.Div(

@@ -16,7 +16,7 @@ dash.register_page(__name__)
 
 # breakpoint()
 
-df = pd.read_csv("datas/indexes/all_indexes_data_usd2.csv")
+df = pd.read_csv("datas/processed/indexes/all_indexes_data_usd2.csv")
 # breakpoint()
 fig = px.line(
 # fig = px.area(
