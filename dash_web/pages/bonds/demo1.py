@@ -103,8 +103,9 @@ def get_final_list(csv_file: str):
 
 dash.register_page(__name__)
 
-path = Path('datas/raw/bonds/conv_20231223.csv')
-path_old = Path('datas/raw/bonds/conv_20231220.csv')
+# TODO: auto set file
+path = Path('datas/raw/bonds/conv_20250825.csv')
+path_old = Path('datas/raw/bonds/conv_20231223.csv')
 
 msg1, msg2, res = judge_bonds(str(path))
 df = get_final_list(str(path))
