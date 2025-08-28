@@ -10,12 +10,6 @@ def get_top_industries():
 def get_top_3_by_industry(industry: str):
     pass
 
-
-def get_datas_from_url(url: str):
-    df = pd.read_html(url)
-    breakpoint()
-    
-    
     
 # df2 = ak.bond_cb_redeem_jsl()  # 强赎df
 # ak.bond_zh_cov()  # 申购债券
@@ -29,4 +23,3 @@ ak.stock_board_industry_info_ths()
 
 if __name__ == '__main__':
     ...
-    
