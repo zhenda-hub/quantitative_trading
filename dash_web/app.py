@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 
 from loguru import logger
 from utils.set_log import set_log
-set_log()
+set_log('dash_web.log')
 
 external_stylesheets = [dbc.themes.BOOTSTRAP]
 

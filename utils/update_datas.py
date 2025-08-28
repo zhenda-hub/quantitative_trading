@@ -355,6 +355,9 @@ def ana_bonds(bond_id2names: dict):
 
 
 if __name__ == "__main__":
+    from utils.set_log import set_log
+    set_log('update_datas.log')
+    
     # 更新 akshare 数据
     get_ak_stock_data()
     get_ak_bond_data()
