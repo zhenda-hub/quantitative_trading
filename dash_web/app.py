@@ -14,12 +14,12 @@ app = Dash(__name__, use_pages=True, external_stylesheets=external_stylesheets)
 CUSTOM_ORDER = [
     'Home', 
     'period', 
+    'Allocation', 
     "Industry",   # 行业
     'Index', 
     'Company', 
     'Bond', 
     'Virtual',
-    'Allocation', 
 ]
 
 # 简单按自定义顺序获取页面
