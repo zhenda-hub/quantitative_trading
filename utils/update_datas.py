@@ -336,14 +336,17 @@ def get_ef_futures_data():
         logger.error(f"获取期货数据失败: {str(e)}")
 
 
+def get_ak_jsl_bond():
+    try:
+        cookies = os.getenv('JISILU_COOKIES')
+        df = ak.bond_cb_jsl(cookie=cookies)
+        breakpoint()
+        df.to_csv(f'datas/raw/bonds/conv_{datetime.now().strftime("%Y%m%d")}.csv', index=False)    
+        logger.info("jsl债券数据已更新")
 
-
-def get_bond():
-    cookies = os.getenv('JISILU_COOKIES')
-    df = ak.bond_cb_jsl(cookie=cookies)
+    except Exception as e:
+        logger.error(f"获取jsl债券数据失败: {str(e)}")
     
-    breakpoint()
-    df.to_csv(f'datas/raw/bonds/conv_{datetime.datetime.now().strftime("%Y%m%d")}.csv', index=False)
 
 
 def ana_bonds(bond_id2names: dict):
@@ -363,6 +366,7 @@ if __name__ == "__main__":
     # 更新 akshare 数据
     get_ak_stock_data()
     get_ak_bond_data()
+    get_ak_jsl_bond()
     get_ak_fund_data()
     get_ak_macro_data()
     
