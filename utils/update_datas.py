@@ -111,12 +111,13 @@ def get_ak_fund_data():
 def get_ak_macro_data():
     """获取 akshare 宏观经济数据"""
     try:
-        
         # CPI数据
         get_ak_cpi_data()
 
         # GDP数据
         get_ak_gdp_data()
+        
+        date_str = datetime.now().strftime('%Y%m%d')
 
         # 中国PMI数据
         pmi_data = ak.macro_china_pmi_yearly()
@@ -229,25 +230,27 @@ def get_yf_market_data():
             '399001.SZ': 'SZSE'
         }
         
-        for symbol, name in tickers.items():
-            try:
-                ticker = yf.Ticker(symbol)
-                # 获取历史数据
-                hist = ticker.history(period="1y")
-                filename = f"datas/raw/indexes/yf_{name}_{date_str}.csv"
-                ensure_dir(filename)
-                hist.to_csv(filename)
-                logger.info(f"{name}指数数据已更新")
+        # todo:check
+        
+        # for symbol, name in tickers.items():
+        #     try:
+        #         ticker = yf.Ticker(symbol)
+        #         # 获取历史数据
+        #         hist = ticker.history(period="1y")
+        #         filename = f"datas/raw/indexes/yf_{name}_{date_str}.csv"
+        #         ensure_dir(filename)
+        #         hist.to_csv(filename)
+        #         logger.info(f"{name}指数数据已更新")
                 
-                # 获取基本信息
-                info = pd.Series(ticker.info)
-                filename = f"datas/raw/indexes/yf_{name}_info_{date_str}.csv"
-                ensure_dir(filename)
-                info.to_csv(filename)
-                logger.info(f"{name}指数信息已更新")
+        #         # 获取基本信息
+        #         info = pd.Series(ticker.info)
+        #         filename = f"datas/raw/indexes/yf_{name}_info_{date_str}.csv"
+        #         ensure_dir(filename)
+        #         info.to_csv(filename)
+        #         logger.info(f"{name}指数信息已更新")
                 
-            except Exception as e:
-                logger.error(f"获取{name}数据失败: {str(e)}")
+        #     except Exception as e:
+        #         logger.error(f"获取{name}数据失败: {str(e)}")
 
     except Exception as e:
         logger.error(f"获取yfinance数据失败: {str(e)}")
@@ -270,7 +273,8 @@ def get_ef_stock_data():
             'sh000905': '中证500'
         }
         
-        df_dict = ef.stock.get_quote_history(code)
+        # df_dict = ef.stock.get_quote_history(code)
+        
         # for code, name in index_codes.items():
         #     try:
             #     for period, df in df_dict.items():
