@@ -1,4 +1,5 @@
-from dash import Dash, dcc, html, Input, Output, callback
+from dash import Dash, dcc, html, Input, Output, callback, dash_table
+import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
@@ -62,16 +63,58 @@ def gene_fig(csv_path: str, yaxis_title: str, title: str):
 
 fig_gdp = gene_fig("datas/processed/gdps/all_gdps_data.csv", 'GDP年率', 'GDP年率')
 fig_cpi = gene_fig("datas/processed/cpis/all_cpi_data.csv", 'CPI年率', 'CPI年率(e.g., 数值为2.5，意味着物价一年涨2.5%)')
-fig_unemp = gene_fig("datas/processed/unemps/all_unemps_data.csv", '失业率', '失业率')
+# fig_unemp = gene_fig("datas/processed/unemps/all_unemps_data.csv", '失业率', '失业率')
 
 
 layout = html.Div(
     [
         html.H4("全球经济周期"),
         html.H6("GDP年率，经济发展状况"),
-        html.H6("CPI年率，反应物价波动状况， 通常和GDP成正方向"),
-        html.H6("失业率， 经济周期中，通常和GDP，CPI成反方向"),
+        html.H6("CPI年率，反应物价波动状况"),
+        # html.H6("失业率， 经济周期中，通常和GDP，CPI成反方向"),
         html.H6("GDP， CPI表示经济周期：上升，高点，下降，低点"),
+        html.H5("经济周期阶段特征"),
+        dbc.Table(
+            [
+                html.Thead(
+                    html.Tr([
+                        html.Th("经济周期阶段"),
+                        html.Th("GDP变化趋势"),
+                        html.Th("CPI变化趋势")
+                    ])
+                ),
+                html.Tbody([
+                    html.Tr([
+                        html.Td("复苏期"),
+                        html.Td("上升 ↑"),
+                        html.Td("下降 ↓")
+                    ]),
+                    html.Tr([
+                        html.Td("过热期"),
+                        html.Td("上升 ↑"),
+                        html.Td("上升 ↑")
+                    ]),
+                    html.Tr([
+                        html.Td("滞胀期"),
+                        html.Td("下降 ↓"),
+                        html.Td("上升 ↑")
+                    ]),
+                    html.Tr([
+                        html.Td("衰退期"),
+                        html.Td("下降 ↓"),
+                        html.Td("下降 ↓")
+                    ])
+                ])
+            ],
+            bordered=True,
+            striped=True,
+            hover=True,
+            responsive=True,
+            style={
+                'margin-top': '20px',
+                'margin-bottom': '20px'
+            }
+        ),
         # dcc.Checklist(
         #     id="toggle-rangeslider",
         #     options=[{"label": "Include Rangeslider", "value": "slider"}],
@@ -82,7 +125,7 @@ layout = html.Div(
 
         dcc.Graph(figure=fig_gdp,),
         dcc.Graph(figure=fig_cpi,),
-        dcc.Graph(figure=fig_unemp,),
+        # dcc.Graph(figure=fig_unemp,),
     ]
 )
 
