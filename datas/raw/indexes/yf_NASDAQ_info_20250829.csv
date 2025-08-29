@@ -1,0 +1,69 @@
+,0
+maxAge,86400
+priceHint,2
+previousClose,21590.14
+open,21619.273
+dayLow,21534.941
+dayHigh,21742.457
+regularMarketPreviousClose,21590.14
+regularMarketOpen,21619.273
+regularMarketDayLow,21534.941
+regularMarketDayHigh,21742.457
+volume,7063469000
+regularMarketVolume,7063469000
+averageVolume,9139102539
+averageVolume10days,8330615000
+averageDailyVolume10Day,8330615000
+bid,0.0
+ask,0.0
+bidSize,0
+askSize,0
+fiftyTwoWeekLow,14784.03
+fiftyTwoWeekHigh,21803.75
+fiftyDayAverage,20840.105
+twoHundredDayAverage,19276.316
+currency,USD
+tradeable,False
+52WeekChange,23.256504
+quoteType,INDEX
+symbol,^IXIC
+language,en-US
+region,US
+typeDisp,Index
+quoteSourceName,Delayed Quote
+triggerable,True
+customPriceAlertConfidence,HIGH
+shortName,NASDAQ Composite
+longName,NASDAQ Composite
+regularMarketChange,115.01758
+regularMarketDayRange,21534.941 - 21742.457
+fullExchangeName,Nasdaq GIDS
+averageDailyVolume3Month,9139102539
+fiftyTwoWeekLowChange,6921.128
+fiftyTwoWeekLowChangePercent,0.46814892
+fiftyTwoWeekRange,14784.03 - 21803.75
+fiftyTwoWeekHighChange,-98.5918
+fiftyTwoWeekHighChangePercent,-0.0045217816
+fiftyTwoWeekChangePercent,23.256504
+fiftyDayAverageChange,865.05273
+fiftyDayAverageChangePercent,0.04150904
+twoHundredDayAverageChange,2428.8418
+twoHundredDayAverageChangePercent,0.12600134
+hasPrePostMarketData,False
+firstTradeDateMilliseconds,34612200000
+corporateActions,[]
+regularMarketTime,1756415759
+exchange,NIM
+messageBoardId,finmb_INDEXIXIC
+exchangeTimezoneName,America/New_York
+exchangeTimezoneShortName,EDT
+gmtOffSetMilliseconds,-14400000
+market,us_market
+esgPopulated,False
+sourceInterval,15
+exchangeDataDelayedBy,0
+cryptoTradeable,False
+regularMarketChangePercent,0.53273195
+regularMarketPrice,21705.158
+marketState,POSTPOST
+trailingPegRatio,

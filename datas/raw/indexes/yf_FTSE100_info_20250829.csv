@@ -1,0 +1,69 @@
+,0
+maxAge,86400
+priceHint,2
+previousClose,9255.5
+open,9255.5
+dayLow,9207.39
+dayHigh,9269.95
+regularMarketPreviousClose,9255.5
+regularMarketOpen,9255.5
+regularMarketDayLow,9207.39
+regularMarketDayHigh,9269.95
+volume,0
+regularMarketVolume,0
+averageVolume,767040435
+averageVolume10days,693977220
+averageDailyVolume10Day,693977220
+bid,0.0
+ask,0.0
+bidSize,0
+askSize,0
+fiftyTwoWeekLow,7544.8
+fiftyTwoWeekHigh,9357.5
+fiftyDayAverage,9010.202
+twoHundredDayAverage,8614.08
+currency,GBP
+tradeable,False
+52WeekChange,10.452771
+quoteType,INDEX
+symbol,^FTSE
+language,en-US
+region,US
+typeDisp,Index
+quoteSourceName,Delayed Quote
+triggerable,False
+customPriceAlertConfidence,LOW
+regularMarketChangePercent,-0.4179103
+regularMarketPrice,9216.82
+regularMarketChange,-38.679688
+regularMarketDayRange,9207.39 - 9269.95
+fullExchangeName,FTSE Index
+averageDailyVolume3Month,767040435
+fiftyTwoWeekLowChange,1672.0205
+fiftyTwoWeekLowChangePercent,0.2216123
+fiftyTwoWeekRange,7544.8 - 9357.5
+fiftyTwoWeekHighChange,-140.67969
+fiftyTwoWeekHighChangePercent,-0.015033897
+fiftyTwoWeekChangePercent,10.452771
+fiftyDayAverageChange,206.61816
+fiftyDayAverageChangePercent,0.02293158
+twoHundredDayAverageChange,602.74023
+twoHundredDayAverageChangePercent,0.06997152
+longName,FTSE 100
+sourceInterval,15
+exchangeDataDelayedBy,15
+cryptoTradeable,False
+marketState,PREPRE
+corporateActions,[]
+regularMarketTime,1756395330
+exchange,FGI
+messageBoardId,finmb_INDEXFTSE
+exchangeTimezoneName,Europe/London
+exchangeTimezoneShortName,BST
+gmtOffSetMilliseconds,3600000
+market,gb_market
+esgPopulated,False
+hasPrePostMarketData,False
+firstTradeDateMilliseconds,441964800000
+shortName,FTSE 100
+trailingPegRatio,
