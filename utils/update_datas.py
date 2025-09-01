@@ -21,7 +21,7 @@ def ensure_dir(file_path):
 
 
 def get_ak_stock_data():
-    """获取 akshare 股票数据"""
+    """获取 akshare 股票数据(code name)"""
     try:
         date_str = datetime.now().strftime('%Y%m%d')
         # A股个股列表
@@ -117,21 +117,21 @@ def get_ak_macro_data():
         # GDP数据
         get_ak_gdp_data()
         
-        date_str = datetime.now().strftime('%Y%m%d')
+        # date_str = datetime.now().strftime('%Y%m%d')
 
-        # 中国PMI数据
-        pmi_data = ak.macro_china_pmi_yearly()
-        filename = f"datas/raw/macro/ak_china_pmi_{date_str}.csv"
-        ensure_dir(filename)
-        pmi_data.to_csv(filename, index=False)
-        logger.info("中国PMI数据已更新")
+        # # 中国PMI数据
+        # pmi_data = ak.macro_china_pmi_yearly()
+        # filename = f"datas/raw/macro/ak_china_pmi_{date_str}.csv"
+        # ensure_dir(filename)
+        # pmi_data.to_csv(filename, index=False)
+        # logger.info("中国PMI数据已更新")
         
-        # 中国货币供应量
-        money_supply = ak.macro_china_money_supply()
-        filename = f"datas/raw/macro/ak_china_money_supply_{date_str}.csv"
-        ensure_dir(filename)
-        money_supply.to_csv(filename, index=False)
-        logger.info("中国货币供应量数据已更新")
+        # # 中国货币供应量
+        # money_supply = ak.macro_china_money_supply()
+        # filename = f"datas/raw/macro/ak_china_money_supply_{date_str}.csv"
+        # ensure_dir(filename)
+        # money_supply.to_csv(filename, index=False)
+        # logger.info("中国货币供应量数据已更新")
 
     except Exception as e:
         logger.error(f"获取akshare宏观数据失败: {str(e)}")
@@ -139,45 +139,45 @@ def get_ak_macro_data():
 
 def get_ak_cpi_data():
     
-    date_str = datetime.now().strftime('%Y%m%d')
+    # date_str = datetime.now().strftime('%Y%m%d')
     
     # cpi消费者物价指数
     cpi_cn_data = ak.macro_china_cpi_yearly()
-    filename = f"datas/raw/cpis/ak_china_cpi_{date_str}.csv"
+    filename = f"datas/raw/cpis/macro_china_cpi_yearly.csv"
     ensure_dir(filename)
     cpi_cn_data.to_csv(filename, index=False)
     logger.info("中国CPI数据已更新")
     
     # cpi 美国
     cpi_usa = ak.macro_usa_cpi_yoy()
-    filename = f"datas/raw/cpis/ak_usa_cpi_{date_str}.csv"
+    filename = f"datas/raw/cpis/macro_usa_cpi_yoy.csv"
     ensure_dir(filename)
     cpi_usa.to_csv(filename, index=False)
     logger.info("美国CPI数据已更新")
     # cpi 欧元区
     cpi_enro = ak.macro_euro_cpi_yoy()
-    filename = f"datas/raw/cpis/ak_euro_cpi_{date_str}.csv"
+    filename = f"datas/raw/cpis/macro_euro_cpi_yoy.csv"
     ensure_dir(filename)
     cpi_enro.to_csv(filename, index=False)
     logger.info("欧元区CPI数据已更新")
     
     # cpi 澳大利亚
     cpi_australia = ak.macro_australia_cpi_yearly()
-    filename = f"datas/raw/cpis/ak_australia_cpi_{date_str}.csv"
+    filename = f"datas/raw/cpis/macro_australia_cpi_yearly.csv"
     ensure_dir(filename)
     cpi_australia.to_csv(filename, index=False)
     logger.info("澳大利亚CPI数据已更新")
     
     # cpi 加拿大
     cpi_canada = ak.macro_canada_cpi_yearly()
-    filename = f"datas/raw/cpis/ak_canada_cpi_{date_str}.csv"
+    filename = f"datas/raw/cpis/macro_canada_cpi_yearly.csv"
     ensure_dir(filename)
     cpi_canada.to_csv(filename, index=False)
     logger.info("加拿大CPI数据已更新")
     
     # cpi 日本
     cpi_japan = ak.macro_japan_cpi_yearly()
-    filename = f"datas/raw/cpis/ak_japan_cpi_{date_str}.csv"
+    filename = f"datas/raw/cpis/macro_japan_cpi_yearly.csv"
     ensure_dir(filename)
     cpi_japan.to_csv(filename, index=False)
     logger.info("日本CPI数据已更新")
@@ -185,24 +185,24 @@ def get_ak_cpi_data():
     
 def get_ak_gdp_data():
     
-    date_str = datetime.now().strftime('%Y%m%d')
+    # date_str = datetime.now().strftime('%Y%m%d')
     # china gdp
     china_gdp = ak.macro_china_gdp_yearly()
-    filename = f"datas/raw/gdps/ak_china_gdp_{date_str}.csv"
+    filename = f"datas/raw/gdps/ak_china_gdp.csv"
     ensure_dir(filename)
     china_gdp.to_csv(filename, index=False)
     logger.info("中国GDP数据已更新")
     
     # usa gdp
     usa_gdp = ak.macro_usa_gdp_monthly()  # usa gdp
-    filename = f"datas/raw/gdps/ak_usa_gdp_{date_str}.csv"
+    filename = f"datas/raw/gdps/ak_usa_gdp.csv"
     ensure_dir(filename)
     usa_gdp.to_csv(filename, index=False)
     logger.info("美国GDP数据已更新")
     
     # euro gdp
     enro_gdp = ak.macro_euro_gdp_yoy()  # euro gdp
-    filename = f"datas/raw/gdps/ak_euro_gdp_{date_str}.csv"
+    filename = f"datas/raw/gdps/ak_euro_gdp.csv"
     ensure_dir(filename)
     enro_gdp.to_csv(filename, index=False)
     logger.info("欧元区GDP数据已更新")
@@ -364,7 +364,7 @@ if __name__ == "__main__":
     set_log('update_datas.log')
     
     # 更新 akshare 数据
-    get_ak_stock_data()
+    # get_ak_stock_data()
     get_ak_bond_data()
     get_ak_jsl_bond()
     get_ak_fund_data()
@@ -374,7 +374,7 @@ if __name__ == "__main__":
     get_ef_stock_data()
     get_ef_fund_data()
     get_ef_bond_data()
-    get_ef_futures_data()
+    # get_ef_futures_data()
     
     # 更新 yfinance 数据
     get_yf_market_data()
