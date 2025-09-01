@@ -113,7 +113,7 @@ def update_one(old_all_csv: str, new_csv: str, target_new_columns: dict, output_
 
 def convert_time(df, target_column: str):
     try:
-        df[target_column] = pd.to_datetime(df[target_column])
+        df[target_column] = pd.to_datetime(df[target_column], format='%Y-%m-%d')
     except:
         df[target_column] = pd.to_datetime(df[target_column], format='%Y年%m月')
     return df

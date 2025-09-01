@@ -69,14 +69,26 @@ def merge_cpis(res_path: str):
         return
     
     base_path = Path('datas/raw/cpis')
+
+    """
+    手动修改: 
+    # CPI_NAME_FILE_DICT = {
+    #     'china': "macro_china_cpi_yearly.csv",
+    #     'euro': "macro_euro_cpi_yoy.csv",
+    # }
+    
+    '日期,今值' -> '时间', '现值'
+    """
+    
     CPI_NAME_FILE_DICT = {
-        'australia': "macro_australia_cpi_yearly.csv",
-        'canada': "macro_canada_cpi_yearly.csv",
         'china': "macro_china_cpi_yearly.csv",
         'euro': "macro_euro_cpi_yoy.csv",
+        'australia': "macro_australia_cpi_yearly.csv",
+        'canada': "macro_canada_cpi_yearly.csv",
         'japan': "macro_japan_cpi_yearly.csv",
         'usa': "macro_usa_cpi_yoy.csv",
     }
+    
     csv_paths = [base_path / v for v in CPI_NAME_FILE_DICT.values()]
 
     new_columns = list(CPI_NAME_FILE_DICT.keys())
@@ -148,6 +160,7 @@ def gene_fig(csv_path: str, yaxis_title: str, title: str):
     )
 
     return fig
+
 
 gdp_res = 'datas/processed/gdps/all_data.csv'
 cpi_res = 'datas/processed/cpis/all_data.csv'
