@@ -13,7 +13,7 @@ app = Dash(__name__, use_pages=True, external_stylesheets=external_stylesheets)
 # 硬编码的自定义导航顺序
 CUSTOM_ORDER = [
     'Home', 
-    'period', 
+    'Period', 
     'Allocation', 
     "Industry",   # 行业
     'Index', 

@@ -1,20 +1,109 @@
+from pathlib import Path
+from datetime import datetime
+
 from dash import Dash, dcc, html, Input, Output, callback, dash_table
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import dash
-# from pathlib import Path
+from loguru import logger
+
+from utils.clean_data import merge_res
+
 # import sys
 #
 # # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
 # sys.path.append(str(BASE_DIR))
 
-dash.register_page(__name__, name='period')
+dash.register_page(__name__)
 # app = Dash(__name__, use_pages=True, pages_folder="my_apps")
 
 
+
+# UNEMP_NAME_FILE_DICT = {
+#     'australia': "australia_unemps.csv",
+#     'canada': "canada_unemps.csv",
+#     'china': "china_unemps.csv",
+#     'euro': "euro_unemps.csv",
+#     'japan': "japan_unemps.csv",
+#     'usa': "usa_unemps.csv",
+# }
+
+
+def merge_gdps(res_path: str):
+    """
+    GDP
+    """
+    
+    final_gdp_path = Path(res_path)
+    if final_gdp_path.exists():
+        logger.info('gdps 已经存在')
+        return
+        
+    base_path = Path('datas/raw/gdps')
+    GDP_NAME_FILE_DICT = {
+        'china': "ak_china_gdp.csv",
+        'euro': "ak_euro_gdp.csv",
+        'usa': "ak_usa_gdp.csv",
+    }
+    csv_paths = [base_path / v for v in GDP_NAME_FILE_DICT.values()]
+
+    new_columns = list(GDP_NAME_FILE_DICT.keys())
+    new_columns.insert(0, 'date')
+
+    target_columns = ['日期', '今值']
+    # breakpoint()
+    addr = merge_res(csv_paths, target_columns, new_columns, final_gdp_path)
+    logger.info('addr:', addr)
+
+
+def merge_cpis(res_path: str):
+    """
+    消费者物价指数年率
+    """
+    final_cpi_path = Path(res_path)
+    if final_cpi_path.exists():
+        logger.info('cpis 已经存在')
+        return
+    
+    base_path = Path('datas/raw/cpis')
+    CPI_NAME_FILE_DICT = {
+        'australia': "macro_australia_cpi_yearly.csv",
+        'canada': "macro_canada_cpi_yearly.csv",
+        'china': "macro_china_cpi_yearly.csv",
+        'euro': "macro_euro_cpi_yoy.csv",
+        'japan': "macro_japan_cpi_yearly.csv",
+        'usa': "macro_usa_cpi_yoy.csv",
+    }
+    csv_paths = [base_path / v for v in CPI_NAME_FILE_DICT.values()]
+
+    new_columns = list(CPI_NAME_FILE_DICT.keys())
+    new_columns.insert(0, 'date')
+
+    target_columns = ['时间', '现值']
+    # breakpoint()
+    addr = merge_res(csv_paths, target_columns, new_columns, final_cpi_path)
+    logger.info('addr:', addr)
+
+
+# def merge_unemps():
+#     """
+#     失业率
+#     """
+#     base_path = Path('datas/unemps')
+#     csv_paths = [base_path / v for v in UNEMP_NAME_FILE_DICT.values()]
+
+#     new_columns = list(UNEMP_NAME_FILE_DICT.keys())
+#     new_columns.insert(0, 'date')
+
+#     target_columns = ['时间', '现值']
+#     # breakpoint()
+#     addr = merge_res(csv_paths, target_columns, new_columns, f'datas/processed/unemps/all_unemps_data_{date_str}.csv')
+#     print('addr:', addr)
+    
+    
 def gene_fig(csv_path: str, yaxis_title: str, title: str):
     df = pd.read_csv(csv_path)
     # breakpoint()
@@ -60,9 +149,14 @@ def gene_fig(csv_path: str, yaxis_title: str, title: str):
 
     return fig
 
+gdp_res = 'datas/processed/gdps/all_data.csv'
+cpi_res = 'datas/processed/cpis/all_data.csv'
+merge_gdps(gdp_res)
+merge_cpis(cpi_res)
 
-fig_gdp = gene_fig("datas/processed/gdps/all_gdps_data.csv", 'GDP年率', 'GDP年率')
-fig_cpi = gene_fig("datas/processed/cpis/all_cpi_data.csv", 'CPI年率', 'CPI年率(e.g., 数值为2.5，意味着物价一年涨2.5%)')
+
+fig_gdp = gene_fig(gdp_res, 'GDP年率', 'GDP年率')
+fig_cpi = gene_fig(cpi_res, 'CPI年率', 'CPI年率(e.g., 数值为2.5，意味着物价一年涨2.5%)')
 # fig_unemp = gene_fig("datas/processed/unemps/all_unemps_data.csv", '失业率', '失业率')
 
 

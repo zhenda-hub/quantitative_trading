@@ -30,57 +30,11 @@ def merge_virtuals():
     print('addr:', addr)
 
 
-def merge_cpis():
-    """
-    消费者物价指数年率
-    """
-    base_path = Path('datas/cpis')
-    csv_paths = [base_path / v for v in CPI_NAME_FILE_DICT.values()]
-
-    new_columns = list(CPI_NAME_FILE_DICT.keys())
-    new_columns.insert(0, 'date')
-
-    target_columns = ['时间', '现值']
-    breakpoint()
-    addr = merge_res(csv_paths, target_columns, new_columns, 'datas/cpis/all_cpi_data.csv')
-    print('addr:', addr)
-
-
-def merge_unemps():
-    """
-    失业率
-    """
-    base_path = Path('datas/unemps')
-    csv_paths = [base_path / v for v in UNEMP_NAME_FILE_DICT.values()]
-
-    new_columns = list(UNEMP_NAME_FILE_DICT.keys())
-    new_columns.insert(0, 'date')
-
-    target_columns = ['时间', '现值']
-    # breakpoint()
-    addr = merge_res(csv_paths, target_columns, new_columns, 'datas/unemps/all_unemps_data.csv')
-    print('addr:', addr)
-
-
-def merge_gdps():
-    """
-    GDP
-    """
-    base_path = Path('datas/gdps')
-    csv_paths = [base_path / v for v in GDP_NAME_FILE_DICT.values()]
-
-    new_columns = list(GDP_NAME_FILE_DICT.keys())
-    new_columns.insert(0, 'date')
-
-    target_columns = ['日期', '今值']
-    # breakpoint()
-    addr = merge_res(csv_paths, target_columns, new_columns, 'datas/gdps/all_gdps_data.csv')
-    print('addr:', addr)
 
 
 def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_csv: str):
     """
-
+    按照时间, 合并多种类型的csv为一个csv
     Args:
         csv_paths:
         target_columns: first must be time , will convert to datetime, sorted
@@ -99,7 +53,7 @@ def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_c
         # breakpoint()
         df = convert_time(df, target_columns[0])
         df_list_target.append(df[target_columns])
-    breakpoint()
+    # breakpoint()
     df_m = pd.merge(df_list_target[0], df_list_target[1], how='outer', on=target_columns[0])
     for i, df in enumerate(df_list_target[2:]):
         df_m = df_m.merge(df, how='outer', on=target_columns[0], suffixes=(f'_{i}', f'_{i+1}'))
@@ -108,7 +62,7 @@ def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_c
 
     df_m.sort_values('date', inplace=True)
 
-    print(df_m.dtypes)
+    logger.debug(df_m.dtypes)
     breakpoint()
     # df_m['比特币'] = df_m['比特币'].str.replace(',', '')
     # df_m['比特币'] = df_m['比特币'].astype(float)
@@ -116,6 +70,7 @@ def merge_res(csv_paths: list, target_columns: list, new_columns: list, output_c
     # df_m['以太坊'] = df_m['以太坊'].astype(float)
     # pd.to_numeric()
     df_m.to_csv(output_csv, index=False)
+    logger.info(f'{output_csv}已更新')
     return output_csv
 
 

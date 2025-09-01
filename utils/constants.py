@@ -35,29 +35,6 @@ VIRTUAL_SYMBOL_NAME_DICT = {
     'SOL': "Solana",
 }
 
-CPI_NAME_FILE_DICT = {
-    'australia': "macro_australia_cpi_yearly.csv",
-    'canada': "macro_canada_cpi_yearly.csv",
-    'china': "macro_china_cpi_yearly.csv",
-    'euro': "macro_euro_cpi_yoy.csv",
-    'japan': "macro_japan_cpi_yearly.csv",
-    'usa': "macro_usa_cpi_yoy.csv",
-}
-
-UNEMP_NAME_FILE_DICT = {
-    'australia': "australia_unemps.csv",
-    'canada': "canada_unemps.csv",
-    'china': "china_unemps.csv",
-    'euro': "euro_unemps.csv",
-    'japan': "japan_unemps.csv",
-    'usa': "usa_unemps.csv",
-}
-
-GDP_NAME_FILE_DICT = {
-    'china': "china_gdp.csv",
-    'euro': "euro_gdp.csv",
-    'usa': "usa_gdp.csv",
-}
 
 PERIOD_ACTION = {
     '上升': ['持续买股票'],
