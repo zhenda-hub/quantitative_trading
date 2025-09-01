@@ -372,7 +372,7 @@ if __name__ == "__main__":
     
     # 更新 efinance 数据
     get_ef_stock_data()
-    get_ef_fund_data()
+    # get_ef_fund_data()
     get_ef_bond_data()
     # get_ef_futures_data()
     
