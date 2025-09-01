@@ -91,21 +91,35 @@ def get_logic_func(avg_low: float):
     return logic_func
 
 
+def get_unlisted_bonds(df: pd.DataFrame) -> list:
+    """
+    获取未上市债券
+    """
+    return df[df['上市日期'].isna()]['债券代码'].to_list()
+
+
 dash.register_page(__name__)
 
 # TODO: auto set file
-path = Path('datas/raw/bonds/conv_20250829.csv')
-path_old = Path('datas/raw/bonds/conv_20250825.csv')
+path = Path('datas/raw/bonds/conv_20250901.csv')
+path_old = Path('datas/raw/bonds/conv_20250829.csv')
+path_base_info = Path('datas/raw/bonds/ef_bond_base_info_20250901.csv')
 
 
 df = pd.read_csv(str(path))
 df_old = pd.read_csv(str(path_old))
+df_base_info = pd.read_csv(str(path_base_info))
+unlisted_bonds = get_unlisted_bonds(df_base_info)
+
 
 msg1, msg2, avg_low, res = judge_bonds(df)
 logic_func = get_logic_func(avg_low)
 
+df = df[~df['代码'].isin(unlisted_bonds)]
 df = logic_func(df)
 df = df.sort_values(by=['转股价值'], ascending=[False])
+
+df_old = df_old[~df_old['代码'].isin(unlisted_bonds)]
 df_old = logic_func(df_old)
 df_old = df_old.sort_values(by=['转股价值'], ascending=[False])
 
