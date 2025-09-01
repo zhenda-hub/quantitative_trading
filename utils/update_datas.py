@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import akshare as ak
 import efinance as ef  # 国内
 import yfinance as yf  # 国际
+import easyquotation as eq  # 国内
 import pandas as pd
 
 load_dotenv()
@@ -207,11 +208,6 @@ def get_ak_gdp_data():
     enro_gdp.to_csv(filename, index=False)
     logger.info("欧元区GDP数据已更新")
     
-    
-# def get_eq_stock_data():
-#     """获取 easyquotation 股票数据 - 暂时停用"""
-#     pass
-
 
 def get_yf_market_data():
     """获取 yfinance 市场数据"""
@@ -357,6 +353,16 @@ def ana_bonds(bond_id2names: dict):
         df_detail = ak.bond_zh_cov_value_analysis(bond_id)
         breakpoint()
         df_detail.to_csv(f'datas/raw/bonds/details/{bond_name}.csv', index=False)
+
+
+def get_eq_stock_data():
+    date_str = datetime.now().strftime('%Y%m%d')
+    
+    obj = eq.use("sina")
+    res = obj.market_snapshot(prefix=True)
+    df = pd.DataFrame(res).T.reset_index().rename(columns={"index": "code"})
+    df.to_csv(f'datas/raw/stocks/eq_stocks_{date_str}.csv', index=False)
+    logger.info("eq股票数据已更新")
 
 
 if __name__ == "__main__":
