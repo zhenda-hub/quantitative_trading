@@ -3,6 +3,8 @@ import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 import dash
+from loguru import logger
+
 # from pathlib import Path
 # import sys
 #
@@ -35,8 +37,8 @@ fig.update_layout(
     yaxis_title='USD(美元)',
 
 )
-print('fig.layout.height', fig.layout.height)
-print('fig.layout.width', fig.layout.width)
+logger.debug('fig.layout.height', fig.layout.height)
+logger.debug('fig.layout.width', fig.layout.width)
 
 fig.update_xaxes(
     # dtick="M1",

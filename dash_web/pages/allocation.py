@@ -4,6 +4,8 @@ import plotly.express as px
 import pandas as pd
 import dash
 from plotly.subplots import make_subplots
+from loguru import logger
+
 # from pathlib import Path
 # import sys
 #
@@ -113,7 +115,7 @@ def display_alloc2(*args, **kwargs):
         category=['激进', '激进', '稳定', '稳定'],
         values=list(args)
     ))
-    print('df', df)
+    logger.info('df', df)
 
     # fig = go.Figure(data=[go.Pie(values=list(args), labels=labels)])
     fig = px.pie(

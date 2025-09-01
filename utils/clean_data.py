@@ -106,7 +106,7 @@ def update_one(old_all_csv: str, new_csv: str, target_new_columns: dict, output_
 
     df_m.sort_values('date', inplace=True)
 
-    print(df_m.dtypes)
+    logger.debug(df_m.dtypes)
     df_m.to_csv(output_csv, index=False)
     return output_csv
 

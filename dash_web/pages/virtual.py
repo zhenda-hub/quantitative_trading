@@ -29,8 +29,8 @@ fig.update_layout(
     yaxis_title='USD(美元)',
 
 )
-print('fig.layout.height', fig.layout.height)
-print('fig.layout.width', fig.layout.width)
+# print('fig.layout.height', fig.layout.height)
+# print('fig.layout.width', fig.layout.width)
 
 fig.update_xaxes(
     # dtick="M1",
