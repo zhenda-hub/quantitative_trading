@@ -64,18 +64,26 @@ ak.stock_board_industry_info_ths()
 
 if __name__ == '__main__':
 
-    for k in [
-        '沪深A股',
-        '美股',
-        '港股',
-        '行业板块',
-        '概念板块',
-        '可转债',
-        'ETF',
-    ]:
-        df = ef.stock.get_realtime_quotes(k)
-        breakpoint()
     
+    def ana_ef_fund(codes: list):
+        try:
+            # date_str = datetime.now().strftime('%Y%m%d')
+            
+            for code in codes:
+                df0 = ef.fund.get_base_info(code)        # 基金基本信息
+                ef.fund.get_pdf_reports(code)      # 基金公告, 非常老旧10年前的pdf
+                logger.info("基金pdf, 已更新")
+                
+                df1 = ef.fund.get_types_percentage(code)  # 基金类型占比
+                # df2 = ef.stock.get_members(code)         # 获取指数的成分股, FIXME: notwork
+                breakpoint()
+            
+                # filename = f"datas/raw/funds/ef_fund_list_{date_str}.csv"
+                # fund_list.to_csv(filename, index=False)
+                # logger.info("基金数据已更新")
+
+        except Exception as e:
+            logger.error(f"获取基金数据失败: {str(e)}")
     
-    
+    ana_ef_fund(['159934', '159920', '159513'])    
     

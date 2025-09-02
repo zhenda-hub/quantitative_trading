@@ -314,6 +314,7 @@ def get_ak_jsl_bond():
     try:
         cookies = os.getenv('JISILU_COOKIES')
         df = ak.bond_cb_jsl(cookie=cookies)
+        logger.info(f'jsl df shape: {df.shape}')
         breakpoint()
         filename = f"datas/raw/bonds/conv_{datetime.now().strftime("%Y%m%d")}.csv"
         df.to_csv(filename, index=False)    
@@ -334,7 +335,7 @@ def get_eq_stock_data():
     logger.info(f"eq股票数据: {filename} 已更新")
 
 
-def ana_bonds(bond_id2names: dict):
+def ana_ak_bonds(bond_id2names: dict):
     """
     对特定债券进行分析
     """
