@@ -257,10 +257,21 @@ def get_ef_stock_data():
     try:
         # 获取所有A股列表
         date_str = datetime.now().strftime('%Y%m%d')
-        stock_list = ef.stock.get_realtime_quotes()
-        filename = f"datas/raw/stocks/ef_stock_list_{date_str}.csv"
-        stock_list.to_csv(filename, index=False)
-        logger.info("股票列表数据已更新")
+        
+        for k in [
+            '沪深A股',
+            '美股',
+            '港股',
+            '行业板块',
+            '概念板块',
+            '可转债',
+            'ETF',
+        ]:
+            # PE in data
+            df = ef.stock.get_realtime_quotes(k)
+            filename = f"datas/raw/stocks/ef_{k}_{date_str}.csv"
+            df.to_csv(filename, index=False)
+            logger.info(f"ef {k} 数据已更新")
 
         # 获取上证50、沪深300、中证500成分股
         index_codes = {
@@ -302,14 +313,14 @@ def get_ef_fund_data():
 def get_ef_bond_data():
     """获取债券相关数据"""
     try:
-        date_str = datetime.now().strftime('%Y%m%d')
+        # date_str = datetime.now().strftime('%Y%m%d')
         # 获取可转债数据
-        bond_list = ef.bond.get_realtime_quotes()
-        filename = f"datas/raw/bonds/ef_bond_list_{date_str}.csv"
-        bond_list.to_csv(filename, index=False)
+        # bond_list = ef.bond.get_realtime_quotes()
+        # filename = f"datas/raw/bonds/ef_bond_list_{date_str}.csv"
+        # bond_list.to_csv(filename, index=False)
         
         bond_base_info = ef.bond.get_all_base_info()
-        filename = f"datas/raw/bonds/ef_bond_base_info_{date_str}.csv"
+        filename = f"datas/raw/bonds/ef_get_all_base_info.csv"
         bond_base_info.to_csv(filename, index=False)
         logger.info("债券数据已更新")
 
@@ -344,17 +355,6 @@ def get_ak_jsl_bond():
         logger.error(f"获取jsl债券数据失败: {str(e)}")
     
 
-
-def ana_bonds(bond_id2names: dict):
-    """
-    对特定债券进行分析
-    """
-    for bond_id, bond_name in bond_id2names.items():
-        df_detail = ak.bond_zh_cov_value_analysis(bond_id)
-        breakpoint()
-        df_detail.to_csv(f'datas/raw/bonds/details/{bond_name}.csv', index=False)
-
-
 def get_eq_stock_data():
     date_str = datetime.now().strftime('%Y%m%d')
     
@@ -365,6 +365,25 @@ def get_eq_stock_data():
     logger.info("eq股票数据已更新")
 
 
+def ana_bonds(bond_id2names: dict):
+    """
+    对特定债券进行分析
+    """
+    for bond_id, bond_name in bond_id2names.items():
+        df_detail = ak.bond_zh_cov_value_analysis(bond_id)
+        breakpoint()
+        df_detail.to_csv(f'datas/raw/bonds/details/{bond_name}.csv', index=False)
+        
+
+def ana_ef_fund(codes: list):
+    for code in codes:
+        ef.fund.get_base_info(code)        # 基金基本信息
+        ef.fund.get_pdf_reports(code)      # 基金公告
+        ef.fund.get_types_percentage(code)  # 基金类型占比
+        ef.stock.get_members(code)         # 获取指数的成分股
+        breakpoint()
+
+    
 if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
@@ -384,3 +403,7 @@ if __name__ == "__main__":
     
     # 更新 yfinance 数据
     get_yf_market_data()
+
+    # 更新 eq 数据
+    get_eq_stock_data()
+    

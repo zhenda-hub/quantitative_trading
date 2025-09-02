@@ -119,16 +119,22 @@ ak_funcs = {
 
 ef_funcs = {
     'stocks': [
-        ef.stock.get_quote_history,   # 历史行情数据
-        ef.stock.get_today_bill,      # 当日资金流向
+        # ef.stock.get_realtime_quotes, # 实时行情数据
         ef.stock.get_base_info,       # 基本信息
+        ef.stock.get_quote_history,   # 历史行情数据
+        ef.stock.get_belong_board,    # 所属板块
     ],
     'funds': [
-        ef.fund.get_base_info,        # 基金基本信息
-        ef.fund.get_history_net_value, # 历史净值
+        # ef.fund.get_fund_codes,       # 基金列表
+        # ef.fund.get_quote_history,    # 历史行情
+        
+        # ef.fund.get_base_info,        # 基金基本信息
+        # ef.fund.get_pdf_reports,      # 基金公告
+        # ef.fund.get_types_percentage, # 基金类型占比
+        # ef.stock.get_members,         # 获取指数的成分股
     ],
     'bonds': [
-        ef.bond.get_base_info,        # 债券基本信息
+        # ef.bond.get_all_base_info,    # 债券基本信息
         ef.bond.get_quote_history,    # 债券历史行情
     ]
 }

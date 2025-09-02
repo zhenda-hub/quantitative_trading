@@ -1,6 +1,9 @@
 from loguru import logger
 import pandas as pd
 import akshare as ak  # 国内
+import efinance as ef  # 国内
+import easyquotation as eq  # 国内
+# import yfinance as yf  # 国际
 
 
 def get_top_industries():
@@ -60,11 +63,18 @@ ak.stock_board_industry_info_ths()
 
 
 if __name__ == '__main__':
-    import easyquotation as eq  # 国内
-    obj = eq.use("sina")
-    res = obj.market_snapshot(prefix=True)
-    pd.DataFrame(res).T.to_csv('all_stocks.csv', index=False)
-    breakpoint()
+
+    for k in [
+        '沪深A股',
+        '美股',
+        '港股',
+        '行业板块',
+        '概念板块',
+        '可转债',
+        'ETF',
+    ]:
+        df = ef.stock.get_realtime_quotes(k)
+        breakpoint()
     
     
     

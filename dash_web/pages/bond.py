@@ -104,6 +104,7 @@ dash.register_page(__name__)
 path = Path('datas/raw/bonds/conv_20250901.csv')
 path_old = Path('datas/raw/bonds/conv_20250829.csv')
 path_base_info = Path('datas/raw/bonds/ef_bond_base_info_20250901.csv')
+'ef_get_all_base_info.csv'
 
 
 df = pd.read_csv(str(path))
