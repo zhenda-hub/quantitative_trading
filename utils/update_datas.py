@@ -314,8 +314,10 @@ def get_ak_jsl_bond():
     try:
         cookies = os.getenv('JISILU_COOKIES')
         df = ak.bond_cb_jsl(cookie=cookies)
-        logger.info(f'jsl df shape: {df.shape}')
-        breakpoint()
+        if len(df) < 200:
+            logger.error(f'jsl df get fail, need to login')
+            return
+        # breakpoint()
         filename = f"datas/raw/bonds/conv_{datetime.now().strftime("%Y%m%d")}.csv"
         df.to_csv(filename, index=False)    
         logger.info(f"jsl债券数据: {filename} 已更新")
@@ -374,23 +376,25 @@ if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
     
-    
-    # 更新 akshare 数据
-    # get_ak_stock_data()
-    get_ak_bond_data()
     get_ak_jsl_bond()
-    get_ak_fund_data()
-    get_ak_macro_data()
     
-    # 更新 efinance 数据
-    get_ef_stock_data()
-    get_ef_bond_data()
-    # get_ef_fund_data()
-    # get_ef_futures_data()
     
-    # 更新 yfinance 数据
-    get_yf_market_data()
+    # # 更新 akshare 数据
+    # # get_ak_stock_data()
+    # get_ak_bond_data()
+    # get_ak_jsl_bond()
+    # get_ak_fund_data()
+    # get_ak_macro_data()
+    
+    # # 更新 efinance 数据
+    # get_ef_stock_data()
+    # get_ef_bond_data()
+    # # get_ef_fund_data()
+    # # get_ef_futures_data()
+    
+    # # 更新 yfinance 数据
+    # get_yf_market_data()
 
-    # 更新 eq 数据
-    get_eq_stock_data()
+    # # 更新 eq 数据
+    # get_eq_stock_data()
     
