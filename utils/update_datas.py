@@ -376,25 +376,25 @@ if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
     
-    get_ak_jsl_bond()
-    
-    
-    # # 更新 akshare 数据
-    # # get_ak_stock_data()
-    # get_ak_bond_data()
     # get_ak_jsl_bond()
-    # get_ak_fund_data()
-    # get_ak_macro_data()
     
-    # # 更新 efinance 数据
-    # get_ef_stock_data()
-    # get_ef_bond_data()
-    # # get_ef_fund_data()
-    # # get_ef_futures_data()
     
-    # # 更新 yfinance 数据
-    # get_yf_market_data()
+    # 更新 akshare 数据
+    # get_ak_stock_data()
+    get_ak_bond_data()
+    get_ak_jsl_bond()
+    get_ak_fund_data()
+    get_ak_macro_data()
+    
+    # 更新 efinance 数据
+    get_ef_stock_data()
+    get_ef_bond_data()
+    # get_ef_fund_data()
+    # get_ef_futures_data()
+    
+    # 更新 yfinance 数据
+    get_yf_market_data()
 
-    # # 更新 eq 数据
-    # get_eq_stock_data()
+    # 更新 eq 数据
+    get_eq_stock_data()
     
