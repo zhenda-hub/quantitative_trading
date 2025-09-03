@@ -72,14 +72,11 @@ def get_ak_bond_data():
         logger.info(f"可转债数据: {filename} 已更新")
 
         # 国债收益率数据
-        try:
-            bond_rate = ak.bond_zh_us_rate()
-            filename = f"datas/raw/bonds/ak_cn_us_rate_{date_str}.csv"
-            ensure_dir(filename)
-            bond_rate.to_csv(filename, index=False)
-            logger.info(f"中美债券收益率数据: {filename} 已更新")
-        except Exception as e:
-            logger.error(f"获取中美债券收益率失败: {str(e)}")
+        bond_rate = ak.bond_zh_us_rate()
+        filename = f"datas/raw/bonds/ak_cn_us_rate_{date_str}.csv"
+        ensure_dir(filename)
+        bond_rate.to_csv(filename, index=False)
+        logger.info(f"中美债券收益率数据: {filename} 已更新")
 
     except Exception as e:
         logger.error(f"获取akshare债券数据失败: {str(e)}")
@@ -256,7 +253,7 @@ def get_ef_stock_data():
     """获取股票相关数据"""
     try:
         # 获取所有A股列表
-        date_str = datetime.now().strftime('%Y%m%d')
+        # date_str = datetime.now().strftime('%Y%m%d')
         
         for k in [
             '沪深A股',
@@ -269,7 +266,7 @@ def get_ef_stock_data():
         ]:
             # PE in data
             df = ef.stock.get_realtime_quotes(k)
-            filename = f"datas/raw/stocks/ef_{k}_{date_str}.csv"
+            filename = f"datas/raw/stocks/ef_{k}.csv"
             df.to_csv(filename, index=False)
             logger.info(f"ef {k} 数据: {filename} 已更新")
 
