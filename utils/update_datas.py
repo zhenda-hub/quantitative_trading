@@ -97,12 +97,12 @@ def get_ak_fund_data():
         etf_list.to_csv(filename, index=False)
         logger.info(f"ETF基金列表: {filename} 已更新")
 
-        # 基金规模数据
-        fund_aum = ak.fund_aum_em()
-        filename = f"datas/raw/funds/ak_fund_aum_{date_str}.csv"
-        ensure_dir(filename)
-        fund_aum.to_csv(filename, index=False)
-        logger.info(f"基金规模数据: {filename} 已更新")
+        # # 基金公司数据
+        # fund_aum = ak.fund_aum_em()
+        # filename = f"datas/raw/funds/ak_fund_aum_{date_str}.csv"
+        # ensure_dir(filename)
+        # fund_aum.to_csv(filename, index=False)
+        # logger.info(f"基金公司数据: {filename} 已更新")
 
         # ak.fund_portfolio_industry_allocation_em()  # 基金行业配置
     except Exception as e:
@@ -327,6 +327,9 @@ def get_ak_jsl_bond():
     
 
 def get_eq_stock_data():
+    """
+    eq stock, 没有有效数据
+    """
     date_str = datetime.now().strftime('%Y%m%d')
     
     obj = eq.use("sina")
@@ -396,5 +399,5 @@ if __name__ == "__main__":
     get_yf_market_data()
 
     # 更新 eq 数据
-    get_eq_stock_data()
+    # get_eq_stock_data()
     
