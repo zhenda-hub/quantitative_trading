@@ -101,10 +101,9 @@ def get_unlisted_bonds(df: pd.DataFrame) -> list:
 dash.register_page(__name__)
 
 # TODO: auto set file
-path = Path('datas/raw/bonds/conv_20250901.csv')
-path_old = Path('datas/raw/bonds/conv_20250829.csv')
-path_base_info = Path('datas/raw/bonds/ef_bond_base_info_20250901.csv')
-'ef_get_all_base_info.csv'
+path = Path('datas/raw/bonds/conv_20250903.csv')
+path_old = Path('datas/raw/bonds/conv_20250825.csv')
+path_base_info = Path('datas/raw/bonds/ef_get_all_base_info.csv')
 
 
 df = pd.read_csv(str(path))
