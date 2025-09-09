@@ -15,8 +15,8 @@ CUSTOM_ORDER = [
     'Home', 
     'Period', 
     'Allocation', 
-    "Industry",   # 行业
     'Index', 
+    "Industry",   # 行业
     'Company', 
     'Bond', 
     'Virtual',
