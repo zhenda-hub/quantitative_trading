@@ -32,17 +32,26 @@ layout = dbc.Container([
                                  color='涨跌幅',
                                  hover_name='股票名称',
                                  hover_data={'涨跌幅': ':.2f%', '总市值': ':,.0f'},
-                                 title='行业板块市值与涨跌幅关系图',
+                                 title='今日行业板块关系图',
                                  labels={'涨跌幅': '涨跌幅 (%)', '总市值': '总市值'},
                                  color_continuous_scale=['red', 'lightgrey', 'green'],
                                  color_continuous_midpoint=0)
                 .update_layout(
+                    height=700,  # 增加图表高度
+                    # width=1200,   # 增加图表宽度
                     xaxis_title='涨跌幅 (%)',
                     yaxis_title='总市值',
                     yaxis_type='log',
                     showlegend=False,
                     hovermode='closest'
                 )
+                .update_traces(
+                    marker=dict(
+                        sizeref=2.*max(df["成交额"])/(20**2),  # 控制最大气泡像素 ~100
+                        sizemin=2                               # 最小气泡半径至少 8 像素
+                    )
+                )
+
                 .add_vline(x=0, line_width=1, line_dash="dash", line_color="gray")
             )
         ], width=12)
