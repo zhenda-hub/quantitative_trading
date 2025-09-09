@@ -69,5 +69,26 @@ layout = dbc.Container([
                 .update_layout(xaxis_tickangle=-45)
             )
         ], width=12)
-    ])
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.H4("相关链接", className="text-center my-4"),
+            dbc.Button("大盘云图", href="https://52etf.site/", 
+                        external_link=True, target="_blank", color="primary"),
+            # dbc.ButtonGroup([
+            #     dbc.Button("东方财富", href="https://www.eastmoney.com", 
+            #             external_link=True, target="_blank", color="primary"),
+            #     dbc.Button("同花顺", href="https://www.10jqka.com.cn", 
+            #             external_link=True, color="secondary"),
+            #     dbc.Button("新浪财经", href="https://finance.sina.com.cn", 
+            #             external_link=True, color="success")
+            # ], className="me-3"),
+            
+            # dbc.ButtonGroup([
+            #     dbc.Button("债券分析", href="/bond", color="info"),
+            #     dbc.Button("首页", href="/", color="light"),
+            #     dbc.Button("虚拟货币", href="/virtual", color="warning")
+            # ])
+        ], width=12, className="text-center")
+    ]),
 ], fluid=True)
