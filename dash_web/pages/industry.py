@@ -41,17 +41,18 @@ layout = dbc.Container([
                     # width=1200,   # 增加图表宽度
                     xaxis_title='涨跌幅 (%)',
                     yaxis_title='总市值',
-                    yaxis_type='log',
+                    yaxis_type='log',  # 使用对数坐标，因为市值差异很大
                     showlegend=False,
                     hovermode='closest'
                 )
+                # 添加气泡控制
                 .update_traces(
                     marker=dict(
-                        sizeref=2.*max(df["成交额"])/(20**2),  # 控制最大气泡像素 ~100
-                        sizemin=2                               # 最小气泡半径至少 8 像素
+                        sizeref=2.*max(df["成交额"])/(20**2),  # 控制最大气泡像素 ~20
+                        sizemin=2                               # 最小气泡半径至少 2 像素
                     )
                 )
-
+                # 添加中线
                 .add_vline(x=0, line_width=1, line_dash="dash", line_color="gray")
             )
         ], width=12)
