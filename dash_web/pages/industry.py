@@ -1,48 +1,73 @@
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import Dash, dcc, html, Input, Output, callback
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
+import dash_bootstrap_components as dbc
 
-# 假设你有行业数据的DataFrame，这里用随机数据代替
-df = pd.DataFrame({
-    'Date': pd.date_range('2023-01-01', '2023-01-10'),
-    'Industry1': [10, 12, 8, 15, 11, 9, 14, 13, 16, 10],
-    'Industry2': [8, 11, 14, 10, 13, 12, 9, 15, 10, 11],
-})
+# 注册页面
+dash.register_page(__name__, path='/industry')
 
-app = dash.Dash(__name__)
+# 读取数据
+df = pd.read_csv("datas/raw/stocks/ef_行业板块.csv")
+df['总市值'] = df['总市值'].astype(float)
+df['涨跌幅'] = df['涨跌幅'].astype(float)
 
-app.layout = html.Div([
-    html.H1("行业数据涨跌图表"),
-    dcc.Graph(id='industry-chart'),
-    dcc.RangeSlider(
-        id='date-range',
-        marks={i: date.strftime('%Y-%m-%d') for i, date in enumerate(df['Date'])},
-        min=0,
-        max=len(df['Date']) - 1,
-        value=[0, len(df['Date']) - 1],
-        step=1,
-        allowCross=False
-    )
-])
-
-@app.callback(
-    Output('industry-chart', 'figure'),
-    [Input('date-range', 'value')]
-)
-def update_chart(selected_dates):
-    filtered_df = df.iloc[selected_dates[0]: selected_dates[1] + 1]
-
-    fig = px.line(filtered_df, x='Date', y=df.columns[1:], title='行业数据涨跌图表')
-    fig.update_layout(
-        xaxis_title='日期',
-        yaxis_title='行业数据',
-        legend_title='行业',
-    )
-
-    return fig
-
-# if __name__ == '__main__':
-#     app.run_server(debug=True)
+# 创建布局
+layout = dbc.Container([
+    dbc.Row([
+        dbc.Col([
+            html.H1("行业板块分析", className="text-center my-4")
+        ])
+    ]),
+    
+    dbc.Row([
+        dbc.Col([
+            dcc.Graph(
+                id='industry-bubble-chart',
+                figure=px.scatter(df, 
+                                 x='涨跌幅', 
+                                 y='总市值',
+                                 size='总市值',
+                                 color='涨跌幅',
+                                 hover_name='股票名称',
+                                 hover_data={'涨跌幅': ':.2f%', '总市值': ':,.0f'},
+                                 title='行业板块市值与涨跌幅关系图',
+                                 labels={'涨跌幅': '涨跌幅 (%)', '总市值': '总市值'},
+                                 color_continuous_scale=['red', 'lightgrey', 'green'],
+                                 color_continuous_midpoint=0)
+                .update_layout(
+                    xaxis_title='涨跌幅 (%)',
+                    yaxis_title='总市值',
+                    yaxis_type='log',
+                    showlegend=False,
+                    hovermode='closest'
+                )
+                .add_vline(x=0, line_width=1, line_dash="dash", line_color="gray")
+            )
+        ], width=12)
+    ]),
+    
+    dbc.Row([
+        dbc.Col([
+            html.H3("行业涨跌幅排名", className="text-center my-4")
+        ])
+    ]),
+    
+    dbc.Row([
+        dbc.Col([
+            dcc.Graph(
+                id='industry-bar-chart',
+                figure=px.bar(df.sort_values('涨跌幅', ascending=False),
+                             x='股票名称',
+                             y='涨跌幅',
+                             color='涨跌幅',
+                             color_continuous_scale=['red', 'lightgrey', 'green'],
+                             color_continuous_midpoint=0,
+                             title='行业涨跌幅排名',
+                             labels={'涨跌幅': '涨跌幅 (%)', '股票名称': '行业名称'})
+                .update_layout(xaxis_tickangle=-45)
+            )
+        ], width=12)
+    ])
+], fluid=True)
