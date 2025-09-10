@@ -1,14 +1,35 @@
 import dash
-from dash import Dash, html
+from dash import Dash, html, dcc, callback, Input, Output
 import dash_bootstrap_components as dbc
 
 from loguru import logger
 from utils.set_log import set_log
 set_log('dash_web.log')
 
-external_stylesheets = [dbc.themes.BOOTSTRAP]
+# 内置主题
+THEMES = {
+    "Bootstrap": dbc.themes.BOOTSTRAP,
+    "Cerulean": dbc.themes.CERULEAN,
+    "Cyborg": dbc.themes.CYBORG,
+    "Darkly": dbc.themes.DARKLY,
+    "Flatly": dbc.themes.FLATLY,
+    "Journal": dbc.themes.JOURNAL,
+    "Litera": dbc.themes.LITERA,
+    "Lumen": dbc.themes.LUMEN,
+    "Lux": dbc.themes.LUX,
+    "Minty": dbc.themes.MINTY,
+    "Pulse": dbc.themes.PULSE,
+    "Sandstone": dbc.themes.SANDSTONE,
+    "Simplex": dbc.themes.SIMPLEX,
+    "Slate": dbc.themes.SLATE,
+    "Solar": dbc.themes.SOLAR,
+    "Spacelab": dbc.themes.SPACELAB,
+    "Superhero": dbc.themes.SUPERHERO,
+    "United": dbc.themes.UNITED,
+    "Yeti": dbc.themes.YETI,
+}
 
-app = Dash(__name__, use_pages=True, external_stylesheets=external_stylesheets)
+app = Dash(__name__, use_pages=True)
 
 # 硬编码的自定义导航顺序
 CUSTOM_ORDER = [
@@ -48,6 +69,16 @@ app.layout = html.Div([
             dbc.NavItem(dbc.NavLink(page['name'], 
                       href=page["relative_path"]))
             for page in nav_pages
+        ] + [
+            dbc.NavItem(
+                dcc.Dropdown(
+                    id='theme-selector',
+                    options=[{"label": k, "value": v} for k, v in THEMES.items()],
+                    value=dbc.themes.BOOTSTRAP,
+                    clearable=False,
+                    style={'width': '120px', 'margin-left': '20px'}
+                )
+            )
         ],
         brand="Zhenda's Quantitative Trading",
         brand_href="/",
@@ -55,9 +86,22 @@ app.layout = html.Div([
         dark=True,
         fluid=True
     ),
+    # 动态样式表
+    html.Link(id="theme-link", rel="stylesheet"),
     dash.page_container
 ])
 
+# 主题切换回调（记录选择的主题，需要手动修改配置后重启应用）
+@callback(
+    Output('theme-link', 'href'),
+    Input('theme-selector', 'value')
+)
+def update_theme_store(selected_theme):
+    logger.info(f"主题已切换至: {selected_theme}")
+    return selected_theme
+
+
 if __name__ == '__main__':
     logger.info("start dash")
+    logger.info("可用主题: " + ", ".join(THEMES.keys()))
     app.run(debug=True)
