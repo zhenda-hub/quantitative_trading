@@ -25,17 +25,19 @@ layout = dbc.Container([
         dbc.Col([
             dcc.Graph(
                 id='industry-bubble-chart',
-                figure=px.scatter(df, 
-                                 x='涨跌幅', 
-                                 y='总市值',
-                                 size='总市值',
-                                 color='涨跌幅',
-                                 hover_name='股票名称',
-                                 hover_data={'涨跌幅': ':.2f%', '总市值': ':,.0f'},
-                                 title='今日行业板块关系图',
-                                 labels={'涨跌幅': '涨跌幅 (%)', '总市值': '总市值'},
-                                 color_continuous_scale=['red', 'lightgrey', 'green'],
-                                 color_continuous_midpoint=0)
+                figure=px.scatter(
+                    df, 
+                    x='涨跌幅', 
+                    y='总市值',
+                    size='总市值',
+                    color='涨跌幅',
+                    hover_name='股票名称',
+                    hover_data={'涨跌幅': ':.2f%', '总市值': ':,.0f'},
+                    title='今日行业板块关系图',
+                    labels={'涨跌幅': '涨跌幅 (%)', '总市值': '总市值'},
+                    color_continuous_scale=['red', 'lightgrey', 'green'],
+                    color_continuous_midpoint=0
+                )
                 .update_layout(
                     height=700,  # 增加图表高度
                     # width=1200,   # 增加图表宽度
