@@ -80,7 +80,7 @@ app.layout = html.Div([
                 )
             )
         ],
-        brand="Zhenda's Quantitative Trading",
+        brand="Quantitative Trading",
         brand_href="/",
         color="primary",
         dark=True,
