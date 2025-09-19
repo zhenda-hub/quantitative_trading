@@ -21,21 +21,85 @@ def ensure_dir(file_path):
         os.makedirs(directory)
 
 
-def get_ak_stock_data():
-    """获取 akshare 股票数据(code name)"""
+def get_ak_news_data():
+    """获取 akshare 新闻数据"""
     try:
         date_str = datetime.now().strftime('%Y%m%d')
-        # A股个股列表
-        stock_info = ak.stock_info_a_code_name()
-        filename = f"datas/raw/stocks/ak_stock_list_{date_str}.csv"
+        file_path = 'datas/raw/news'
+        ensure_dir(file_path)
+        
+        # 全球财经直播
+        df1 = ak.stock_info_global_ths()
+        filename = f"{file_path}/ak_stock_info_global_ths_{date_str}.csv"
+        df1.to_csv(filename, index=False)
+        logger.info(f"全球财经直播数据: {filename} 已更新")
+
+        # 同花顺财经-电报
+        df2 = ak.stock_info_global_cls()
+        filename = f"{file_path}/ak_stock_info_global_cls_{date_str}.csv"
+        df2.to_csv(filename, index=False)
+        logger.info(f"同花顺财经-电报数据: {filename} 已更新")
+
+        # 东方财富-财经早餐
+        df3 = ak.stock_info_cjzc_em()
+        filename = f"{file_path}/ak_stock_info_cjzc_em_{date_str}.csv"
+        df3.to_csv(filename, index=False)
+        logger.info(f"东方财富-财经早餐数据: {filename} 已更新")
+
+        # stock_info_global_sina
+        df4 = ak.stock_info_global_sina()
+        filename = f"{file_path}/ak_stock_info_global_sina_{date_str}.csv"
+        df4.to_csv(filename, index=False)
+        logger.info(f"新浪财经-全球财经新闻数据: {filename} 已更新")
+        
+        # stock_info_global_em
+        df5 = ak.stock_info_global_em()
+        filename = f"{file_path}/ak_stock_info_global_em_{date_str}.csv"
+        df5.to_csv(filename, index=False)
+        logger.info(f"东方财富-全球财经新闻数据: {filename} 已更新")
+        
+    except Exception as e:
+        logger.error(f"获取akshare新闻数据失败: {str(e)}")
+    
+    
+def get_ak_reits_data():
+    
+    """获取 akshare reits 数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        # reits列表
+        reits_list = ak.reits_realtime_em()
+        filename = f"datas/raw/reits/reits_realtime_em_{date_str}.csv"
         ensure_dir(filename)
-        stock_info.to_csv(filename, index=False)
-        logger.info(f"A股列表数据: {filename} 已更新")
+        reits_list.to_csv(filename, index=False)
+        logger.info(f"REITs列表数据: {filename} 已更新")
 
     except Exception as e:
-        logger.error(f"获取akshare股票数据失败: {str(e)}")
+        logger.error(f"获取akshare REITs数据失败: {str(e)}")
+    
 
+def get_ak_metals_data():
+    """获取 akshare 贵金属数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        # 黄金持仓数据
+        gold_data = ak.macro_cons_gold()
+        filename = f"datas/raw/metals/macro_cons_gold_{date_str}.csv"
+        ensure_dir(filename)
+        gold_data.to_csv(filename, index=False)
+        logger.info(f"黄金持仓数据: {filename} 已更新")
+        
+        # 白银持仓数据
+        silver_data = ak.macro_cons_silver()
+        filename = f"datas/raw/metals/macro_cons_silver_{date_str}.csv"
+        ensure_dir(filename)
+        silver_data.to_csv(filename, index=False)
+        logger.info(f"白银持仓数据: {filename} 已更新")
 
+    except Exception as e:
+        logger.error(f"获取akshare 贵金属数据失败: {str(e)}")
+        
+    
 def get_ak_industry_data():
     """获取 akshare 行业数据"""
     try:
@@ -81,6 +145,28 @@ def get_ak_bond_data():
     except Exception as e:
         logger.error(f"获取akshare债券数据失败: {str(e)}")
         
+        
+def get_ak_index_global_data():
+    """获取 akshare 全球指数数据"""
+    try:
+        date_str = datetime.now().strftime('%Y%m%d')
+        # 全球指数列表
+        index_global = ak.index_global_spot_em()
+        filename = f"datas/raw/indexes/ak_index_global_spot_em_{date_str}.csv"
+        ensure_dir(filename)
+        index_global.to_csv(filename, index=False)
+        logger.info(f"全球指数列表数据: {filename} 已更新")
+        
+        for symbol in index_global['指数代码'].unique():
+            df = ak.index_global_hist_em(symbol=symbol)
+            filename = f"datas/raw/indexes/ak_index_global_hist_em_{symbol}_{date_str}.csv"
+            ensure_dir(filename)
+            df.to_csv(filename, index=False)
+            logger.info(f"全球指数 {symbol} 数据: {filename} 已更新")
+
+    except Exception as e:
+        logger.error(f"获取akshare全球指数数据失败: {str(e)}")
+    
         
 def get_ak_fund_data():
     """获取 akshare 基金数据"""
@@ -205,6 +291,12 @@ def get_ak_gdp_data():
     enro_gdp.to_csv(filename, index=False)
     logger.info(f"欧元区GDP数据: {filename} 已更新")
     
+    # canada gdp
+    canada_gdp = ak.macro_canada_gdp_monthly()
+    filename = f"datas/raw/gdps/ak_canada_gdp.csv"
+    ensure_dir(filename)
+    canada_gdp.to_csv(filename, index=False)
+    logger.info(f"加拿大GDP数据: {filename} 已更新")
 
 def get_yf_market_data():
     """获取 yfinance 市场数据"""
@@ -380,11 +472,15 @@ if __name__ == "__main__":
     
     
     # 更新 akshare 数据
-    # get_ak_stock_data()
+    get_ak_news_data()
+    
     get_ak_bond_data()
     get_ak_jsl_bond()
+    get_ak_index_global_data()
     get_ak_fund_data()
     get_ak_macro_data()
+    get_ak_reits_data()
+    get_ak_metals_data()
     
     # 更新 efinance 数据
     get_ef_stock_data()

@@ -5,115 +5,164 @@ import easyquotation as eq  # 国内
 
 
 ak_funcs = {
-    # 大盘 宽基
-    'wide_base': [
-        ak.fund_etf_hist_em,
-        ak.index_zh_a_hist,  # A股指数
+    
+    # gold
+    ak.macro_cons_gold,
+    ak.macro_cons_silver,
+    ak.macro_cons_opec_month,
+    
+    # 新浪财经-行情中心-环球市场
+    ak.index_global_name_table,
+    ak.index_global_hist_sina, 
 
-        ak.index_us_stock_sina(symbol=".INX"),  # 美国指数
+    # 东方财富网-行情中心-全球指数
+    ak.index_global_spot_em,
+    ak.index_global_hist_em, 
+    ak.macro_info_ws,
+    
+    # 东方财富-财经早餐
+    
+    ak.stock_info_cjzc_em,
+    ak.stock_info_global_em,
+    ak.stock_info_global_ths,
+    ak.stock_info_global_futu,
+    ak.stock_info_global_sina,
+    ak.stock_info_global_cls,
+    ak.stock_info_broker_sina,
+    
+    # 主营介绍
+    
+    ak.stock_zyjs_ths, 
+    ak.stock_board_industry_summary_ths,
+    
+    
+    ak.index_zh_a_hist,
+    ak.index_zh_a_hist_min_em,
 
-        ak.stock_hk_index_spot_em(),
-        ak.stock_hk_index_daily_em(symbol="HSI"),  # 恒生指数
-        ak.crypto_hist,  # 虚拟货币历史NG
-        # 'https://cn.investing.com/crypto/currencies'  # 虚拟货币url
+    ak.cost_living,  # FIXME: not work
+    ak.crypto_js_spot,
+    
+    # gdp
+    ak.macro_china_gdp_yearly,  # gdp
+    ak.macro_china_gdp,  # gdp
+    ak.macro_china_hk_gbp,  # FIXME: not work
+    ak.macro_usa_gdp_monthly,  # usa gdp
+    ak.macro_euro_gdp_yoy,  # euro gdp
 
-        # gdp
-        ak.macro_china_gdp_yearly,  # gdp
-        ak.macro_china_gdp,  # gdp
-        ak.macro_china_hk_gbp()  # FIXME: not work
-        ak.macro_usa_gdp_monthly()  # usa gdp
-        ak.macro_euro_gdp_yoy()  # euro gdp
+    # unemp 失业率
+    ak.macro_china_urban_unemployment,  # china
+    ak.macro_china_hk_rate_of_unemployment, # hk unemp FIXME: not work
+    ak.macro_usa_unemployment_rate, # usa unemp
+    ak.macro_euro_unemployment_rate_mom,  # euro
+    ak.macro_japan_unemployment_rate,  # japan
+    ak.macro_australia_unemployment_rate,  # australia
+    ak.macro_canada_unemployment_rate,  # canada
 
-        # unemp 失业率
-        ak.macro_china_urban_unemployment,  # china
-        ak.macro_china_hk_rate_of_unemployment, # hk unemp FIXME: not work
-        ak.macro_usa_unemployment_rate, # usa unemp
-        ak.macro_euro_unemployment_rate_mom,  # euro
-        ak.macro_japan_unemployment_rate,  # japan
-        ak.macro_australia_unemployment_rate,  # australia
-        ak.macro_canada_unemployment_rate,  # canada
+    ak.macro_china_pmi_yearly,  # pmi(宏观经济好不好)
+    ak.macro_china_money_supply,  # 中国货币供应量
+    # ppi生产者物价指数(生产成本)
 
-        ak.macro_china_pmi_yearly, # pmi(宏观经济好不好)
-        ak.macro_china_money_supply,  # 中国货币供应量
-        # ppi生产者物价指数(生产成本)
+    # cpi
+    ak.macro_china_cpi_yearly,  # cpi消费者物价指数
+    ak.macro_usa_cpi_yoy,  # cpi 美国
+    ak.macro_euro_cpi_yoy,  # cpi 欧元区
+    ak.macro_australia_cpi_yearly,
+    ak.macro_canada_cpi_yearly,
+    ak.macro_japan_cpi_yearly,
 
-        # cpi
-        ak.macro_china_cpi_yearly,  # cpi消费者物价指数
-        ak.macro_usa_cpi_yoy,  # cpi 美国
-        ak.macro_euro_cpi_yoy,  # cpi 欧元区
-        ak.macro_australia_cpi_yearly,
-        ak.macro_canada_cpi_yearly,
-        ak.macro_japan_cpi_yearly,
+    # 可转债
+    
+    # 新浪财经-债券-可转债
+    
+    ak.bond_cb_profile_sina, 
+    ak.bond_cb_summary_sina,
+    
+    ak.bond_zh_cov_info_ths,
+    ak.bond_zh_cov,
+    
+    ak.bond_zh_cov_value_analysis,  # 可转债价值分析
+    ak.bond_zh_us_rate,  # 国债收益率
+
+    ak.fund_portfolio_hold_em,  # 基金持仓
+    ak.fund_portfolio_industry_allocation_em,  # 基金行业配置
+    ak.fund_report_industry_allocation_cninfo,  # 基金行业配置2
 
 
-        # 可转债
-        ak.bond_zh_cov_value_analysis('113045'),  # 可转债价值分析
-        ak.bond_zh_us_rate,  # 国债收益率
+    ak.macro_uk_gdp_yearly,
+    ak.macro_uk_gdp_quarterly,
+    ak.macro_swiss_gdp_quarterly,
+    ak.macro_canada_gdp_monthly,
 
-        ak.fund_portfolio_hold_em,  # 基金持仓
-        ak.fund_portfolio_industry_allocation_em,  # 基金行业配置
-        ak.fund_report_industry_allocation_cninfo,  # 基金行业配置2
+    ak.reits_realtime_em,  # reits
+    ak.reits_hist_em,
+    
+    
 
-
-        ak.stock_zh_index_spot,  # 大盘指数
-        ak.stock_zh_index_daily,  # 大盘指数
-        # ak.reits_realtime_em,  # reits
-        # ak.index_value_name_funddb,  # 指数
-        ak.stock_a_ttm_lyr,  # 中位数市盈率
-        ak.fund_aum_hist_em,  # 基金规模
-        ak.fund_report_industry_allocation_cninfo,  # 基金行业配置
-        ak.google_index,  # 谷歌指数
-        ak.fund_aum_em,
-    ],
+    ak.stock_zh_index_daily,  # 大盘指数
+    # ak.index_value_name_funddb,  # 指数
+    ak.stock_a_ttm_lyr,  # 中位数市盈率
+    ak.fund_aum_hist_em,  # 基金规模
+    ak.fund_report_industry_allocation_cninfo,  # 基金行业配置
+    ak.fund_aum_em,
+    
     # 行业 窄基, 看5年即可
-    'narrow_base': [
-        ak.stock_fund_flow_industry
-        ak.stock_sector_fund_flow_hist,
-        ak.fund_fh_rank_em,  # 分红排行榜， FIXME: not work
+    # 'narrow_base'
+    ak.stock_fund_flow_industry,
+    ak.stock_sector_fund_flow_hist,
+    ak.fund_fh_rank_em,  # 分红排行榜， FIXME: not work
 
-        ak.stock_board_concept_name_ths,  # 概念板块-名称， 容易炒作
-        ak.stock_board_concept_info_ths,  # 概念板块-板块简介
+    ak.stock_board_concept_name_ths,  # 概念板块-名称， 容易炒作
+    ak.stock_board_concept_info_ths,  # 概念板块-板块简介
+    
+    ak.stock_board_industry_name_em,  # 行业板块-名称， 推荐
+    ak.stock_board_industry_cons_em,  # 东财行业成分股， 推荐
+    ak.stock_board_industry_summary_ths,  # 同花顺行业一览表
 
-        ak.stock_board_industry_name_em,  # 行业板块-名称， 推荐
-        ak.stock_board_industry_cons_em,  # 东财行业成分股， 推荐
-        ak.stock_board_industry_summary_ths,  # 同花顺行业一览表
+    ak.stock_board_industry_info_ths,  # 行业板块-板块简介, 信息很少，没用
+    ak.stock_board_industry_index_ths,  # 行业指数
 
-        ak.stock_board_cons_ths,  #  同花顺行业成分股， FIXME: not work
+    ak.stock_industry_pe_ratio_cninfo,  # 行业市盈率
+    ak.stock_classify_sina,  # 按 symbol 分类后的股票
+    
+        # 大盘 宽基
+    ak.fund_etf_hist_em,
+    ak.index_zh_a_hist,  # A股指数
 
-        ak.stock_board_industry_info_ths,  # 行业板块-板块简介, 信息很少，没用
-        ak.stock_board_industry_index_ths,  # 行业指数
+    ak.index_us_stock_sina,  # 美国指数
 
-        ak.stock_industry_pe_ratio_cninfo,  # 行业市盈率
-        ak.stock_classify_sina,  # 按 symbol 分类后的股票
-    ],
-    'stocks': [
-        # 个股
-        ak.stock_a_indicator_lg,  # 市盈率, 市净率, 股息率数据接口
-        ak.stock_index_pe_lg(indicator="pe_ttm"),  # 指数市盈率
-        ak.stock_market_pe_lg(indicator="pe_ttm"),  # 市场市盈率
-        ak.stock_info_a_code_name,  # 所有股票代码
-        # 港股
-        ak.stock_zh_ah_daily,  # 港股历史行情
-        ak.stock_zh_ah_spot,  # 港股实时行情
-        # A股
-        ak.stock_zh_a_spot,  # 实时数据
-        ak.stock_zh_a_daily,  # 个股历史数据
-        ak.stock_zh_a_cdr_daily,  # 个股历史cdr数据
-        ak.stock_zh_a_minute,  # 个股历史min数据
-    ],
-    'stocks_info': [
-        ak.stock_balance_sheet_by_yearly_em,  # 资产负债表-按年度
-        ak.stock_profit_sheet_by_yearly_em,  # 利润表-按年度
-        ak.stock_cash_flow_sheet_by_yearly_em,  # 现金流量表-按年度
+    ak.stock_hk_index_spot_em,
+    ak.stock_hk_index_daily_em,  # 恒生指数
 
-        ak.stock_a_ttm_lyr(),  # 中位数市盈率
-        ak.stock_dividents_cninfo,  # 个股分红
-        ak.stock_individual_info_em,  # 个股信息
-        ak.stock_profile_cninfo,  # 个股-公司概况
+    
+    
 
-        # 收益率roe。。。
-        ak.stock_us_famous_spot_em,  # 知名美股
-    ],
+    # 'stocks'
+    # 个股
+    ak.stock_a_indicator_lg,  # 市盈率, 市净率, 股息率数据接口
+    ak.stock_index_pe_lg(indicator="pe_ttm"),  # 指数市盈率
+    ak.stock_market_pe_lg(indicator="pe_ttm"),  # 市场市盈率
+    ak.stock_info_a_code_name,  # 所有股票代码
+    # 港股
+    ak.stock_zh_ah_daily,  # 港股历史行情
+    ak.stock_zh_ah_spot,  # 港股实时行情
+    # A股
+    ak.stock_zh_a_spot,  # 实时数据
+    ak.stock_zh_a_daily,  # 个股历史数据
+    ak.stock_zh_a_cdr_daily,  # 个股历史cdr数据
+    ak.stock_zh_a_minute,  # 个股历史minute数据
+
+    # 'stocks_info'
+    ak.stock_balance_sheet_by_yearly_em,  # 资产负债表-按年度
+    ak.stock_profit_sheet_by_yearly_em,  # 利润表-按年度
+    ak.stock_cash_flow_sheet_by_yearly_em,  # 现金流量表-按年度
+
+    ak.stock_a_ttm_lyr,  # 中位数市盈率
+    ak.stock_individual_info_em,  # 个股信息
+    ak.stock_profile_cninfo,  # 个股-公司概况
+
+    ak.stock_us_famous_spot_em,  # 知名美股
+  
+
 }
 
 
@@ -166,3 +215,15 @@ yf_funcs = {
     #     yf.Ticker('QQQ'),            # Invesco纳斯达克100ETF
     # ]
 }
+
+
+
+
+
+
+
+
+    
+    # todo ========================
+    
+    # 'https://cn.investing.com/crypto/currencies'  # 虚拟货币url
