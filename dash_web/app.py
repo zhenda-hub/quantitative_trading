@@ -37,6 +37,7 @@ CUSTOM_ORDER = [
     'Period', 
     'Allocation', 
     'Index', 
+    'Metals',
     "Industry",   # 行业
     'Company', 
     'Bond', 

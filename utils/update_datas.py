@@ -83,14 +83,14 @@ def get_ak_metals_data():
         date_str = datetime.now().strftime('%Y%m%d')
         # 黄金持仓数据
         gold_data = ak.macro_cons_gold()
-        filename = f"datas/raw/metals/macro_cons_gold_{date_str}.csv"
+        filename = f"datas/raw/metals/macro_cons_gold.csv"
         ensure_dir(filename)
         gold_data.to_csv(filename, index=False)
         logger.info(f"黄金持仓数据: {filename} 已更新")
         
         # 白银持仓数据
         silver_data = ak.macro_cons_silver()
-        filename = f"datas/raw/metals/macro_cons_silver_{date_str}.csv"
+        filename = f"datas/raw/metals/macro_cons_silver.csv"
         ensure_dir(filename)
         silver_data.to_csv(filename, index=False)
         logger.info(f"白银持仓数据: {filename} 已更新")
