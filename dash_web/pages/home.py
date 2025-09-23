@@ -27,7 +27,11 @@ def get_latest_news():
     df_news = pd.concat([df_news, df_news2], ignore_index=True)
     
     df_news = df_news.drop_duplicates(subset=['title'])
-    df_news = df_news.sort_values(by='time', ascending=False)
+    
+    # 随机展示20条
+    df_news = df_news.sample(n=20, random_state=1)
+    # df_news = df_news.sort_values(by='time', ascending=False)
+    
     # 'title', 'summary', 'time', 'link'
     news_list = df_news.to_dict('records')
     
