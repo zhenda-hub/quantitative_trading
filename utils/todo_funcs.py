@@ -28,7 +28,7 @@ ak_funcs = {
     ak.stock_info_global_futu,
     ak.stock_info_global_sina,
     ak.stock_info_global_cls,
-    ak.stock_info_broker_sina,
+    ak.stock_info_broker_sina, #FIXME: not work
     
     # 主营介绍
     

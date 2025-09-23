@@ -28,32 +28,32 @@ def get_ak_news_data():
         
         # 全球财经直播
         df1 = ak.stock_info_global_ths()
-        filename = f"datas/raw/news/ak_stock_info_global_ths_{date_str}.csv"
+        filename = f"datas/raw/news/ak_stock_info_global_ths.csv"
         ensure_dir(filename)
         df1.to_csv(filename, index=False)
         logger.info(f"全球财经直播数据: {filename} 已更新")
 
         # 同花顺财经-电报
         df2 = ak.stock_info_global_cls()
-        filename = f"datas/raw/news/ak_stock_info_global_cls_{date_str}.csv"
+        filename = f"datas/raw/news/ak_stock_info_global_cls.csv"
         df2.to_csv(filename, index=False)
         logger.info(f"同花顺财经-电报数据: {filename} 已更新")
 
         # 东方财富-财经早餐
         df3 = ak.stock_info_cjzc_em()
-        filename = f"datas/raw/news/ak_stock_info_cjzc_em_{date_str}.csv"
+        filename = f"datas/raw/news/ak_stock_info_cjzc_em.csv"
         df3.to_csv(filename, index=False)
         logger.info(f"东方财富-财经早餐数据: {filename} 已更新")
 
         # stock_info_global_sina
         df4 = ak.stock_info_global_sina()
-        filename = f"datas/raw/news/ak_stock_info_global_sina_{date_str}.csv"
+        filename = f"datas/raw/news/ak_stock_info_global_sina.csv"
         df4.to_csv(filename, index=False)
         logger.info(f"新浪财经-全球财经新闻数据: {filename} 已更新")
         
         # stock_info_global_em
         df5 = ak.stock_info_global_em()
-        filename = f"datas/raw/news/ak_stock_info_global_em_{date_str}.csv"
+        filename = f"datas/raw/news/ak_stock_info_global_em.csv"
         df5.to_csv(filename, index=False)
         logger.info(f"东方财富-全球财经新闻数据: {filename} 已更新")
         
@@ -467,29 +467,23 @@ if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
     
-    # get_ak_jsl_bond()
-    
-    
-    # 更新 akshare 数据
-    get_ak_index_global_data()
-    get_ak_news_data()
-    get_ak_reits_data()
-    get_ak_metals_data()
-    
-    get_ak_bond_data()
     get_ak_jsl_bond()
-    get_ak_fund_data()
-    get_ak_macro_data()
+    get_ak_news_data()
     
-    # 更新 efinance 数据
-    get_ef_stock_data()
-    get_ef_bond_data()
-    # get_ef_fund_data()
-    # get_ef_futures_data()
     
-    # 更新 yfinance 数据
-    get_yf_market_data()
-
-    # 更新 eq 数据
-    # get_eq_stock_data()
+    # # 更新 akshare 数据
+    # get_ak_index_global_data()
+    # get_ak_reits_data()
+    # get_ak_metals_data()
+    
+    # get_ak_bond_data()
+    # get_ak_fund_data()
+    # get_ak_macro_data()
+    
+    # # 更新 efinance 数据
+    # get_ef_stock_data()
+    # get_ef_bond_data()
+    
+    # # 更新 yfinance 数据
+    # get_yf_market_data()
     

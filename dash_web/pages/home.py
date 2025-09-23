@@ -15,66 +15,23 @@ market_data = {
 }
 
 
-# 模拟最新新闻数据
+# 从CSV文件读取最新新闻数据
 def get_latest_news():
-    return [
-        {
-            'title': '美联储维持利率不变，市场反应积极',
-            'time': '2小时前',
-            'source': '财经新闻',
-            'impact': '积极',
-            'summary': '美联储宣布维持基准利率在5.25%-5.50%区间不变，符合市场预期。'
-        },
-        {
-            'title': '科技股财报季来临，投资者密切关注',
-            'time': '5小时前', 
-            'source': '华尔街日报',
-            'impact': '中性',
-            'summary': '苹果、微软等科技巨头即将发布季度财报，市场预期乐观。'
-        },
-        {
-            'title': '原油价格突破关键阻力位',
-            'time': '昨天',
-            'source': '能源资讯',
-            'impact': '积极',
-            'summary': '布伦特原油价格突破85美元/桶，创近三个月新高。'
-        },
-        {
-            'title': '新兴市场货币波动加剧',
-            'time': '昨天',
-            'source': '外汇观察',
-            'impact': '谨慎',
-            'summary': '受美元走强影响，新兴市场货币普遍承压。'
-        },
-        {
-            'title': '人工智能板块持续走强',
-            'time': '前天',
-            'source': '科技前沿',
-            'impact': '积极',
-            'summary': 'AI相关股票连续上涨，机构看好长期发展前景。'
-        },
-        {
-            'title': '房地产市场政策调整',
-            'time': '3天前',
-            'source': '地产观察',
-            'impact': '中性',
-            'summary': '多地出台房地产支持政策，市场预期逐步回暖。'
-        },
-        {
-            'title': '黄金价格创历史新高',
-            'time': '4天前',
-            'source': '贵金属分析',
-            'impact': '积极',
-            'summary': '避险情绪推动黄金价格突破2100美元/盎司。'
-        },
-        {
-            'title': '电动汽车销量增长放缓',
-            'time': '5天前',
-            'source': '汽车行业',
-            'impact': '谨慎',
-            'summary': '全球电动汽车销量增速放缓，市场竞争加剧。'
-        }
-    ]
+    
+    # title link summary
+    df_news = pd.read_csv("datas/raw/news/ak_stock_info_global_ths.csv")
+    df_news = df_news.rename(columns={'内容': 'summary', '标题': 'title', '链接': 'link', '发布时间': 'time'})
+    df_news2 = pd.read_csv("datas/raw/news/ak_stock_info_global_em.csv")
+    df_news2 = df_news2.rename(columns={'摘要': 'summary', '标题': 'title', '链接': 'link', '发布时间': 'time'})
+    # 合并两个数据源
+    df_news = pd.concat([df_news, df_news2], ignore_index=True)
+    
+    df_news = df_news.drop_duplicates(subset=['title'])
+    df_news = df_news.sort_values(by='time', ascending=False)
+    # 'title', 'summary', 'time', 'link'
+    news_list = df_news.to_dict('records')
+    
+    return news_list
 
 
 layout = dbc.Container([
@@ -221,14 +178,14 @@ layout = dbc.Container([
                     html.Div([
                         html.Div([
                             html.Div([
-                                html.H5(news['title'], className='mb-1'),
-                                html.P(news['summary'], className='text-muted small mb-2'),
-                                html.Div([
-                                    html.Small(f"{news['time']} | {news['source']}", 
-                                             className='text-muted'),
-                                    html.Span(f" {news['impact']}", 
-                                            className=f"badge bg-{'success' if news['impact'] == '积极' else 'warning' if news['impact'] == '谨慎' else 'info'} ms-2")
-                                ], className='d-flex justify-content-between align-items-center')
+                                html.A(
+                                    html.H5(news['title'], className='mb-1'),
+                                    href=news['link'],
+                                    target='_blank',
+                                    style={'textDecoration': 'none', 'color': 'inherit'}
+                                ),
+                                html.P(news['summary'], className='text-muted small mb-1'),
+                                html.Small(news['time'], className='text-muted')
                             ])
                         ], className='border-bottom pb-3 mb-3')
                         for news in get_latest_news()
