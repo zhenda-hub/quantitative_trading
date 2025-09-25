@@ -4,8 +4,6 @@
 #
 #    pip-compile requirements.in
 #
-aiofiles==24.1.0
-    # via gradio
 aiohappyeyeballs==2.6.1
     # via aiohttp
 aiohttp==3.12.15
@@ -18,13 +16,8 @@ akshare==1.17.40
     # via -r requirements.in
 altair==5.5.0
     # via streamlit
-annotated-types==0.7.0
-    # via pydantic
-anyio==4.10.0
-    # via
-    #   gradio
-    #   httpx
-    #   starlette
+asttokens==3.0.0
+    # via stack-data
 attrs==25.3.0
     # via
     #   aiohttp
@@ -40,8 +33,6 @@ blinker==1.9.0
     # via
     #   flask
     #   streamlit
-brotli==1.1.0
-    # via gradio
 bs4==0.0.2
     # via tushare
 build==1.3.0
@@ -51,8 +42,6 @@ cachetools==6.1.0
 certifi==2025.8.3
     # via
     #   curl-cffi
-    #   httpcore
-    #   httpx
     #   requests
 cffi==1.17.1
     # via curl-cffi
@@ -63,8 +52,8 @@ click==8.2.1
     #   flask
     #   pip-tools
     #   streamlit
-    #   typer
-    #   uvicorn
+comm==0.2.3
+    # via ipykernel
 cssselect==1.3.0
     # via pyquery
 curl-cffi==0.13.0
@@ -77,9 +66,12 @@ dash-bootstrap-components==2.0.4
     # via -r requirements.in
 dash-mantine-components==2.2.1
     # via -r requirements.in
+debugpy==1.8.17
+    # via ipykernel
 decorator==5.2.1
     # via
     #   akshare
+    #   ipython
     #   retry
 easyquotation==0.7.7
     # via -r requirements.in
@@ -89,12 +81,8 @@ efinance==0.5.5.2
     # via -r requirements.in
 et-xmlfile==2.0.0
     # via openpyxl
-fastapi==0.116.1
-    # via gradio
-ffmpy==0.6.1
-    # via gradio
-filelock==3.19.1
-    # via huggingface-hub
+executing==2.2.1
+    # via stack-data
 flask==3.1.2
     # via dash
 frozendict==2.4.6
@@ -103,54 +91,32 @@ frozenlist==1.7.0
     # via
     #   aiohttp
     #   aiosignal
-fsspec==2025.7.0
-    # via
-    #   gradio-client
-    #   huggingface-hub
 gitdb==4.0.12
     # via gitpython
 gitpython==3.1.45
     # via streamlit
-gradio==5.43.1
-    # via -r requirements.in
-gradio-client==1.12.1
-    # via gradio
-groovy==0.1.2
-    # via gradio
-h11==0.16.0
-    # via
-    #   httpcore
-    #   uvicorn
-hf-xet==1.1.8
-    # via huggingface-hub
 html5lib==1.1
     # via akshare
-httpcore==1.0.9
-    # via httpx
-httpx==0.28.1
-    # via
-    #   gradio
-    #   gradio-client
-    #   safehttpx
-huggingface-hub==0.34.4
-    # via
-    #   gradio
-    #   gradio-client
 idna==3.10
     # via
-    #   anyio
-    #   httpx
     #   requests
     #   yarl
 importlib-metadata==8.7.0
     # via dash
+ipykernel==6.30.1
+    # via -r requirements.in
+ipython==9.5.0
+    # via ipykernel
+ipython-pygments-lexers==1.1.1
+    # via ipython
 itsdangerous==2.2.0
     # via flask
+jedi==0.19.2
+    # via ipython
 jinja2==3.1.6
     # via
     #   altair
     #   flask
-    #   gradio
     #   pydeck
 jsonpath==0.82.2
     # via
@@ -160,6 +126,12 @@ jsonschema==4.25.1
     # via altair
 jsonschema-specifications==2025.4.1
     # via jsonschema
+jupyter-client==8.6.3
+    # via ipykernel
+jupyter-core==5.8.1
+    # via
+    #   ipykernel
+    #   jupyter-client
 loguru==0.7.3
     # via -r requirements.in
 lxml==6.0.1
@@ -172,9 +144,12 @@ markdown-it-py==4.0.0
 markupsafe==3.0.2
     # via
     #   flask
-    #   gradio
     #   jinja2
     #   werkzeug
+matplotlib-inline==0.1.7
+    # via
+    #   ipykernel
+    #   ipython
 mdurl==0.1.2
     # via markdown-it-py
 multidict==6.6.4
@@ -193,24 +168,20 @@ nest-asyncio==1.6.0
     # via
     #   akshare
     #   dash
+    #   ipykernel
 numpy==2.3.2
     # via
-    #   gradio
     #   pandas
     #   pydeck
     #   streamlit
     #   yfinance
 openpyxl==3.1.5
     # via akshare
-orjson==3.11.2
-    # via gradio
 packaging==25.0
     # via
     #   altair
     #   build
-    #   gradio
-    #   gradio-client
-    #   huggingface-hub
+    #   ipykernel
     #   pipdeptree
     #   plotly
     #   streamlit
@@ -218,24 +189,29 @@ pandas==2.3.2
     # via
     #   akshare
     #   efinance
-    #   gradio
     #   streamlit
     #   tushare
     #   yfinance
+parso==0.8.5
+    # via jedi
 peewee==3.18.2
     # via yfinance
+pexpect==4.9.0
+    # via ipython
 pillow==11.3.0
-    # via
-    #   gradio
-    #   streamlit
+    # via streamlit
 pip-tools==7.5.0
     # via -r requirements.in
 pipdeptree==2.28.0
     # via -r requirements.in
 platformdirs==4.3.8
-    # via yfinance
+    # via
+    #   jupyter-core
+    #   yfinance
 plotly==6.3.0
     # via dash
+prompt-toolkit==3.0.52
+    # via ipython
 propcache==0.3.2
     # via
     #   aiohttp
@@ -244,6 +220,12 @@ protobuf==6.32.0
     # via
     #   streamlit
     #   yfinance
+psutil==7.1.0
+    # via ipykernel
+ptyprocess==0.7.0
+    # via pexpect
+pure-eval==0.2.3
+    # via stack-data
 py==1.11.0
     # via retry
 py-mini-racer==0.6.0
@@ -252,18 +234,13 @@ pyarrow==21.0.0
     # via streamlit
 pycparser==2.22
     # via cffi
-pydantic==2.11.7
-    # via
-    #   fastapi
-    #   gradio
-pydantic-core==2.33.2
-    # via pydantic
 pydeck==0.9.1
     # via streamlit
-pydub==0.25.1
-    # via gradio
 pygments==2.19.2
-    # via rich
+    # via
+    #   ipython
+    #   ipython-pygments-lexers
+    #   rich
 pyproject-hooks==1.2.0
     # via
     #   build
@@ -271,19 +248,19 @@ pyproject-hooks==1.2.0
 pyquery==2.0.1
     # via easyutils
 python-dateutil==2.9.0.post0
-    # via pandas
+    # via
+    #   jupyter-client
+    #   pandas
 python-dotenv==1.1.1
     # via -r requirements.in
-python-multipart==0.0.20
-    # via gradio
 pytz==2025.2
     # via
     #   pandas
     #   yfinance
-pyyaml==6.0.2
+pyzmq==27.1.0
     # via
-    #   gradio
-    #   huggingface-hub
+    #   ipykernel
+    #   jupyter-client
 referencing==0.36.2
     # via
     #   jsonschema
@@ -295,7 +272,6 @@ requests==2.32.5
     #   easyquotation
     #   easyutils
     #   efinance
-    #   huggingface-hub
     #   streamlit
     #   tushare
     #   yfinance
@@ -304,21 +280,11 @@ retry==0.9.2
 retrying==1.4.2
     # via dash
 rich==14.1.0
-    # via
-    #   efinance
-    #   typer
+    # via efinance
 rpds-py==0.27.0
     # via
     #   jsonschema
     #   referencing
-ruff==0.12.10
-    # via gradio
-safehttpx==0.1.6
-    # via gradio
-semantic-version==2.10.0
-    # via gradio
-shellingham==1.5.4
-    # via typer
 simplejson==3.20.1
     # via tushare
 six==1.17.0
@@ -328,14 +294,10 @@ six==1.17.0
     #   python-dateutil
 smmap==5.0.2
     # via gitdb
-sniffio==1.3.1
-    # via anyio
 soupsieve==2.7
     # via beautifulsoup4
-starlette==0.47.3
-    # via
-    #   fastapi
-    #   gradio
+stack-data==0.6.3
+    # via ipython
 streamlit==1.48.1
     # via -r requirements.in
 tabulate==0.9.0
@@ -344,58 +306,49 @@ tenacity==9.1.2
     # via streamlit
 toml==0.10.2
     # via streamlit
-tomlkit==0.13.3
-    # via gradio
 tornado==6.5.2
-    # via streamlit
+    # via
+    #   ipykernel
+    #   jupyter-client
+    #   streamlit
 tqdm==4.67.1
     # via
     #   akshare
     #   efinance
-    #   huggingface-hub
     #   tushare
+traitlets==5.14.3
+    # via
+    #   ipykernel
+    #   ipython
+    #   jupyter-client
+    #   jupyter-core
+    #   matplotlib-inline
 tushare==1.4.24
     # via -r requirements.in
-typer==0.16.1
-    # via gradio
 typing-extensions==4.14.1
     # via
     #   aiosignal
     #   altair
-    #   anyio
     #   beautifulsoup4
     #   dash
-    #   fastapi
-    #   gradio
-    #   gradio-client
-    #   huggingface-hub
-    #   pydantic
-    #   pydantic-core
     #   referencing
-    #   starlette
     #   streamlit
-    #   typer
-    #   typing-inspection
-typing-inspection==0.4.1
-    # via pydantic
 tzdata==2025.2
     # via pandas
 urllib3==2.5.0
     # via
     #   akshare
     #   requests
-uvicorn==0.35.0
-    # via gradio
 watchdog==6.0.0
     # via streamlit
+wcwidth==0.2.14
+    # via prompt-toolkit
 webencodings==0.5.1
     # via html5lib
 websocket-client==1.8.0
     # via tushare
 websockets==15.0.1
-    # via
-    #   gradio-client
-    #   yfinance
+    # via yfinance
 werkzeug==3.1.3
     # via
     #   dash
