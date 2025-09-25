@@ -72,10 +72,31 @@ def get_ak_reits_data():
         ensure_dir(filename)
         reits_list.to_csv(filename, index=False)
         logger.info(f"REITs列表数据: {filename} 已更新")
+        
+        # reits_hist_em
+        
+        for symbol, name in zip(reits_list['代码'], reits_list['名称']):
+            try:
+                df = ak.reits_hist_em(symbol=symbol)
+            except Exception as e:
+                logger.error(f"获取REITs {symbol} 数据失败: {str(e)}")
+                
+                import traceback
+                import pprint
+                print('traceback.print_exc()')
+                traceback.print_exc()
+                
+                print("Locals:", pprint.pformat(locals()))
+                
+                continue
+            filename = f"datas/raw/reits/reits_hist_em_{name}.csv"
+            ensure_dir(filename)
+            df.to_csv(filename, index=False)
+            logger.info(f"REITs {symbol} 数据: {filename} 已更新")
 
     except Exception as e:
         logger.error(f"获取akshare REITs数据失败: {str(e)}")
-    
+        
 
 def get_ak_metals_data():
     """获取 akshare 贵金属数据"""
@@ -467,23 +488,23 @@ if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
     
+    get_ak_reits_data()
+    
+    
+    # 更新 akshare 数据
     get_ak_jsl_bond()
     get_ak_news_data()
+    get_ak_index_global_data()
+    get_ak_metals_data()
     
+    get_ak_bond_data()
+    get_ak_fund_data()
+    get_ak_macro_data()
     
-    # # 更新 akshare 数据
-    # get_ak_index_global_data()
-    # get_ak_reits_data()
-    # get_ak_metals_data()
+    # 更新 efinance 数据
+    get_ef_stock_data()
+    get_ef_bond_data()
     
-    # get_ak_bond_data()
-    # get_ak_fund_data()
-    # get_ak_macro_data()
-    
-    # # 更新 efinance 数据
-    # get_ef_stock_data()
-    # get_ef_bond_data()
-    
-    # # 更新 yfinance 数据
-    # get_yf_market_data()
+    # 更新 yfinance 数据
+    get_yf_market_data()
     
