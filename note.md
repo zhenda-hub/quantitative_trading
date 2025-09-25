@@ -28,10 +28,10 @@ CMD ["python", "main.py"]
 pip install pip-tools
 
 pip-compile requirements.in
+pip-compile --upgrade
 
 # 会删除多余包, 包严格一致
 pip-sync requirements.txt
-pip-compile --upgrade
 
 
 ```
@@ -63,14 +63,17 @@ TODO:
   - [ ] 策略(指标, 买卖)
 - [ ] gold
   - [x] 数据
-  - [ ] 绘图
+  - [x] 绘图
   - [ ] 策略(指标, 买卖)
-
-
+- [ ] news
+  - [x] 数据
+  - [x] 绘图
 - [ ] index
+  - [x] 数据
   - [ ] 绘图
   - [ ] 策略(指标, 买卖)
 - [ ] virtual
+  - [ ] 数据
   - [ ] 绘图
   - [ ] 策略(指标, 买卖)
 
