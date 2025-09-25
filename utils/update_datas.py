@@ -150,14 +150,14 @@ def get_ak_bond_data():
         
         # 可转债数据
         conv_bond = ak.bond_zh_cov()
-        filename = f"datas/raw/bonds/ak_bond_zh_cov_{date_str}.csv"
+        filename = f"datas/raw/bonds/ak_bond_zh_cov.csv"
         ensure_dir(filename)
         conv_bond.to_csv(filename, index=False)
         logger.info(f"可转债数据: {filename} 已更新")
 
         # 国债收益率数据
         bond_rate = ak.bond_zh_us_rate()
-        filename = f"datas/raw/bonds/ak_cn_us_rate_{date_str}.csv"
+        filename = f"datas/raw/bonds/ak_cn_us_rate.csv"
         ensure_dir(filename)
         bond_rate.to_csv(filename, index=False)
         logger.info(f"中美债券收益率数据: {filename} 已更新")
