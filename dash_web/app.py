@@ -41,6 +41,7 @@ CUSTOM_ORDER = [
     "Industry",   # 行业
     'Company', 
     'Bond', 
+    'Reits', 
     'Virtual',
 ]
 
