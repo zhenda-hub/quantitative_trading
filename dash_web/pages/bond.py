@@ -128,8 +128,12 @@ def create_yield_curve_chart(df_rate: pd.DataFrame):
         xaxis_title='日期',
         yaxis_title='收益率 (%)',
         hovermode='x unified',
-        height=1000,
-        showlegend=True
+        height=600,
+        showlegend=True,
+        font=dict(size=12),
+        margin=dict(l=50, r=50, t=80, b=50),
+        plot_bgcolor='rgba(240, 240, 240, 0.5)',
+        paper_bgcolor='rgba(255, 255, 255, 0.9)'
     )
     fig.update_xaxes(
         rangeslider_visible=True,  # 添加滑动块
@@ -213,75 +217,190 @@ asset_impact_data = [
 
 layout = dbc.Container(
     [
-        html.H4("国债收益率变化对各类资产的影响"),
-        dash_table.DataTable(
-            data=asset_impact_data,
-            style_table={'overflowX': 'auto', 'width': '100%'},
-            style_cell={
-                'textAlign': 'center',
-                'padding': '10px',
-                'fontSize': 14,
-                'fontFamily': 'Arial'
-            },
-            style_header={
-                'backgroundColor': 'rgb(230, 230, 230)',
-                'fontWeight': 'bold'
-            },
-            style_data_conditional=[
-                {
-                    'if': {'column_id': '国债收益率变化'},
-                    'fontWeight': 'bold'
-                }
-            ]
-        ),
-        html.Hr(),
-        dcc.Graph(figure=yield_curve_fig,),
-        html.Hr(),
+        # 国债分析部分
         dbc.Row(
             [
-                dbc.Col(html.Div(""), width=1),
-                dbc.Col(html.Div(
-                    children=[      
-                        html.H4("国内可转债， 不买银行的"),
-                        html.H5(f"{msg1}"),
-                        html.H5(f"{msg2}"),
-                        html.H5(f"推荐操作：{res}!!!!!!!!!!!!!"),
-                        html.Hr(),
-                        html.H6(f"{path.name}筛选结果："),
-                        dash_table.DataTable(
-                            data=df.to_dict('records'),
-                            style_table={'overflowX': 'auto'},
-                            sort_action='native',
-                        ),
-                        html.H6(f"{path_old.name}筛选结果："),
-                        dash_table.DataTable(
-                            data=df_old.to_dict('records'),
-                            style_table={'overflowX': 'auto'},
-                            sort_action='native',
-                        ),
-                        html.Hr(),
-                        html.H6("需要买入："),
-                        dash_table.DataTable(
-                            data=df.merge(df_old, on='代码', suffixes=('', '_old'), how='outer', indicator=True).query('_merge == "left_only"').drop('_merge', axis=1).to_dict('records'),
-                            style_table={'overflowX': 'auto'},
-                            sort_action='native',
-                        ),
-                        html.H6("需要卖出："),
-                        dash_table.DataTable(
-                            data=df.merge(df_old, on='代码', suffixes=('', '_old'), how='outer', indicator=True).query('_merge == "right_only"').drop('_merge', axis=1).to_dict('records'),
-                            style_table={'overflowX': 'auto'},
-                            sort_action='native',
-                        ),
-                        html.H6("继续持有："),
-                        dash_table.DataTable(
-                            data=df.merge(df_old, on='代码', suffixes=('', '_old')).to_dict('records'),
-                            style_table={'overflowX': 'auto'},
-                            sort_action='native',
-                        ),
-                    ]
-                ), width=10),
-                dbc.Col(html.Div(""), width=1),
+                dbc.Col(
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(
+                                html.H4("📊 国债收益率分析", className="mb-0"),
+                                className="bg-primary text-white"
+                            ),
+                            dbc.CardBody(
+                                [
+                                    html.H5("国债收益率变化对各类资产的影响", className="card-title"),
+                                    dash_table.DataTable(
+                                        data=asset_impact_data,
+                                        style_table={
+                                            'overflowX': 'auto', 
+                                            'width': '100%',
+                                            'borderRadius': '8px'
+                                        },
+                                        style_cell={
+                                            'textAlign': 'center',
+                                            'padding': '12px',
+                                            'fontSize': 14,
+                                            'fontFamily': 'Arial',
+                                            'border': '1px solid #dee2e6'
+                                        },
+                                        style_header={
+                                            'backgroundColor': '#007bff',
+                                            'color': 'white',
+                                            'fontWeight': 'bold',
+                                            'textAlign': 'center'
+                                        },
+                                        style_data_conditional=[
+                                            {
+                                                'if': {'column_id': '国债收益率变化'},
+                                                'fontWeight': 'bold',
+                                                'backgroundColor': '#f8f9fa'
+                                            }
+                                        ]
+                                    ),
+                                    html.Hr(),
+                                    dcc.Graph(figure=yield_curve_fig)
+                                ]
+                            )
+                        ],
+                        className="mb-4 shadow-sm"
+                    ),
+                    width=12
+                )
+            ]
+        ),
+        
+        # 可转债分析部分
+        dbc.Row(
+            [
+                dbc.Col(
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(
+                                html.H4("💼 可转债投资分析", className="mb-0"),
+                                className="bg-success text-white"
+                            ),
+                            dbc.CardBody(
+                                [
+                                    html.H4("国内可转债投资策略", className="card-title"),
+                                    html.P("不买银行的", className="text-muted"),
+                                    dbc.Alert(
+                                        [
+                                            html.H5("市场分析", className="alert-heading"),
+                                            html.P(f"{msg1}", className="mb-1"),
+                                            html.P(f"{msg2}", className="mb-1"),
+                                            html.Hr(),
+                                            html.H4(f"推荐操作：{res}", className="mb-0 text-danger")
+                                        ],
+                                        color="info",
+                                        className="mb-3"
+                                    ),
+                                    
+                                    # 筛选结果表格
+                                    html.H5(f"{path.name}筛选结果", className="mt-4"),
+                                    dash_table.DataTable(
+                                        data=df.to_dict('records'),
+                                        style_table={
+                                            'overflowX': 'auto',
+                                            'borderRadius': '8px'
+                                        },
+                                        style_cell={
+                                            'padding': '8px',
+                                            'fontSize': 12,
+                                            'border': '1px solid #dee2e6'
+                                        },
+                                        style_header={
+                                            'backgroundColor': '#28a745',
+                                            'color': 'white',
+                                            'fontWeight': 'bold'
+                                        },
+                                        sort_action='native',
+                                        page_size=10
+                                    ),
+                                    
+                                    html.H5(f"{path_old.name}筛选结果", className="mt-4"),
+                                    dash_table.DataTable(
+                                        data=df_old.to_dict('records'),
+                                        style_table={
+                                            'overflowX': 'auto',
+                                            'borderRadius': '8px'
+                                        },
+                                        style_cell={
+                                            'padding': '8px',
+                                            'fontSize': 12,
+                                            'border': '1px solid #dee2e6'
+                                        },
+                                        style_header={
+                                            'backgroundColor': '#28a745',
+                                            'color': 'white',
+                                            'fontWeight': 'bold'
+                                        },
+                                        sort_action='native',
+                                        page_size=10
+                                    ),
+                                    
+                                    # 交易建议
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    html.H5("需要买入", className="mt-4 text-success"),
+                                                    dash_table.DataTable(
+                                                        data=df.merge(
+                                                            df_old, on='代码', suffixes=('', '_old'), 
+                                                            how='outer', indicator=True
+                                                        ).query('_merge == "left_only"').drop('_merge', axis=1).to_dict('records'),
+                                                        style_table={'overflowX': 'auto'},
+                                                        style_cell={'padding': '6px', 'fontSize': 11},
+                                                        style_header={'backgroundColor': '#28a745', 'color': 'white'},
+                                                        sort_action='native'
+                                                    )
+                                                ],
+                                                width=4
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    html.H5("需要卖出", className="mt-4 text-danger"),
+                                                    dash_table.DataTable(
+                                                        data=df.merge(
+                                                            df_old, on='代码', suffixes=('', '_old'), 
+                                                            how='outer', indicator=True
+                                                        ).query('_merge == "right_only"').drop('_merge', axis=1).to_dict('records'),
+                                                        style_table={'overflowX': 'auto'},
+                                                        style_cell={'padding': '6px', 'fontSize': 11},
+                                                        style_header={'backgroundColor': '#dc3545', 'color': 'white'},
+                                                        sort_action='native'
+                                                    )
+                                                ],
+                                                width=4
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    html.H5("继续持有", className="mt-4 text-primary"),
+                                                    dash_table.DataTable(
+                                                        data=df.merge(
+                                                            df_old, on='代码', suffixes=('', '_old')
+                                                        ).to_dict('records'),
+                                                        style_table={'overflowX': 'auto'},
+                                                        style_cell={'padding': '6px', 'fontSize': 11},
+                                                        style_header={'backgroundColor': '#007bff', 'color': 'white'},
+                                                        sort_action='native'
+                                                    )
+                                                ],
+                                                width=4
+                                            )
+                                        ],
+                                        className="mt-3"
+                                    )
+                                ]
+                            )
+                        ],
+                        className="mb-4 shadow-sm"
+                    ),
+                    width=12
+                )
             ]
         )
-    ]
+    ],
+    fluid=True
 )
