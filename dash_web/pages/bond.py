@@ -190,9 +190,51 @@ df_old = df_old.sort_values(by=['转股价值'], ascending=[False])
 # 创建国债收益率曲线图
 yield_curve_fig = create_yield_curve_chart(df_rate)
 
+# 创建资产影响表格数据
+asset_impact_data = [
+    {
+        '国债收益率变化': '📈 上升（利息高）',
+        '股票': '↓',
+        '房地产': '↓', 
+        '债券': '↓',
+        '黄金/比特币': '↓',
+        '汇率（本币）': '↑'
+    },
+    {
+        '国债收益率变化': '📉 下降（利息低）',
+        '股票': '↑',
+        '房地产': '↑',
+        '债券': '↑',
+        '黄金/比特币': '↑',
+        '汇率（本币）': '↓'
+    }
+]
+
 
 layout = dbc.Container(
     [
+        html.H4("国债收益率变化对各类资产的影响"),
+        dash_table.DataTable(
+            data=asset_impact_data,
+            style_table={'overflowX': 'auto', 'width': '100%'},
+            style_cell={
+                'textAlign': 'center',
+                'padding': '10px',
+                'fontSize': 14,
+                'fontFamily': 'Arial'
+            },
+            style_header={
+                'backgroundColor': 'rgb(230, 230, 230)',
+                'fontWeight': 'bold'
+            },
+            style_data_conditional=[
+                {
+                    'if': {'column_id': '国债收益率变化'},
+                    'fontWeight': 'bold'
+                }
+            ]
+        ),
+        html.Hr(),
         dcc.Graph(figure=yield_curve_fig,),
         html.Hr(),
         dbc.Row(
