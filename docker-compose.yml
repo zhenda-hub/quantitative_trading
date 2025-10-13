@@ -10,8 +10,7 @@ services:
       - "8050:8050"
     volumes:
       # 挂载数据目录，确保数据持久化
-      - ./datas:/app/datas
-      - ./logs:/app/logs
+      - ./:/app
     environment:
       - JISILU_COOKIES=${JISILU_COOKIES}
       - DEBUG=0  # 设置为 true 以启用调试模式
