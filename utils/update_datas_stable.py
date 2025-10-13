@@ -32,28 +32,6 @@ def get_ak_stock_data():
 
     except Exception as e:
         logger.error(f"获取akshare股票数据失败: {str(e)}")
-
-
-def get_ak_index_global_data():
-    """获取 akshare 全球指数数据"""
-    try:
-        date_str = datetime.now().strftime('%Y%m%d')
-        # 全球指数列表
-        index_global = ak.index_global_spot_em()
-        filename = f"datas/raw/indexes/ak_index_global_spot_em_{date_str}.csv"
-        ensure_dir(filename)
-        index_global.to_csv(filename, index=False)
-        logger.info(f"全球指数列表数据: {filename} 已更新")
-        
-        for symbol in index_global['指数代码'].unique():
-            df = ak.index_global_hist_em(symbol=symbol)
-            filename = f"datas/raw/indexes/ak_index_global_hist_em_{symbol}_{date_str}.csv"
-            ensure_dir(filename)
-            df.to_csv(filename, index=False)
-            logger.info(f"全球指数 {symbol} 数据: {filename} 已更新")
-
-    except Exception as e:
-        logger.error(f"获取akshare全球指数数据失败: {str(e)}")
     
     
 if __name__ == "__main__":
@@ -62,5 +40,4 @@ if __name__ == "__main__":
     
     # 更新 akshare 数据
     get_ak_stock_data()
-    get_ak_index_global_data()
     
