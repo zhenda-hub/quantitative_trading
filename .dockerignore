@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+.venv
+venv
+.venv/
+venv/
+ENV/
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp
+
+# 数据文件（可选，如果需要在容器内生成数据则保留）
+# datas/
+
+# 文档
+*.pdf
+*.doc
+*.docx
+*.ppt
+*.pptx
+
+# 图片
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+
+# 缓存目录
+.cache
+.pytest_cache

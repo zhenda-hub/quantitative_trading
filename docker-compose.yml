@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  quantitative-trading:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quantitative-trading
+    ports:
+      - "8050:8050"
+    volumes:
+      # 挂载数据目录，确保数据持久化
+      - ./datas:/app/datas
+      - ./logs:/app/logs
+    environment:
+      - JISILU_COOKIES=${JISILU_COOKIES}
+      - DEBUG=0  # 设置为 true 以启用调试模式
+    # restart: unless-stopped
+    # 开发模式启用热重载
+    # command: python dash_web/app.py --debug

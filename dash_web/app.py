@@ -106,4 +106,4 @@ def update_theme_store(selected_theme):
 if __name__ == '__main__':
     logger.info("start dash")
     logger.info("可用主题: " + ", ".join(THEMES.keys()))
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8050, debug=True)
