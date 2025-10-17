@@ -159,7 +159,7 @@ def create_yield_curve_chart(df_rate: pd.DataFrame):
 dash.register_page(__name__)
 
 # TODO: auto set file
-path = Path('datas/raw/bonds/conv_20251013.csv')
+path = Path('datas/raw/bonds/conv_20251014.csv')
 # datas/raw/bonds/conv_20250903.csv
 path_old = Path('datas/raw/bonds/conv_20250903.csv')
 path_base_info = Path('datas/raw/bonds/ef_get_all_base_info.csv')
