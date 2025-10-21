@@ -489,12 +489,11 @@ if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
     
-    get_ak_reits_data()
-    
-    
-    # 更新 akshare 数据
     get_ak_jsl_bond()
     get_ak_news_data()
+    
+    # 更新 akshare 数据
+    get_ak_reits_data()
     get_ak_index_global_data()
     get_ak_metals_data()
     
