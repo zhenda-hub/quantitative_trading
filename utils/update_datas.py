@@ -425,7 +425,7 @@ def get_ak_jsl_bond():
         cookies = os.getenv('JISILU_COOKIES')
         df = ak.bond_cb_jsl(cookie=cookies)
         if len(df) < 200:
-            logger.error(f'jsl df get fail, need to login')
+            logger.error(f'jsl df get fail, need to login: https://www.jisilu.cn/data/cbnew/#cb')
             return
         # breakpoint()
         filename = f"datas/raw/bonds/conv_{datetime.now().strftime("%Y%m%d")}.csv"
