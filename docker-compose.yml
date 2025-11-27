@@ -14,7 +14,8 @@ services:
     environment:
       - JISILU_COOKIES=${JISILU_COOKIES}
       - DEBUG=0  # 设置为 true 以启用调试模式
-    user: "1000:1000"
+    # user: "1000:1000"
+    # user: root
     # restart: unless-stopped
     # 开发模式启用热重载
     # command: python dash_web/app.py --debug
