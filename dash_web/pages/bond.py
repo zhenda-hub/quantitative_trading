@@ -163,7 +163,7 @@ path = Path('datas/raw/bonds/conv_20251110.csv')
 # datas/raw/bonds/conv_20250903.csv
 path_old = Path('datas/raw/bonds/conv_20250903.csv')
 path_base_info = Path('datas/raw/bonds/ef_get_all_base_info.csv')
-path_rate = Path('datas/raw/bonds/ak_cn_us_rate_20250925.csv')
+path_rate = Path('datas/raw/bonds/ak_cn_us_rate.csv')
 
 
 df = pd.read_csv(str(path))
