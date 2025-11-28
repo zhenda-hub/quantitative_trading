@@ -90,6 +90,12 @@ pandas_ta: 轻量、易用，集成 Pandas。
 
 
 
+性能优化:
+
+- [x] metals: 计算单价
+- [ ] reits, index: 多个csv读取,很慢, 改用保存结果
+
+
 
 
 - [ ] 按钮刷新数据的日志问题
