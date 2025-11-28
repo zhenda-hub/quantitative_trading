@@ -104,7 +104,9 @@ def get_ak_metals_data():
         # date_str = datetime.now().strftime('%Y%m%d')
         # 黄金持仓数据
         gold_data = ak.macro_cons_gold()
+        
         gold_data['单价'] = gold_data['总价值']/gold_data['总库存']
+        gold_data['单价'] = gold_data['单价'].round(2)
         
         filename = f"datas/raw/metals/macro_cons_gold.csv"
         ensure_dir(filename)
@@ -113,7 +115,9 @@ def get_ak_metals_data():
         
         # 白银持仓数据
         silver_data = ak.macro_cons_silver()
+        
         silver_data['单价'] = silver_data['总价值']/silver_data['总库存']
+        silver_data['单价'] = silver_data['单价'].round(2)
         
         filename = f"datas/raw/metals/macro_cons_silver.csv"
         ensure_dir(filename)
@@ -493,22 +497,22 @@ if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
     
-    get_ak_jsl_bond()
-    get_ak_news_data()
+    # get_ak_jsl_bond()
+    # get_ak_news_data()
     
-    # 更新 akshare 数据
-    get_ak_reits_data()
-    get_ak_index_global_data()
+    # # 更新 akshare 数据
+    # get_ak_reits_data()
+    # get_ak_index_global_data()
     get_ak_metals_data()
     
-    get_ak_bond_data()
-    get_ak_fund_data()
-    get_ak_macro_data()
+    # get_ak_bond_data()
+    # get_ak_fund_data()
+    # get_ak_macro_data()
     
-    # 更新 efinance 数据
-    get_ef_stock_data()
-    get_ef_bond_data()
+    # # 更新 efinance 数据
+    # get_ef_stock_data()
+    # get_ef_bond_data()
     
-    # 更新 yfinance 数据
-    get_yf_market_data()
+    # # 更新 yfinance 数据
+    # get_yf_market_data()
     
