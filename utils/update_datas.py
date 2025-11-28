@@ -101,9 +101,11 @@ def get_ak_reits_data():
 def get_ak_metals_data():
     """获取 akshare 贵金属数据"""
     try:
-        date_str = datetime.now().strftime('%Y%m%d')
+        # date_str = datetime.now().strftime('%Y%m%d')
         # 黄金持仓数据
         gold_data = ak.macro_cons_gold()
+        gold_data['单价'] = gold_data['总价值']/gold_data['总库存']
+        
         filename = f"datas/raw/metals/macro_cons_gold.csv"
         ensure_dir(filename)
         gold_data.to_csv(filename, index=False)
@@ -111,6 +113,8 @@ def get_ak_metals_data():
         
         # 白银持仓数据
         silver_data = ak.macro_cons_silver()
+        silver_data['单价'] = silver_data['总价值']/silver_data['总库存']
+        
         filename = f"datas/raw/metals/macro_cons_silver.csv"
         ensure_dir(filename)
         silver_data.to_csv(filename, index=False)

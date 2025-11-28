@@ -14,8 +14,8 @@ df_silver = pd.read_csv("datas/raw/metals/macro_cons_silver.csv")
 
 # draw line
 fig = go.Figure()
-fig.add_trace(go.Scatter(x=df_glod['日期'], y=df_glod['总价值']/df_glod['总库存'], mode='lines+markers', name='Gold'))
-fig.add_trace(go.Scatter(x=df_silver['日期'], y=df_silver['总价值']/df_silver['总库存'], mode='lines+markers', name='Silver'))
+fig.add_trace(go.Scatter(x=df_glod['日期'], y=df_glod['单价'], mode='lines+markers', name='Gold'))
+fig.add_trace(go.Scatter(x=df_silver['日期'], y=df_silver['单价'], mode='lines+markers', name='Silver'))
 fig.update_layout(
     title='Gold and Silver Prices Over Time',
     xaxis_title='Date', 
