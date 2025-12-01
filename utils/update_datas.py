@@ -3,6 +3,7 @@ from datetime import datetime
 
 from loguru import logger
 from dotenv import load_dotenv
+from pathlib import Path
 import akshare as ak
 import efinance as ef  # 国内
 import yfinance as yf  # 国际
@@ -63,7 +64,9 @@ def get_ak_news_data():
     
 def get_ak_reits_data():
     
-    """获取 akshare reits 数据"""
+    """
+    获取 akshare reits 数据
+    """
     try:
         date_str = datetime.now().strftime('%Y%m%d')
         # reits列表
@@ -97,7 +100,54 @@ def get_ak_reits_data():
     except Exception as e:
         logger.error(f"获取akshare REITs数据失败: {str(e)}")
         
+    merge_ak_reits()
+        
 
+def merge_ak_reits():
+    """
+    读取多个 akshare REITs 数据, pd.merge 合并后保存为一个csv文件, 方便绘图
+    """
+    reits_dir = Path("datas/raw/reits")
+    output_dir = Path("datas/processed/reits")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    for csv_file in sorted(reits_dir.glob("reits_hist_em_*.csv")):
+        try:
+            df_tmp = pd.read_csv(csv_file)
+            if "日期" in df_tmp.columns and "今开" in df_tmp.columns:
+                # 解析日期
+                dates = pd.to_datetime(df_tmp["日期"], errors="coerce")
+                vals = pd.to_numeric(df_tmp["今开"], errors="coerce")
+
+                name = csv_file.stem.replace("reits_hist_em_", "")
+                
+                # 合并数据
+                if 'merged_df' in locals():
+                    merged_df = pd.merge(merged_df, pd.DataFrame({
+                        '日期': dates,
+                        name: vals
+                    }), on='日期', how='outer')
+                else:
+                    merged_df = pd.DataFrame({
+                        '日期': dates,
+                        name: vals
+                    })
+
+        except Exception as e:
+            logger.warning(f"读取文件 {csv_file} 失败: {e}")
+            
+    # 保存合并后的数据
+    if 'merged_df' in locals():
+        merged_df.sort_values('日期', inplace=True)
+        merge_file = output_dir / "reits_merged.csv"
+        merged_df.to_csv(merge_file, index=False)
+        logger.info(f"REITs合并数据已保存: {merge_file}")
+        
+    else:
+        logger.warning("没有可合并的REITs数据")
+
+    
+    
 def get_ak_metals_data():
     """获取 akshare 贵金属数据"""
     try:
@@ -175,9 +225,11 @@ def get_ak_bond_data():
         
         
 def get_ak_index_global_data():
-    """获取 akshare 全球指数数据"""
+    """
+    获取 akshare 全球指数数据
+    """
     try:
-        date_str = datetime.now().strftime('%Y%m%d')
+        # date_str = datetime.now().strftime('%Y%m%d')
         # 全球指数列表
         index_global = ak.index_global_spot_em()
         filename = f"datas/raw/indexes/ak_index_global_spot_em.csv"
@@ -195,6 +247,72 @@ def get_ak_index_global_data():
 
     except Exception as e:
         logger.error(f"获取akshare全球指数数据失败: {str(e)}")
+        
+    merge_ak_index()
+    
+    
+def merge_ak_index():
+    """
+    读取多个 akshare 全球指数数据, pd.merge 合并后保存为一个csv文件, 方便绘图
+    数据的columns: 日期, 名称1, 名称2, 名称3, ...
+    
+    数据为归一化值
+    归一化公式: (x - min) / (max - min)
+    归一化后保留两位小数
+    归一化后保存为新的csv文件
+    方便后续绘图使用
+    
+    """
+
+    index_dir = Path("datas/raw/indexes")
+    output_dir = Path("datas/processed/indexes")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    for csv_file in sorted(index_dir.glob("ak_index_global_hist_em_*.csv")):
+        try:
+            df_tmp = pd.read_csv(csv_file)
+            if "日期" in df_tmp.columns and "今开" in df_tmp.columns:
+                # 解析日期并归一化今开列
+                dates = pd.to_datetime(df_tmp["日期"], errors="coerce")
+                vals = pd.to_numeric(df_tmp["今开"], errors="coerce")
+                if vals.dropna().empty:
+                    continue
+                vmin = vals.min()
+                vmax = vals.max()
+                if vmax > vmin:
+                    norm = (vals - vmin) / (vmax - vmin)
+                else:
+                    norm = pd.Series(0.5, index=vals.index)
+                    
+                # norm(Series) 保留两位小数
+                norm = norm.round(2)
+
+                name = csv_file.stem.replace("ak_index_global_hist_em_", "")
+                
+                # 合并数据
+                if 'merged_df' in locals():
+                    merged_df = pd.merge(merged_df, pd.DataFrame({
+                        '日期': dates,
+                        name: norm
+                    }), on='日期', how='outer')
+                else:
+                    merged_df = pd.DataFrame({
+                        '日期': dates,
+                        name: norm
+                    })
+
+        except Exception as e:
+            logger.warning(f"读取文件 {csv_file} 失败: {e}")
+            
+    breakpoint()
+    # 保存合并后的数据
+    if 'merged_df' in locals():
+        merged_df.sort_values('日期', inplace=True)
+        merge_file = output_dir / "ak_index_global_merged.csv"
+        merged_df.to_csv(merge_file, index=False)
+        logger.info(f"全球指数合并数据已保存: {merge_file}")
+    else:
+        logger.warning("没有可合并的全球指数数据")
     
         
 def get_ak_fund_data():
@@ -497,22 +615,25 @@ if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
     
-    # get_ak_jsl_bond()
-    # get_ak_news_data()
+    get_ak_jsl_bond()
+    get_ak_news_data()
     
-    # # 更新 akshare 数据
-    # get_ak_reits_data()
-    # get_ak_index_global_data()
+    # 更新 akshare 数据
+    get_ak_reits_data()
+    get_ak_index_global_data()
     get_ak_metals_data()
     
-    # get_ak_bond_data()
-    # get_ak_fund_data()
-    # get_ak_macro_data()
+    get_ak_bond_data()
+    get_ak_fund_data()
+    get_ak_macro_data()
     
-    # # 更新 efinance 数据
-    # get_ef_stock_data()
-    # get_ef_bond_data()
+    # 更新 efinance 数据
+    get_ef_stock_data()
+    get_ef_bond_data()
     
-    # # 更新 yfinance 数据
-    # get_yf_market_data()
+    # 更新 yfinance 数据
+    get_yf_market_data()
     
+    
+    # merge_ak_index()
+    # merge_ak_reits()
