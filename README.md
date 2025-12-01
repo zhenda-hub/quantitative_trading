@@ -165,8 +165,7 @@ cp .envExample .env
 
 **运行Dash Web应用：**
 ```bash
-cd dash_web
-python app.py
+python -m dash_web.app
 ```
 
 访问 http://localhost:8050
@@ -175,7 +174,7 @@ python app.py
 
 使用定时任务更新数据：
 ```bash
-python utils/update_datas.py
+python -m utils.update_datas
 ```
 
 ## 🤝 参与贡献

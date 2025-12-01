@@ -164,8 +164,7 @@ cp .envExample .env
 
 **Run Dash Web Application:**
 ```bash
-cd dash_web
-python app.py
+python -m dash_web.app
 ```
 
 Visit http://localhost:8050
@@ -174,7 +173,7 @@ Visit http://localhost:8050
 
 Use scheduled tasks to update data:
 ```bash
-python utils/update_datas.py
+python -m utils.update_datas
 ```
 
 ## 🤝 Contributing
