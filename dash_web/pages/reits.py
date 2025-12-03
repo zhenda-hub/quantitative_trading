@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 import dash
@@ -11,17 +12,6 @@ from loguru import logger
 
 dash.register_page(__name__)
 
-
-reits_dir = Path('datas/raw/reits')
-reits_files = list(reits_dir.glob('reits_realtime_em_*.csv'))
-
-
-# 获取REITs历史数据文件
-def get_reits_hist_files():
-    """获取所有REITs历史数据文件"""
-    reits_dir = Path('datas/raw/reits')
-    hist_files = list(reits_dir.glob('reits_hist_em_*.csv'))
-    return hist_files
 
 
 # 分析REITs数据
@@ -100,36 +90,22 @@ def get_reits_categories(df):
     return category_counts
 
 
-# 处理实时整体数据
+# 处理实时整体数据, 前两个块
 df_reits = pd.read_csv('datas/raw/reits/reits_realtime_em.csv')
 analysis = analyze_reits_data(df_reits)
 category_counts = get_reits_categories(df_reits)
 
-# 获取最新的数据文件用于显示更新时间
-latest_file = max(reits_files, key=lambda x: x.stat().st_mtime) if reits_files else None
+# 绘制整体的历史数据图, 用merged的历史数据
+df = pd.read_csv('datas/processed/reits/reits_merged.csv', parse_dates=['日期'])
 
-# 绘制整体的历史数据图
-fig = go.Figure()
-for hist_file in get_reits_hist_files():
-    try:
-        df = pd.read_csv(hist_file)
-        # 从文件名中提取REITs名称
-        reits_name = hist_file.stem.replace('reits_hist_em_', '')
-        
-        # 确保数据包含必要的列
-        if '日期' in df.columns and '今开' in df.columns:
-            fig.add_trace(go.Scatter(
-                x=df['日期'], 
-                y=df['今开'],
-                mode='lines',
-                name=reits_name,
-                hovertemplate=(
-                    'REITs: ' + reits_name + 
-                    '<br>日期: %{x}<br>开盘价: %{y:.2f}<extra></extra>'
-                )
-            ))
-    except Exception as e:
-        logger.warning(f"读取文件 {hist_file} 失败: {e}")
+# 用px.line绘图，y是所有非日期列
+fig = px.line(
+    df,
+    x='日期',
+    y=[col for col in df.columns if col != '日期'],
+    title='REITs历史价格走势',
+    color_discrete_sequence=px.colors.qualitative.Dark24,
+)
 
 fig.update_layout(
     title='REITs历史价格走势',
@@ -266,14 +242,5 @@ layout = dbc.Container([
     # REITs图表
     dcc.Graph(figure=fig,),
     
-    # 数据更新时间
-    dbc.Row([
-        dbc.Col([
-            html.Div([
-                html.Small(f'数据更新时间: {latest_file.stem.split("_")[-1] if latest_file else "未知"}', 
-                         className='text-muted')
-            ], className='text-center mt-3')
-        ], width=12)
-    ])
     
 ], fluid=True, className='py-4', style={'backgroundColor': '#f8f9fa'})
