@@ -137,25 +137,19 @@ git clone git@github.com:zhenda-hub/quantitative_trading.git
 cd quantitative_trading
 ```
 
-2. **创建虚拟环境**
+2. **uv安装依赖**
+
 ```bash
-python -m venv .venv
+pip install uv
+uv sync
+
+# 激活虚拟环境
 source .venv/bin/activate  # Linux/Mac
 # 或
 .venv\Scripts\activate     # Windows
 ```
 
-3. **安装依赖**
-
-使用 `pip-tools` 进行依赖管理：
-```bash
-pip install pip-tools
-pip-compile requirements.in    # 编译依赖
-pip-sync requirements.txt      # 同步依赖
-# pipdeptree                     # 查看依赖树
-```
-
-4. **配置环境变量**
+3. **配置环境变量**
 ```bash
 cp .envExample .env
 # 编辑.env文件配置相关参数
