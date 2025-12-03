@@ -115,7 +115,24 @@ def get_fig(csv_path: str, x_key: str, y_title: str) -> go.Figure:
     return fig
 
 # 归一化指数图
-fig1 = get_fig("datas/processed/indexes/ak_index_global_merged.csv", "日期", "归一化值 (0-1)")
+
+# 模糊获取文件路径
+data_dir = Path("datas/processed/indexes")
+file_pattern = "ak_index_global_merged_*.csv"
+matching_files = list(data_dir.glob(file_pattern))
+if not matching_files:
+    raise FileNotFoundError(f"No files matching pattern {file_pattern} found in {data_dir}")
+
+# 通常只有一个匹配文件，选择第一个
+logger.info(f"找到归一化指数数据文件一共 {len(matching_files)}个")
+csv_path = str(matching_files[0])
+
+# 提取start
+start = matching_files[0].stem.split("_")[-1]
+logger.info(f"使用的归一化指数数据文件: {csv_path}, 起始日期: {start}")
+
+fig1 = get_fig(csv_path, "日期", "归一化值, 起始于 " + start)
+
 
 # 美元计价指数图, out 了
 # fig2 = get_fig("datas/processed/indexes/all_indexes_data_usd2.csv", "date", "USD(美元)")

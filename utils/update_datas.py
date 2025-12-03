@@ -257,7 +257,10 @@ def merge_ak_index():
     数据的columns: 日期, 名称1, 名称2, 名称3, ...
     
     数据为归一化值
-    归一化公式: (x - min) / (max - min)
+    min-max 会扭曲涨跌幅，只能表示区间位置，所以不能用。只有 x/start 才能表达真实涨跌率，是金融标准做法
+    
+    基准归一化（x / start）
+    
     归一化后保留两位小数
     归一化后保存为新的csv文件
     方便后续绘图使用
@@ -268,22 +271,41 @@ def merge_ak_index():
     output_dir = Path("datas/processed/indexes")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    for csv_file in sorted(index_dir.glob("ak_index_global_hist_em_*.csv")):
+    # 获取制定的csv
+    target_csv = [
+        '道琼斯', '标普500', '纳斯达克', 
+        '巴西BOVESPA',
+        '富时100', '德国DAX', '法国CAC', 
+        '日经225', 
+        '上证指数', '深证成指', '恒生指数', '沪深300',
+        '澳大利亚标普200', 
+        '印度孟买SENSEX',
+        '越南',
+    ]
+    csvs = []
+    for csv_file in index_dir.glob("ak_index_global_hist_em_*.csv"):
+        if any(tc in csv_file.stem.replace("ak_index_global_hist_em_", "") for tc in target_csv):
+            csvs.append(csv_file)
+    
+    # 获取 start date
+    start_date = get_start_date(csvs)
+    
+    for csv_file in csvs:
         try:
+            
             df_tmp = pd.read_csv(csv_file)
+            
             if "日期" in df_tmp.columns and "今开" in df_tmp.columns:
                 # 解析日期并归一化今开列
-                dates = pd.to_datetime(df_tmp["日期"], errors="coerce")
+                # dates = pd.to_datetime(df_tmp["日期"], errors="coerce")
+                dates = df_tmp["日期"]
                 vals = pd.to_numeric(df_tmp["今开"], errors="coerce")
                 if vals.dropna().empty:
                     continue
-                vmin = vals.min()
-                vmax = vals.max()
-                if vmax > vmin:
-                    norm = (vals - vmin) / (vmax - vmin)
-                else:
-                    norm = pd.Series(0.5, index=vals.index)
-                    
+
+                # 计算norm
+                start_val = vals[dates == start_date].values[0]
+                norm = vals / start_val    
                 # norm(Series) 保留两位小数
                 norm = norm.round(2)
 
@@ -302,19 +324,32 @@ def merge_ak_index():
                     })
 
         except Exception as e:
-            logger.warning(f"读取文件 {csv_file} 失败: {e}")
+            logger.error(f"读取文件 {csv_file} 失败: {e}")
             
-    breakpoint()
     # 保存合并后的数据
     if 'merged_df' in locals():
         merged_df.sort_values('日期', inplace=True)
-        merge_file = output_dir / "ak_index_global_merged.csv"
+        merge_file = output_dir / f"ak_index_global_merged_{start_date}.csv"
         merged_df.to_csv(merge_file, index=False)
         logger.info(f"全球指数合并数据已保存: {merge_file}")
     else:
-        logger.warning("没有可合并的全球指数数据")
+        logger.error("没有可合并的全球指数数据")
     
+
+def get_start_date(csvs: list) -> str:
+    """
+    获取多个csv文件的共同起始日期, 非连续
+    """
+    k = '日期'
+    common_dates = set(pd.read_csv(csvs[0])[k])
+    for f in csvs[1:]:
+        common_dates &= set(pd.read_csv(f)[k])
+    common_dates = sorted(list(common_dates))
         
+    if common_dates:
+        return min(common_dates)
+
+
 def get_ak_fund_data():
     """获取 akshare 基金数据"""
     try:
@@ -615,25 +650,25 @@ if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
     
-    get_ak_jsl_bond()
-    get_ak_news_data()
+    # get_ak_jsl_bond()
+    # get_ak_news_data()
     
-    # 更新 akshare 数据
-    get_ak_reits_data()
-    get_ak_index_global_data()
-    get_ak_metals_data()
+    # # 更新 akshare 数据
+    # get_ak_reits_data()
+    # get_ak_index_global_data()
+    # get_ak_metals_data()
     
-    get_ak_bond_data()
-    get_ak_fund_data()
-    get_ak_macro_data()
+    # get_ak_bond_data()
+    # get_ak_fund_data()
+    # get_ak_macro_data()
     
-    # 更新 efinance 数据
-    get_ef_stock_data()
-    get_ef_bond_data()
+    # # 更新 efinance 数据
+    # get_ef_stock_data()
+    # get_ef_bond_data()
     
-    # 更新 yfinance 数据
-    get_yf_market_data()
+    # # 更新 yfinance 数据
+    # get_yf_market_data()
     
     
-    # merge_ak_index()
+    merge_ak_index()
     # merge_ak_reits()
