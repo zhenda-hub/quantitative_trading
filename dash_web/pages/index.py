@@ -123,9 +123,11 @@ matching_files = list(data_dir.glob(file_pattern))
 if not matching_files:
     raise FileNotFoundError(f"No files matching pattern {file_pattern} found in {data_dir}")
 
-# 通常只有一个匹配文件，选择第一个
 logger.info(f"找到归一化指数数据文件一共 {len(matching_files)}个")
+# 选择日期最大的csv
+matching_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
 csv_path = str(matching_files[0])
+logger.info(f"最新的归一化指数数据文件: {csv_path}")
 
 # 提取start
 start = matching_files[0].stem.split("_")[-1]
