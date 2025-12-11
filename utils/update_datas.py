@@ -68,7 +68,7 @@ def get_ak_reits_data():
     获取 akshare reits 数据
     """
     try:
-        date_str = datetime.now().strftime('%Y%m%d')
+        # date_str = datetime.now().strftime('%Y%m%d')
         # reits列表
         reits_list = ak.reits_realtime_em()
         filename = f"datas/raw/reits/reits_realtime_em.csv"
@@ -100,7 +100,7 @@ def get_ak_reits_data():
     except Exception as e:
         logger.error(f"获取akshare REITs数据失败: {str(e)}")
         
-    merge_ak_reits()
+    # merge_ak_reits()
         
 
 def merge_ak_reits():
@@ -248,7 +248,7 @@ def get_ak_index_global_data():
     except Exception as e:
         logger.error(f"获取akshare全球指数数据失败: {str(e)}")
         
-    merge_ak_index()
+    # merge_ak_index()
     
     
 def merge_ak_index():
@@ -497,7 +497,7 @@ def get_yf_market_data():
             '399001.SZ': 'SZSE'
         }
         
-        # todo:check
+        # TODO: 获取SP500数据失败: Too Many Requests. Rate limited. Try after a while.
         
         # for symbol, name in tickers.items():
         #     try:
@@ -645,30 +645,47 @@ def ana_ef_fund(codes: list):
     except Exception as e:
         logger.error(f"获取基金数据失败: {str(e)}")
 
+
+"""===============================stage================================="""
+    
+    
+def update_ef():
+    # 更新 efinance 数据
+    get_ef_stock_data()
+    get_ef_bond_data()
+    
+
+def update_ak0():
+    get_ak_jsl_bond()
+    get_ak_news_data()
+    
+
+def update_ak1():
+    
+    get_ak_metals_data()
+    get_ak_bond_data()
+    get_ak_fund_data()
+    get_ak_macro_data()
+    
+    
+def update_ak2():
+    # 更新 akshare 数据
+    get_ak_reits_data()
+    get_ak_index_global_data()
+    
+    
+def update_ak3():
+    merge_ak_index()
+    merge_ak_reits()
+    
     
 if __name__ == "__main__":
     from utils.set_log import set_log
     set_log('update_datas.log')
     
-    # get_ak_jsl_bond()
-    # get_ak_news_data()
+    update_ef()
+    update_ak0()
+    update_ak1()
+    update_ak2()
+    update_ak3()
     
-    # # 更新 akshare 数据
-    # get_ak_reits_data()
-    # get_ak_index_global_data()
-    # get_ak_metals_data()
-    
-    # get_ak_bond_data()
-    # get_ak_fund_data()
-    # get_ak_macro_data()
-    
-    # # 更新 efinance 数据
-    # get_ef_stock_data()
-    # get_ef_bond_data()
-    
-    # # 更新 yfinance 数据
-    # get_yf_market_data()
-    
-    
-    merge_ak_index()
-    # merge_ak_reits()

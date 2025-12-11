@@ -159,7 +159,7 @@ def create_yield_curve_chart(df_rate: pd.DataFrame):
 dash.register_page(__name__)
 
 # TODO: remove diff
-path = Path('datas/raw/bonds/conv_20251205.csv')
+path = Path('datas/raw/bonds/conv_20251211.csv')
 # datas/raw/bonds/conv_20250903.csv
 path_old = Path('datas/raw/bonds/conv_20250903.csv')
 path_base_info = Path('datas/raw/bonds/ef_get_all_base_info.csv')
