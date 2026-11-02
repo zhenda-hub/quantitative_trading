@@ -1,3 +1,6 @@
+from datetime import datetime
+from pathlib import Path
+
 from dash import dcc, html
 import plotly.graph_objects as go
 import pandas as pd
@@ -6,37 +9,205 @@ import dash_bootstrap_components as dbc
 
 dash.register_page(__name__, path='/', folder='')
 
-# 模拟数据 - 在实际应用中可以从数据库或API获取
-market_data = {
-    'total_assets': '1,234.56M',
-    'daily_change': '+2.34%',
-    'portfolio_value': '987.65M',
-    'active_strategies': '15'
-}
+NEWS_DIR = Path("datas/raw/news")
+
+# 新闻源配置：path -> (列映射, 显示名, badge 颜色)
+# 各源表头不同，统一成 title / summary / time / link / source 五列
+NEWS_SOURCES = [
+    {
+        "path": NEWS_DIR / "ak_stock_info_global_em.csv",
+        "columns": {"title": "标题", "summary": "摘要", "time": "发布时间", "link": "链接"},
+        "name": "东财快讯",
+        "badge": "primary",
+    },
+    {
+        "path": NEWS_DIR / "ak_stock_info_global_ths.csv",
+        "columns": {"title": "标题", "summary": "内容", "time": "发布时间", "link": "链接"},
+        "name": "同花顺",
+        "badge": "success",
+    },
+    {
+        "path": NEWS_DIR / "ak_stock_info_cjzc_em.csv",
+        "columns": {"title": "标题", "summary": "摘要", "time": "发布时间", "link": "链接"},
+        "name": "财经早餐",
+        "badge": "warning",
+    },
+    {
+        # 新浪只有 时间 + 内容，没有标题和链接
+        "path": NEWS_DIR / "ak_stock_info_global_sina.csv",
+        "columns": {"summary": "内容", "time": "时间"},
+        "name": "新浪",
+        "badge": "info",
+    },
+    {
+        # 财联社的日期和时间分两列
+        "path": NEWS_DIR / "ak_stock_info_global_cls.csv",
+        "columns": {"title": "标题", "summary": "内容"},
+        "date_columns": ("发布日期", "发布时间"),
+        "name": "财联社",
+        "badge": "danger",
+    },
+]
+
+NEWS_LIMIT = 150           # 页面展示的最大新闻条数
+PER_SOURCE_LIMIT = 60      # 单一来源最多保留条数（否则高频快讯会把早餐/要闻挤没）
+SUMMARY_MAX_CHARS = 120
+TODAY_ONLY = False         # 只显示当日新闻（关：改用滚动时间窗）
+NEWS_WINDOW_HOURS = 72     # 只显示最近 72 小时内的新闻
 
 
-# 从CSV文件读取最新新闻数据
-def get_latest_news():
-    
-    # title link summary
-    df_news = pd.read_csv("datas/raw/news/ak_stock_info_global_ths.csv")
-    df_news = df_news.rename(columns={'内容': 'summary', '标题': 'title', '链接': 'link', '发布时间': 'time'})
-    df_news2 = pd.read_csv("datas/raw/news/ak_stock_info_global_em.csv")
-    df_news2 = df_news2.rename(columns={'摘要': 'summary', '标题': 'title', '链接': 'link', '发布时间': 'time'})
-    # 合并两个数据源
-    df_news = pd.concat([df_news, df_news2], ignore_index=True)
-    
-    df_news = df_news.drop_duplicates(subset=['title'])
-    
-    # 随机展示20条
-    df_news = df_news.sample(n=20, random_state=1)
-    # df_news = df_news.sort_values(by='time', ascending=False)
-    
-    # 'title', 'summary', 'time', 'link'
-    news_list = df_news.to_dict('records')
-    
-    return news_list
+def _normalize_source(config: dict) -> pd.DataFrame:
+    """把单个新闻源读成 title / summary / time / link / source / badge 六列"""
+    path = config["path"]
+    if not path.exists():
+        return pd.DataFrame()
 
+    df = pd.read_csv(path)
+    df = df.rename(columns={v: k for k, v in config["columns"].items()})
+
+    # 时间：普通源一列，财联社要拼 发布日期 + 发布时间
+    if "date_columns" in config:
+        date_col, time_col = config["date_columns"]
+        if date_col in df.columns and time_col in df.columns:
+            df["time"] = (
+                df[date_col].astype(str).str.strip()
+                + " "
+                + df[time_col].astype(str).str.strip()
+            )
+
+    for column in ("title", "summary", "time", "link"):
+        if column not in df.columns:
+            df[column] = ""
+
+    df = df[["title", "summary", "time", "link"]]
+    df["title"] = df["title"].fillna("").astype(str).str.strip()
+    df["summary"] = df["summary"].fillna("").astype(str).str.strip()
+
+    # 没有标题的源（新浪）：用内容首句当标题
+    blank = df["title"] == ""
+    if blank.any():
+        df.loc[blank, "title"] = (
+            df.loc[blank, "summary"].str.split("。").str[0].str[:60]
+        )
+
+    # 摘要开头与标题重复时去掉那一段（新浪的【标题】、同花顺/东财的“标乄 + 细节”）
+    def _strip_dup(summary: str, title: str) -> str:
+        text = summary
+        if not title or not text:
+            return text
+        for prefix in (f"【{title}】", title):
+            if text.startswith(prefix):
+                text = text[len(prefix):]
+                break
+        return text.lstrip("】】　 ，。:：")
+
+    df["summary"] = [
+        _strip_dup(summary, title)
+        for summary, title in zip(df["summary"], df["title"])
+    ]
+
+    df["time"] = pd.to_datetime(df["time"], errors="coerce")
+    df = df.dropna(subset=["time"])
+    df = df[df["title"] != ""]
+
+    df["source"] = config["name"]
+    df["badge"] = config["badge"]
+    return df
+
+
+def load_news(limit: int = NEWS_LIMIT, per_source: int = PER_SOURCE_LIMIT):
+    """合并全部新闻源，只取当日新闻，按时间倒序返回
+
+    实测可用量：东财快讯 200 / 同花顺 20 / 新浪 20 / 财联社 20 / 财经早餐 400
+
+    处理顺序：合并 → 去重 → **只留当日** → 每源配额粗筛 → 全局按时间排序取 limit。
+    每源配额是为了避免高频快讯把每天只有 1 条的财经早餐挤掉。
+
+    Returns:
+        (DataFrame, 日期说明文字)；当日无新闻时退栈到最新一天并标注。
+    """
+    empty = pd.DataFrame(columns=["title", "summary", "time", "link", "source", "badge"])
+
+    frames = [_normalize_source(config) for config in NEWS_SOURCES]
+    frames = [frame for frame in frames if not frame.empty]
+    if not frames:
+        return empty, "无数据"
+
+    df = pd.concat(frames, ignore_index=True)
+    df = df.drop_duplicates(subset=["title"], keep="first")
+
+    if TODAY_ONLY:
+        today = pd.Timestamp.now().normalize()
+        window_df = df[df["time"] >= today]
+        window_label = f"{today:%Y-%m-%d}（当日）"
+        if window_df.empty:
+            # 跨日或数据未更新时兜底：退回最新一天，并明确标注
+            fallback = df["time"].max().normalize()
+            window_df = df[df["time"] >= fallback]
+            window_label = f"{fallback:%Y-%m-%d}（非当日，数据未更新）"
+    elif NEWS_WINDOW_HOURS:
+        cutoff = pd.Timestamp.now() - pd.Timedelta(hours=NEWS_WINDOW_HOURS)
+        window_df = df[df["time"] >= cutoff]
+        window_label = f"最近 {NEWS_WINDOW_HOURS} 小时"
+        if window_df.empty:
+            # 长时间未更新时兜底：退回最新一天
+            fallback = df["time"].max().normalize()
+            window_df = df[df["time"] >= fallback]
+            window_label = (
+                f"{fallback:%Y-%m-%d}（已有 {NEWS_WINDOW_HOURS} 小时内无数据，数据未更新）"
+            )
+    else:
+        window_df = df
+        window_label = "全部"
+
+    df = window_df
+    day_label = window_label
+
+    if df.empty:
+        return empty, "无数据"
+
+    df = (
+        df.sort_values("time", ascending=False)
+        .groupby("source", group_keys=False)
+        .head(per_source)
+    )
+    df = df.sort_values("time", ascending=False).head(limit).reset_index(drop=True)
+
+    df["summary"] = df["summary"].str.slice(0, SUMMARY_MAX_CHARS)
+    return df, day_label
+
+
+def _news_item(row) -> html.Div:
+    """单条新闻：时间 + 来源标签 + 标题（可点） + 摘要"""
+    stamps = row["time"]
+    label = stamps.strftime("%m-%d %H:%M")
+    title = html.Span(row["title"], className="fw-semibold")
+    if row["link"]:
+        title = html.A(
+            title,
+            href=row["link"],
+            target="_blank",
+            style={"textDecoration": "none", "color": "inherit"},
+        )
+
+    block = [
+        html.Div([
+            html.Small(label, className="text-muted me-2"),
+            dbc.Badge(row["source"], color=row["badge"], pill=True, className="me-2"),
+            title,
+        ], className="d-flex align-items-center flex-wrap")
+    ]
+    if row["summary"]:
+        block.append(
+            html.P(row["summary"], className="text-muted small mb-0 mt-1")
+        )
+    return html.Div(block, className="border-bottom pb-2 mb-2")
+
+
+news_df, news_day_label = load_news()
+latest_update = (
+    news_df["time"].max().strftime("%H:%M") if not news_df.empty else "无数据"
+)
 
 layout = dbc.Container([
     # 欢迎区域
@@ -55,180 +226,39 @@ layout = dbc.Container([
             ], className='py-5', style={'backgroundColor': '#f8f9fa'})
         ], width=12)
     ]),
-    
-    # 实时数据概览区域
+
+    # 快捷入口（横向一行，不再挤占新闻宽度）
     dbc.Row([
         dbc.Col([
-            dbc.Card([
-                dbc.CardHeader('📊 实时市场概览'),
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            html.Div([
-                                html.H5('主要指数', className='text-primary'),
-                                html.Div([
-                                    html.Span('上证指数: ', className='fw-bold'),
-                                    html.Span('3,245.67', className='text-success'),
-                                    html.Small(' +1.23%', className='text-success ms-2')
-                                ], className='mb-1'),
-                                html.Div([
-                                    html.Span('深证成指: ', className='fw-bold'),
-                                    html.Span('11,234.56', className='text-success'),
-                                    html.Small(' +0.89%', className='text-success ms-2')
-                                ], className='mb-1'),
-                                html.Div([
-                                    html.Span('创业板指: ', className='fw-bold'),
-                                    html.Span('2,345.78', className='text-danger'),
-                                    html.Small(' -0.45%', className='text-danger ms-2')
-                                ])
-                            ])
-                        ], md=4),
-                        dbc.Col([
-                            html.Div([
-                                html.H5('商品期货', className='text-info'),
-                                html.Div([
-                                    html.Span('黄金: ', className='fw-bold'),
-                                    html.Span('2,045.50', className='text-success'),
-                                    html.Small(' +0.78%', className='text-success ms-2')
-                                ], className='mb-1'),
-                                html.Div([
-                                    html.Span('原油: ', className='fw-bold'),
-                                    html.Span('85.23', className='text-success'),
-                                    html.Small(' +2.15%', className='text-success ms-2')
-                                ], className='mb-1'),
-                                html.Div([
-                                    html.Span('铜: ', className='fw-bold'),
-                                    html.Span('8,456.00', className='text-danger'),
-                                    html.Small(' -0.32%', className='text-danger ms-2')
-                                ])
-                            ])
-                        ], md=4),
-                        dbc.Col([
-                            html.Div([
-                                html.H5('外汇市场', className='text-warning'),
-                                html.Div([
-                                    html.Span('USD/CNY: ', className='fw-bold'),
-                                    html.Span('7.2456', className='text-success'),
-                                    html.Small(' +0.12%', className='text-success ms-2')
-                                ], className='mb-1'),
-                                html.Div([
-                                    html.Span('EUR/USD: ', className='fw-bold'),
-                                    html.Span('1.0854', className='text-danger'),
-                                    html.Small(' -0.08%', className='text-danger ms-2')
-                                ], className='mb-1'),
-                                html.Div([
-                                    html.Span('GBP/USD: ', className='fw-bold'),
-                                    html.Span('1.2654', className='text-success'),
-                                    html.Small(' +0.15%', className='text-success ms-2')
-                                ])
-                            ])
-                        ], md=4)
-                    ]),
-                    # html.Hr(),
-                    # dbc.Row([
-                    #     dbc.Col([
-                    #         html.Div([
-                    #             html.H6('今日交易统计', className='text-center'),
-                    #             html.Div([
-                    #                 html.H4('156', className='text-center text-primary mb-0'),
-                    #                 html.Small('成交笔数', className='text-muted d-block text-center')
-                    #             ])
-                    #         ])
-                    #     ], md=3),
-                    #     dbc.Col([
-                    #         html.Div([
-                    #             html.H6('持仓市值', className='text-center'),
-                    #             html.Div([
-                    #                 html.H4('876.5M', className='text-center text-success mb-0'),
-                    #                 html.Small('当前估值', className='text-muted d-block text-center')
-                    #             ])
-                    #         ])
-                    #     ], md=3),
-                    #     dbc.Col([
-                    #         html.Div([
-                    #             html.H6('收益率', className='text-center'),
-                    #             html.Div([
-                    #                 html.H4('+8.76%', className='text-center text-info mb-0'),
-                    #                 html.Small('本月累计', className='text-muted d-block text-center')
-                    #             ])
-                    #         ])
-                    #     ], md=3),
-                    #     dbc.Col([
-                    #         html.Div([
-                    #             html.H6('风险指标', className='text-center'),
-                    #             html.Div([
-                    #                 html.H4('0.23', className='text-center text-warning mb-0'),
-                    #                 html.Small('夏普比率', className='text-muted d-block text-center')
-                    #             ])
-                    #         ])
-                    #     ], md=3)
-                    # ])
-                ])
-            ], className='border-0 shadow-sm',
-               style={'transition': 'transform 0.2s ease-in-out'})
-        ], width=12, className='mb-4')
-    ]),
-    
-    # 图表预览和功能导航
+            dbc.Button('📈 指数分析', color='primary', href='/index', size='sm', className='me-2'),
+            dbc.Button('💰 金属市场', color='success', href='/metals', size='sm', className='me-2'),
+            dbc.Button('🏢 行业分析', color='info', href='/industry', size='sm', className='me-2'),
+            dbc.Button('📊 虚拟资产', color='warning', href='/virtual', size='sm', className='me-2'),
+            dbc.Button('🔗 可转债', color='secondary', href='/bond', size='sm'),
+        ], width=12, className='text-center')
+    ], className='mb-3'),
+
+    # 最新市场新闻（全宽 + 视口高度自适应）
     dbc.Row([
-        # 最新新闻 - 扩大区域
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader([
-                    html.H4('📰 最新市场新闻', className='mb-0'),
-                    # html.Small('实时更新', className='text-muted')
+                    html.Div([
+                        html.H4('📰 最新市场新闻', className='mb-0'),
+                        html.Small(
+                            f"{len(news_df)} 条 · {news_day_label} · 按时间倒序 · 最新 {latest_update}",
+                            className='text-muted',
+                        ),
+                    ], className='d-flex align-items-center gap-3 flex-wrap'),
                 ]),
                 dbc.CardBody([
-                    html.Div([
-                        html.Div([
-                            html.Div([
-                                html.A(
-                                    html.H5(news['title'], className='mb-1'),
-                                    href=news['link'],
-                                    target='_blank',
-                                    style={'textDecoration': 'none', 'color': 'inherit'}
-                                ),
-                                html.P(news['summary'], className='text-muted small mb-1'),
-                                html.Small(news['time'], className='text-muted')
-                            ])
-                        ], className='border-bottom pb-3 mb-3')
-                        for news in get_latest_news()
-                    ], style={'maxHeight': '400px', 'overflowY': 'auto', 'padding': '10px'})
+                    html.Div(
+                        [_news_item(row) for _, row in news_df.iterrows()],
+                        style={'maxHeight': '72vh', 'overflowY': 'auto', 'padding': '10px'},
+                    )
                 ])
-            ], className='h-100 border-0 shadow-sm',
-               style={'transition': 'transform 0.2s ease-in-out', 'minHeight': '450px'})
-        ], md=8, className='mb-3'),  # 从md=6改为md=8，占据更多空间
-        
-        # 快速导航 - 缩小区域
-        dbc.Col([
-            dbc.Card([
-                dbc.CardHeader('🚀 快速导航'),
-                dbc.CardBody([
-                    dbc.Row([
-                        dbc.Col([
-                            dbc.Button(
-                                '📈 指数分析', color='primary',
-                                href='/index', className='w-100 mb-2', size='sm'
-                            ),
-                            dbc.Button(
-                                '💰 金属市场', color='success',
-                                href='/metals', className='w-100 mb-2', size='sm'
-                            ),
-                            dbc.Button(
-                                '🏢 行业分析', color='info',
-                                href='/industry', className='w-100 mb-2', size='sm'
-                            ),
-                            dbc.Button(
-                                '📊 虚拟资产', color='warning',
-                                href='/virtual', className='w-100 mb-2', size='sm'
-                            )
-                        ], width=12)
-                    ])
-                ])
-            ], className='h-100 border-0 shadow-sm',
-               style={'transition': 'transform 0.2s ease-in-out'})
-        ], md=4, className='mb-3')  # 从md=6改为md=4，缩小空间
+            ], className='border-0 shadow-sm')
+        ], width=12)
     ]),
-    
-    
+
 ], fluid=True, className='py-4', style={'backgroundColor': '#f8f9fa'})

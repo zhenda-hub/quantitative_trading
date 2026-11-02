@@ -4,7 +4,9 @@ import pandas as pd
 import dash
 from utils.chart_utils import CHART_HEIGHT
 
-dash.register_page(__name__)
+# 已停用（2026-11-02）：页面暂不对外，保留代码以便后续恢复
+# 需要恢复时取消下面一行的注释，并在 dash_web/app.py 的 CUSTOM_ORDER 里加回 'Company'
+# dash.register_page(__name__)
 
 layout = html.Div([
     html.H4("股票K线图"),

@@ -39,7 +39,7 @@ CUSTOM_ORDER = [
     'Index', 
     'Metals',
     "Industry",   # 行业
-    'Company', 
+    # 'Company',   # 已停用：pages/company.py 的 register_page 已注释
     'Bond', 
     'Reits', 
     'Virtual',
