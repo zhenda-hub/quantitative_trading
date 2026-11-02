@@ -9,7 +9,7 @@ dependencies = [
     "aiohttp==3.12.15",
     "aiosignal==1.4.0",
     "akracer[py-mini-racer]==0.0.13",
-    "akshare==1.17.40",
+    "akshare==1.20.22",
     "altair==5.5.0",
     "asttokens==3.0.0",
     "attrs==25.3.0",
