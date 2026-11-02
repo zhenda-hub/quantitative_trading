@@ -10,6 +10,7 @@ import yfinance as yf  # 国际
 from dotenv import load_dotenv
 from func_timeout import FunctionTimedOut, func_timeout
 from loguru import logger
+from time import sleep
 
 load_dotenv()
 
@@ -319,27 +320,74 @@ def get_ak_bond_data():
         logger.info(f"中美债券收益率数据: {filename} 已更新")
 
 
+# 全球指数名单(唯一来源): spot 接口失败时用它兜底; merge_ak_index() 也用它筛选 csv
+FALLBACK_INDEX_SYMBOLS = [
+    "道琼斯",
+    "标普500",
+    "纳斯达克",
+    "加拿大S&PTSX",
+    "巴西BOVESPA",
+    "富时100",
+    "德国DAX",
+    "法国CAC",
+    "日经225",
+    "韩国KOSPI",
+    "上证指数",
+    "深证成指",
+    "恒生指数",
+    "沪深300",
+    "澳大利亚标普200",
+    "印度孟买SENSEX",
+    "越南",
+]
+
+
 @data_handler
 def get_ak_index_global_data():
     """
     获取 akshare 全球指数数据
+
+    spot 接口只用来拿指数名单, 不能让它成为单点依赖:
+    spot 失败时回落到 FALLBACK_INDEX_SYMBOLS, 历史数据照常刷新。
     """
-    # date_str = datetime.now().strftime('%Y%m%d')
-    # 全球指数列表
-    index_global = safe_call(ak.index_global_spot_em)
+    # 1) 拿指数名单 (带重试)
+    index_global = None
+    for attempt in range(1, 4):
+        index_global = safe_call(ak.index_global_spot_em, timeout_seconds=30)
+        if index_global is not None:
+            break
+        logger.warning(f"全球指数列表获取失败(第 {attempt}/3 次)")
+        if attempt < 3:
+            sleep(5)
+
+    symbols = None
     if index_global is not None:
         filename = f"datas/raw/indexes/ak_index_global_spot_em.csv"
         ensure_dir(filename)
         index_global.to_csv(filename, index=False)
         logger.info(f"全球指数列表数据: {filename} 已更新")
+        symbols = list(index_global["名称"].unique())
 
-        for symbol in index_global["名称"].unique():
-            df = safe_call(ak.index_global_hist_em, symbol=symbol)
-            if df is not None:
-                filename = f"datas/raw/indexes/ak_index_global_hist_em_{symbol.replace('/', '')}.csv"
-                ensure_dir(filename)
-                df.to_csv(filename, index=False)
-                logger.info(f"全球指数 {symbol} 数据: {filename} 已更新")
+    if not symbols:
+        symbols = FALLBACK_INDEX_SYMBOLS
+        logger.warning(
+            f"全球指数名单不可用, 回落到内置名单, 共 {len(symbols)} 个指数"
+        )
+
+    # 2) 逐个刷新历史数据
+    ok, fail = 0, 0
+    for symbol in symbols:
+        df = safe_call(ak.index_global_hist_em, symbol=symbol, timeout_seconds=30)
+        if df is None or df.empty:
+            fail += 1
+            continue
+        filename = f"datas/raw/indexes/ak_index_global_hist_em_{symbol.replace('/', '')}.csv"
+        ensure_dir(filename)
+        df.to_csv(filename, index=False)
+        logger.info(f"全球指数 {symbol} 数据: {filename} 已更新")
+        ok += 1
+
+    logger.info(f"全球指数历史数据更新完成: 成功 {ok} 个, 失败 {fail} 个")
 
     # merge_ak_index()
 
@@ -364,31 +412,11 @@ def merge_ak_index():
     output_dir = Path("datas/processed/indexes")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 获取制定的csv
-    target_csv = [
-        "道琼斯",
-        "标普500",
-        "纳斯达克",
-        "加拿大S&PTSX",
-        "巴西BOVESPA",
-        "富时100",
-        "德国DAX",
-        "法国CAC",
-        "日经225",
-        "韩国KOSPI",
-        "上证指数",
-        "深证成指",
-        "恒生指数",
-        "沪深300",
-        "澳大利亚标普200",
-        "印度孟买SENSEX",
-        "越南",
-    ]
     csvs = []
     for csv_file in index_dir.glob("ak_index_global_hist_em_*.csv"):
         if any(
             tc in csv_file.stem.replace("ak_index_global_hist_em_", "")
-            for tc in target_csv
+            for tc in FALLBACK_INDEX_SYMBOLS
         ):
             csvs.append(csv_file)
 
