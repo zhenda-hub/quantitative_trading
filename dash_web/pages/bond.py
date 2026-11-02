@@ -9,6 +9,7 @@ import plotly.express as px
 import dash
 
 from loguru import logger
+from utils.chart_utils import CHART_HEIGHT
 
 # TODO: 12天，更新一次数据
 
@@ -128,7 +129,7 @@ def create_yield_curve_chart(df_rate: pd.DataFrame):
         xaxis_title='日期',
         yaxis_title='收益率 (%)',
         hovermode='x unified',
-        height=600,
+        height=CHART_HEIGHT,
         showlegend=True,
         font=dict(size=12),
         margin=dict(l=50, r=50, t=80, b=50),

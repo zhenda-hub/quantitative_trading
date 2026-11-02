@@ -2,6 +2,7 @@ from dash import dcc, html, Input, Output, callback
 import plotly.graph_objects as go
 import pandas as pd
 import dash
+from utils.chart_utils import CHART_HEIGHT
 
 dash.register_page(__name__)
 
@@ -52,7 +53,7 @@ def display_candlestick(view_mode, slider_value):
 
     fig.update_layout(
         xaxis_rangeslider_visible="slider" in slider_value,
-        height=1000,
+        height=CHART_HEIGHT,
         yaxis_type=view_mode,  # 使用选择的视图模式
     )
     fig.update_xaxes(

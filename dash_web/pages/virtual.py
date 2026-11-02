@@ -5,6 +5,7 @@ import pandas as pd
 import dash
 from functools import reduce
 from pathlib import Path
+from utils.chart_utils import CHART_HEIGHT
 
 dash.register_page(__name__)
 
@@ -91,7 +92,7 @@ def update_virtual_chart(view_mode):
     )
 
     fig.update_layout(
-        height=1000,
+        height=CHART_HEIGHT,
         yaxis_title=yaxis_title,
         yaxis_type=yaxis_type,
     )

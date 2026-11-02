@@ -1,8 +1,14 @@
 """
-图表数据转换工具函数
+图表数据转换工具函数与公共图表常量
 用于支持对数/线性/归一化三种视图模式
 """
 import pandas as pd
+
+# 全站图表统一高度: 改这一个值即可影响所有页面的图表
+CHART_HEIGHT = 1200
+
+# 紧凑型图表高度(饼图等方宽比不适合拉高的图)
+CHART_HEIGHT_COMPACT = 600
 
 
 def transform_for_view(df, view_mode, date_col='date'):

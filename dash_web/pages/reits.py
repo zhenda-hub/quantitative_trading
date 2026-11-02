@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 import dash
 
 from loguru import logger
-from utils.chart_utils import transform_for_view
+from utils.chart_utils import transform_for_view, CHART_HEIGHT
 
 
 dash.register_page(__name__)
@@ -260,7 +260,7 @@ def update_reits_chart(view_mode):
         xaxis_title='日期',
         yaxis_title=yaxis_title,
         legend_title='REITs名称',
-        height=1000,
+        height=CHART_HEIGHT,
         template='plotly_white',
         yaxis_type=yaxis_type,
     )

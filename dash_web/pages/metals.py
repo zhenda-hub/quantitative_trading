@@ -2,7 +2,7 @@ from dash import dcc, html, Input, Output, callback
 import plotly.graph_objects as go
 import pandas as pd
 import dash
-from utils.chart_utils import transform_for_view
+from utils.chart_utils import transform_for_view, CHART_HEIGHT
 
 dash.register_page(__name__)
 
@@ -72,7 +72,7 @@ def update_metals_chart(view_mode):
         xaxis_title='Date',
         yaxis_title=yaxis_title,
         legend_title='Metals',
-        height=1000,
+        height=CHART_HEIGHT,
         yaxis_type=yaxis_type,
     )
     fig.update_xaxes(

@@ -6,7 +6,7 @@ import plotly.express as px
 from loguru import logger
 from pathlib import Path
 from functools import reduce
-from utils.chart_utils import transform_for_view
+from utils.chart_utils import transform_for_view, CHART_HEIGHT
 
 
 dash.register_page(__name__)
@@ -116,7 +116,7 @@ def get_fig(csv_path: str, x_key: str, y_title: str) -> go.Figure:
 
     )
     fig.update_layout(
-        height=1000,
+        height=CHART_HEIGHT,
         # xaxis_title='花萼宽度（cm）',
         yaxis_title=y_title,
 
@@ -206,7 +206,7 @@ def update_index_chart(view_mode):
     )
 
     fig.update_layout(
-        height=1000,
+        height=CHART_HEIGHT,
         xaxis_title='日期',
         yaxis_title=yaxis_title,
         yaxis_type=yaxis_type,

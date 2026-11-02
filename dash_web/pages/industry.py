@@ -4,6 +4,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 import dash_bootstrap_components as dbc
+from utils.chart_utils import CHART_HEIGHT
 
 # 注册页面
 dash.register_page(__name__, path='/industry')
@@ -39,7 +40,7 @@ layout = dbc.Container([
                     color_continuous_midpoint=0
                 )
                 .update_layout(
-                    height=700,  # 增加图表高度
+                    height=CHART_HEIGHT,  # 统一图表高度
                     # width=1200,   # 增加图表宽度
                     xaxis_title='涨跌幅 (%)',
                     yaxis_title='总市值',

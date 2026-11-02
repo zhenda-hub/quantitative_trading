@@ -5,6 +5,7 @@ import pandas as pd
 import dash
 from plotly.subplots import make_subplots
 from loguru import logger
+from utils.chart_utils import CHART_HEIGHT_COMPACT
 
 # from pathlib import Path
 # import sys
@@ -129,7 +130,7 @@ def display_alloc2(*args, **kwargs):
 
     fig.update_layout(
         title=f'资产配置饼图， 总计: {sum(args)}',
-        height=600,
+        height=CHART_HEIGHT_COMPACT,
     )
     return fig
 

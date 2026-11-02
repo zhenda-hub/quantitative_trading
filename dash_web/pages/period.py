@@ -10,6 +10,7 @@ import dash
 from loguru import logger
 
 from utils.clean_data import merge_res
+from utils.chart_utils import CHART_HEIGHT
 
 # import sys
 #
@@ -129,7 +130,7 @@ def gene_fig(csv_path: str, yaxis_title: str, title: str):
 
     )
     fig.update_layout(
-        height=1000,
+        height=CHART_HEIGHT,
         # xaxis_title='花萼宽度（cm）',
         yaxis_title=yaxis_title,
 
