@@ -33,16 +33,23 @@ dash.register_page(__name__)
 # }
 
 
+def needs_rebuild(output_path: Path, raw_paths: list) -> bool:
+    """输出不存在, 或任一源文件比输出新 -> 需要重建"""
+    if not output_path.exists():
+        return True
+    output_mtime = output_path.stat().st_mtime
+    newer = [p.name for p in raw_paths if p.exists() and p.stat().st_mtime > output_mtime]
+    if newer:
+        logger.info(f'{output_path.name} 已过期, 源文件更新: {newer}')
+        return True
+    return False
+
+
 def merge_gdps(res_path: str):
     """
     GDP
     """
-    
-    final_gdp_path = Path(res_path)
-    if final_gdp_path.exists():
-        logger.info('gdps 已经存在')
-        return
-        
+
     base_path = Path('datas/raw/gdps')
     GDP_NAME_FILE_DICT = {
         'china': "ak_china_gdp.csv",
@@ -51,11 +58,15 @@ def merge_gdps(res_path: str):
     }
     csv_paths = [base_path / v for v in GDP_NAME_FILE_DICT.values()]
 
+    final_gdp_path = Path(res_path)
+    if not needs_rebuild(final_gdp_path, csv_paths):
+        logger.info('gdps 已是最新')
+        return
+
     new_columns = list(GDP_NAME_FILE_DICT.keys())
     new_columns.insert(0, 'date')
 
     target_columns = ['日期', '今值']
-    # breakpoint()
     addr = merge_res(csv_paths, target_columns, new_columns, final_gdp_path)
     logger.info('addr:', addr)
 
@@ -64,23 +75,8 @@ def merge_cpis(res_path: str):
     """
     消费者物价指数年率
     """
-    final_cpi_path = Path(res_path)
-    if final_cpi_path.exists():
-        logger.info('cpis 已经存在')
-        return
-    
     base_path = Path('datas/raw/cpis')
 
-    """
-    手动修改: 
-    # CPI_NAME_FILE_DICT = {
-    #     'china': "macro_china_cpi_yearly.csv",
-    #     'euro': "macro_euro_cpi_yoy.csv",
-    # }
-    
-    '日期,今值' -> '时间', '现值'
-    """
-    
     CPI_NAME_FILE_DICT = {
         'china': "macro_china_cpi_yearly.csv",
         'euro': "macro_euro_cpi_yoy.csv",
@@ -89,15 +85,30 @@ def merge_cpis(res_path: str):
         'japan': "macro_japan_cpi_yearly.csv",
         'usa': "macro_usa_cpi_yoy.csv",
     }
-    
+
     csv_paths = [base_path / v for v in CPI_NAME_FILE_DICT.values()]
+
+    final_cpi_path = Path(res_path)
+    if not needs_rebuild(final_cpi_path, csv_paths):
+        logger.info('cpis 已是最新')
+        return
 
     new_columns = list(CPI_NAME_FILE_DICT.keys())
     new_columns.insert(0, 'date')
 
     target_columns = ['时间', '现值']
-    # breakpoint()
-    addr = merge_res(csv_paths, target_columns, new_columns, final_cpi_path)
+    # 部分源(中国/欧元)表头是 '日期/今值', 需归一后才能合并
+    column_aliases = {
+        '时间': ['时间', '日期'],
+        '现值': ['现值', '今值'],
+    }
+    addr = merge_res(
+        csv_paths,
+        target_columns,
+        new_columns,
+        final_cpi_path,
+        column_aliases=column_aliases,
+    )
     logger.info('addr:', addr)
 
 
@@ -163,21 +174,69 @@ def gene_fig(csv_path: str, yaxis_title: str, title: str):
     return fig
 
 
+def _last_period(csv_path) -> str:
+    """取 csv 里最后一个「真正有数据」的日期, 用于标题标注数据截止期
+
+    注意: 跳过所有数值列均为 NaN 的行（未来发布日会造成虚假的最新期）。
+    """
+    try:
+        df = pd.read_csv(csv_path)
+        value_cols = [c for c in df.columns if c != 'date']
+        if value_cols:
+            df = df.dropna(subset=value_cols, how='all')
+        last = pd.to_datetime(df['date'], errors='coerce').max()
+        return last.strftime('%Y-%m') if pd.notna(last) else '未知'
+    except Exception as error:  # noqa: BLE001
+        logger.warning(f'读取 {csv_path} 失败: {error}')
+        return '未知'
+
+
 gdp_res = 'datas/processed/gdps/all_data.csv'
 cpi_res = 'datas/processed/cpis/all_data.csv'
+std_gdp_res = 'datas/processed/gdps/std_gdp_growth.csv'
 merge_gdps(gdp_res)
 merge_cpis(cpi_res)
 
+# 标准口径 GDP（FRED + 国家统计局）: 文件缺失时尝试现抓一次
+if not Path(std_gdp_res).exists():
+    logger.warning(f'{std_gdp_res} 不存在, 尝试重新抓取')
+    try:
+        from utils.gdp_std import build_std_gdp
 
-fig_gdp = gene_fig(gdp_res, 'GDP年率', 'GDP年率')
-fig_cpi = gene_fig(cpi_res, 'CPI年率', 'CPI年率(e.g., 数值为2.5，意味着物价一年涨2.5%)')
+        build_std_gdp()
+    except Exception as error:  # noqa: BLE001
+        logger.error(f'标准口径 GDP 抓取失败: {error}')
+
+if Path(std_gdp_res).exists():
+    fig_gdp = gene_fig(
+        std_gdp_res,
+        '实际GDP同比 (%)',
+        f"实际GDP同比（季调 SNA2008；中国为累计同比） 数据截至 {_last_period(std_gdp_res)}",
+    )
+else:
+    fig_gdp = go.Figure()
+    fig_gdp.update_layout(
+        height=CHART_HEIGHT,
+        title='标准口径 GDP 数据缺失，请运行: python -m utils.gdp_std',
+    )
+
+fig_cpi = gene_fig(
+    cpi_res,
+    'CPI年率 (%)',
+    f"CPI年率 数据截至 {_last_period(cpi_res)}"
+    "（e.g., 数值为2.5，意味着物价一年涨2.5%）",
+)
 # fig_unemp = gene_fig("datas/processed/unemps/all_unemps_data.csv", '失业率', '失业率')
 
 
 layout = html.Div(
     [
         html.H4("全球经济周期"),
-        html.H6("GDP年率，经济发展状况"),
+        html.H6("GDP同比，经济发展状况"),
+        html.P(
+            "美国 / 德国 / 欧元区19 为 FRED 实际GDP（季调、链式、SNA2008）自算同比；"
+            "中国为国家统计局季度累计同比 —— 口径与其他三条不同，看趋势为主。"
+        ),
         html.H6("CPI年率，反应物价波动状况"),
         # html.H6("失业率， 经济周期中，通常和GDP，CPI成反方向"),
         html.H6("GDP， CPI表示经济周期：上升，高点，下降，低点"),
