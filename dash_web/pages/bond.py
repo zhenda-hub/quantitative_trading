@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -38,7 +39,7 @@ def judge_bonds(df: pd.DataFrame):
 
 
 def common_logic(df: pd.DataFrame):
-    
+
 
     # 去掉未来1年到期的
     df['到期时间'] = pd.to_datetime(df['到期时间'])
@@ -60,7 +61,7 @@ def get_low_premium_rate_and_double_low(df: pd.DataFrame, num: int = 30):
     df = common_logic(df)
     df = df[df['转股溢价率'] < 20]
     df = df.sort_values(by=['转股溢价率'], ascending=[True]).head(50)
-    
+
     df = df[df['双低'] < 125]
     # df = df[df['现价'] < 110]
     df = df.sort_values(by=['双低'], ascending=[True]).head(num)
@@ -73,12 +74,12 @@ def get_double_low_and_low_premium_rate(df: pd.DataFrame, num: int = 30):
     双低, 低溢价率, 债性
     """
     df = common_logic(df)
-    
+
     df = df[df['双低'] < 125]
     df = df[df['现价'] < 110]
     df = df[df['转股溢价率'] < 20]
     df = df.sort_values(by=['双低'], ascending=[True]).head(50)
-    
+
     df = df.sort_values(by=['转股溢价率'], ascending=[True]).head(num)
 
     return df
@@ -105,7 +106,7 @@ def create_yield_curve_chart(df_rate: pd.DataFrame):
     """
     # 创建收益率曲线图
     fig = go.Figure()
-    
+
     # 添加不同期限的收益率曲线
     fig.add_trace(go.Scatter(
         x=df_rate['日期'],
@@ -114,7 +115,7 @@ def create_yield_curve_chart(df_rate: pd.DataFrame):
         name='美国国债收益率10年',
         line=dict(width=2)
     ))
-    
+
     fig.add_trace(go.Scatter(
         x=df_rate['日期'],
         y=df_rate['中国国债收益率10年'],
@@ -122,7 +123,7 @@ def create_yield_curve_chart(df_rate: pd.DataFrame):
         name='中国国债收益率10年',
         line=dict(width=3, color='red')  # 10年期用红色突出显示
     ))
-    
+
     # 更新图表布局
     fig.update_layout(
         title='国债10年收益率曲线',
@@ -153,16 +154,45 @@ def create_yield_curve_chart(df_rate: pd.DataFrame):
             ])
         )
     )
-    
+
     return fig
 
 
 dash.register_page(__name__)
 
 # TODO: remove diff
-path = Path('datas/raw/bonds/conv_20251211.csv')
-# datas/raw/bonds/conv_20250903.csv
-path_old = Path('datas/raw/bonds/conv_20250903.csv')
+def latest_conv_files(bond_dir: Path = Path('datas/raw/bonds'), count: int = 2) -> list:
+    """取最新（和次新）的 conv_YYYYMMDD.csv
+
+    数据更新后会自动生成新文件, 这里按文件名里的日期倒序取, 不用手改。
+
+    Args:
+        bond_dir: 存放 conv_*.csv 的目录
+        count: 需要几个文件（2 = 最新 + 次新）
+
+    Returns:
+        按日期倒序排好的 Path 列表
+    """
+    dated = []
+    for file in bond_dir.glob('conv_*.csv'):
+        match = re.match(r'^conv_(\d{8})\.csv$', file.name)
+        if match:
+            dated.append((match.group(1), file))
+
+    if not dated:
+        raise FileNotFoundError(f'{bond_dir} 下没有 conv_YYYYMMDD.csv 文件')
+
+    dated.sort(key=lambda item: item[0], reverse=True)
+    return [file for _, file in dated[:count]]
+
+
+_conv_files = latest_conv_files(count=2)
+path = _conv_files[0]  # 最新
+path_old = _conv_files[1] if len(_conv_files) > 1 else _conv_files[0]  # 次新
+if path == path_old:
+    logger.warning('conv_*.csv 不足 2 个, 次新沿用最新数据')
+logger.info(f'可转债对比: 最新={path.name}, 次新={path_old.name}')
+
 path_base_info = Path('datas/raw/bonds/ef_get_all_base_info.csv')
 path_rate = Path('datas/raw/bonds/ak_cn_us_rate.csv')
 
@@ -201,7 +231,7 @@ asset_impact_data = [
     {
         '国债收益率变化': '📈 上升（利息高）',
         '股票': '↓',
-        '房地产': '↓', 
+        '房地产': '↓',
         '债券': '↓',
         '黄金/比特币': '↓',
         '汇率（本币）': '↑'
@@ -235,7 +265,7 @@ layout = dbc.Container(
                                     dash_table.DataTable(
                                         data=asset_impact_data,
                                         style_table={
-                                            'overflowX': 'auto', 
+                                            'overflowX': 'auto',
                                             'width': '100%',
                                             'borderRadius': '8px'
                                         },
@@ -271,7 +301,7 @@ layout = dbc.Container(
                 )
             ]
         ),
-        
+
         # 可转债分析部分
         dbc.Row(
             [
@@ -297,7 +327,7 @@ layout = dbc.Container(
                                         color="info",
                                         className="mb-3"
                                     ),
-                                    
+
                                     # 筛选结果表格
                                     html.H5(f"{path.name}筛选结果", className="mt-4"),
                                     dash_table.DataTable(
@@ -319,7 +349,7 @@ layout = dbc.Container(
                                         sort_action='native',
                                         page_size=10
                                     ),
-                                    
+
                                     html.H5(f"{path_old.name}筛选结果", className="mt-4"),
                                     dash_table.DataTable(
                                         data=df_old.to_dict('records'),
@@ -340,7 +370,7 @@ layout = dbc.Container(
                                         sort_action='native',
                                         page_size=10
                                     ),
-                                    
+
                                     # 交易建议
                                     dbc.Row(
                                         [
@@ -349,7 +379,7 @@ layout = dbc.Container(
                                                     html.H5("需要买入", className="mt-4 text-success"),
                                                     dash_table.DataTable(
                                                         data=df.merge(
-                                                            df_old, on='代码', suffixes=('', '_old'), 
+                                                            df_old, on='代码', suffixes=('', '_old'),
                                                             how='outer', indicator=True
                                                         ).query('_merge == "left_only"').drop('_merge', axis=1).to_dict('records'),
                                                         style_table={'overflowX': 'auto'},
@@ -365,7 +395,7 @@ layout = dbc.Container(
                                                     html.H5("需要卖出", className="mt-4 text-danger"),
                                                     dash_table.DataTable(
                                                         data=df.merge(
-                                                            df_old, on='代码', suffixes=('', '_old'), 
+                                                            df_old, on='代码', suffixes=('', '_old'),
                                                             how='outer', indicator=True
                                                         ).query('_merge == "right_only"').drop('_merge', axis=1).to_dict('records'),
                                                         style_table={'overflowX': 'auto'},
