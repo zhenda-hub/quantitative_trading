@@ -870,9 +870,9 @@ if __name__ == "__main__":
 
     set_log("update_datas.log")
 
-    # update_ef()
-    # update_ak0()
+    update_ef()
+    update_ak0()
     update_ak1()
-    # update_ak2()
-    # update_ak3()
-    # get_yf_virtual_data()
+    update_ak2()
+    update_ak3()
+    get_yf_virtual_data()
