@@ -13,7 +13,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 from func_timeout import FunctionTimedOut
 
-from utils.update_datas import safe_call
+from utils.update_common import safe_call
 
 
 class TestSafeCall:
@@ -60,7 +60,7 @@ class TestSafeCall:
         result = safe_call(raise_error, timeout_seconds=5)
         assert result is None
 
-    @patch('utils.update_datas.logger')
+    @patch('utils.update_common.logger')
     def test_timeout_logs_warning(self, mock_logger):
         """测试超时记录警告日志"""
         def slow_func():
@@ -75,7 +75,7 @@ class TestSafeCall:
         assert "【超时】" in args[0]
         assert "slow_func" in args[0]
 
-    @patch('utils.update_datas.logger')
+    @patch('utils.update_common.logger')
     def test_exception_logs_error(self, mock_logger):
         """测试异常记录错误日志"""
         def raise_error():

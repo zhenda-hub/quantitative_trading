@@ -168,7 +168,11 @@ python -m dash_web.app
 
 使用定时任务更新数据：
 ```bash
-python -m utils.update_datas
+# 每日：行情快照、可转债、新闻、金属、行业板块、加密货币（约 1 分钟）
+python -m utils.update_daily
+
+# 每周/每月：REITs 与全球指数历史、宏观 GDP/CPI、静态列表
+python -m utils.update_weekly
 ```
 
 ## 🤝 参与贡献
@@ -192,7 +196,7 @@ python -m utils.update_datas
 
 ### 开发指南
 - 使用 `loguru` 进行日志管理，日志文件保存在 `logs/` 目录
-- 数据更新使用：`python utils/update_datas.py`
+- 数据更新使用：`python -m utils.update_daily`（每日）/ `python -m utils.update_weekly`（每周或每月）
 - 遵循PEP8代码规范
 
 ## ❓ 问题反馈

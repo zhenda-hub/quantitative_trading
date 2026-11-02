@@ -28,8 +28,11 @@ python -m dash_web.app
 
 ### Data Management
 ```bash
-# Update all financial data from sources
-python -m utils.update_datas
+# Daily update: quotes, convertible bonds, news, metals, industry, crypto (~1 min)
+python -m utils.update_daily
+
+# Weekly/monthly update: REITs & global index history, macro GDP/CPI, static lists
+python -m utils.update_weekly
 
 # Note: Data is stored in datas/raw/ (source data) and datas/processed/ (cleaned data)
 ```
@@ -51,14 +54,17 @@ This is a **multi-layered quantitative trading platform** that processes financi
 ```
 Data Sources → Data Collection → Raw Storage → Processing → Processed Storage → Web Pages → Visualization
      ↓              ↓                ↓             ↓                ↓              ↓           ↓
-  akshare,    update_datas.py    datas/raw/   clean_data.py   datas/processed/ dash_web/   Plotly
-  efinance,                                          & logic modules
+  akshare,  update_daily.py   datas/raw/   clean_data.py   datas/processed/ dash_web/   Plotly
+  efinance, update_weekly.py                                          & logic modules
   yfinance
 ```
 
 ### Layer Structure
 
-**1. Data Collection Layer** (`utils/update_datas.py`)
+**1. Data Collection Layer** (`utils/update_common.py`, `utils/update_daily.py`, `utils/update_weekly.py`)
+- `update_common.py`: shared `safe_call` (timeout guard) / `data_handler` (error logging) / `ensure_dir`
+- `update_daily.py`: high-frequency data, run daily (quotes, convertible bonds, news, metals, industry)
+- `update_weekly.py`: low-frequency data, run weekly/monthly (REITs & index history, macro, static lists)
 - Orchestrates data fetching from multiple providers (akshare, efinance, yfinance, easyquotation)
 - Stores raw data in `datas/raw/` organized by asset class
 - Each data source function is independent with error handling and logging
@@ -129,7 +135,7 @@ Each page follows this structure:
 
 ### Adding New Data Sources
 
-1. Add function to `utils/update_datas.py`
+1. Add function to `utils/update_daily.py` (high frequency) or `utils/update_weekly.py` (slow/macro), then register it in the matching `update_*()` entry
 2. Save to appropriate `datas/raw/` subdirectory
 3. Add processing logic to `utils/clean_data.py` or create new processor
 4. Store processed data in `datas/processed/`

@@ -173,7 +173,11 @@ Visit http://localhost:8050
 
 Use scheduled tasks to update data:
 ```bash
-python -m utils.update_datas
+# Daily: quotes, convertible bonds, news, metals, industry, crypto (~1 min)
+python -m utils.update_daily
+
+# Weekly/monthly: REITs & global index history, macro GDP/CPI, static lists
+python -m utils.update_weekly
 ```
 
 ## 🤝 Contributing
@@ -197,7 +201,7 @@ Welcome to contribute code! Please follow these steps:
 
 ### Development Guide
 - Use `loguru` for log management, log files are saved in `logs/` directory
-- Data updates use: `python utils/update_datas.py`
+- Data updates use: `python -m utils.update_daily` (daily) / `python -m utils.update_weekly` (weekly or monthly)
 - Follow PEP8 code style guidelines
 
 ## ❓ Issue Reporting
