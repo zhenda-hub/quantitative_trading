@@ -40,6 +40,11 @@ bar_chart_height = max(
     CHART_HEIGHT, len(top_bottom) * ROW_HEIGHT_PX + BAR_MARGIN_HEIGHT
 )
 
+# 气泡图尺寸：Plotly 公式 sizeref = 2*max(size)/(标称直径²) 实际绘制直径约为标称值的 1/√2
+# 标称 80 → 实际最大气泡约 56px
+BUBBLE_MAX_PX = 80
+BUBBLE_MIN_PX = 4
+
 treemap_fig = px.treemap(
     df,
     path=[px.Constant("全部行业"), "股票名称"],
@@ -96,33 +101,37 @@ layout = dbc.Container([
             dcc.Graph(
                 id='industry-bubble-chart',
                 figure=px.scatter(
-                    df, 
-                    x='涨跌幅', 
+                    df,
+                    x='涨跌幅',
                     y='总市值',
+                    # 气泡大小 = 总市值（与 sizeref 用同一字段，否则尺度会错配）
                     size='总市值',
                     color='涨跌幅',
                     hover_name='股票名称',
-                    hover_data={'涨跌幅': ':.2f%', '总市值': ':,.0f'},
-                    title='今日行业板块关系图',
-                    labels={'涨跌幅': '涨跌幅 (%)', '总市值': '总市值'},
+                    hover_data={
+                        '涨跌幅': ':.2f',
+                        '总市值': ':,.0f',
+                        '成交额': ':,.0f',
+                    },
+                    title='行业板块：涨跌幅 × 总市值（气泡大小=总市值）',
+                    labels={'涨跌幅': '涨跌幅 (%)', '总市值': '总市值', '成交额': '成交额'},
                     color_continuous_scale=['green', 'lightgrey', 'red'],
                     color_continuous_midpoint=0,
                     range_color=COLOR_RANGE
                 )
                 .update_layout(
                     height=CHART_HEIGHT,  # 统一图表高度
-                    # width=1200,   # 增加图表宽度
                     xaxis_title='涨跌幅 (%)',
                     yaxis_title='总市值',
                     yaxis_type='log',  # 使用对数坐标，因为市值差异很大
                     showlegend=False,
                     hovermode='closest'
                 )
-                # 添加气泡控制
+                # 气泡缩放：sizeref 必须用 size 同字段（总市值）的 max 计算
                 .update_traces(
                     marker=dict(
-                        sizeref=2.*max(df["成交额"])/(20**2),  # 控制最大气泡像素 ~20
-                        sizemin=2                               # 最小气泡半径至少 2 像素
+                        sizeref=2. * max(df["总市值"]) / (BUBBLE_MAX_PX ** 2),
+                        sizemin=BUBBLE_MIN_PX,
                     )
                 )
                 # 添加中线
