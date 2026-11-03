@@ -1,7 +1,7 @@
 """低频数据更新（每周 / 每月）
 
 REITs 与全球指数的历史序列及其合并、宏观 CPI/GDP、标准口径 GDP/CPI、
-A股代码名称列表等变化缓慢的数据。
+A股代码名称列表、行业估值快照、行业→ETF 映射等变化缓慢的数据。
 
 用法: python -m utils.update_weekly"""
 
@@ -22,6 +22,8 @@ from loguru import logger
 from time import sleep
 
 load_dotenv()
+from utils.industry_etf_map import build_map as build_etf_map
+from utils.industry_valuation import build_industry_valuation
 from utils.update_common import data_handler, ensure_dir, safe_call
 from utils.cpi_std import build_std_cpi
 from utils.gdp_std import build_std_gdp
@@ -388,6 +390,7 @@ def get_ak_stock_data():
 
 def update_weekly():
     """低频数据：REITs / 全球指数历史 + 合并 / 宏观 / 静态列表 / 标准口径 GDP-CPI
+       / 行业估值快照 / 行业→ETF 映射
 
     注: 这些数据发布频率本身就是月度/季度, 且逐个抓历史容易被限流,
         建议每周或每月跑一次。
@@ -400,6 +403,10 @@ def update_weekly():
     build_std_gdp()
     build_std_cpi()
     get_ak_stock_data()
+    # 行业估值：按 (日期, 板块) 去重追加，需多期累积才能算分位
+    build_industry_valuation()
+    # 行业→ETF 映射：刷新 ETF 行情/份额/折溢价，并重生成候选表
+    build_etf_map()
 
 
 if __name__ == "__main__":
