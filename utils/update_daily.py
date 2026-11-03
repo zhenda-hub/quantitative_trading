@@ -1,7 +1,8 @@
 """高频数据更新（每日）
 
 行情快照与当日数据: efinance 股票/债券、集思录可转债、新闻、金属持仓、
-行业板块、ETF 列表、yfinance 美股与加密货币。
+行业板块、ETF 列表、yfinance 美股与加密货币；
+最后更新行业历史 K 线并重算行业轮动榜。
 
 用法: python -m utils.update_daily"""
 
@@ -22,6 +23,8 @@ from loguru import logger
 from time import sleep
 
 load_dotenv()
+from utils.industry_hist import build as build_industry_hist
+from utils.industry_rotation import build as build_industry_rotation
 from utils.update_common import data_handler, ensure_dir, safe_call
 
 
@@ -341,10 +344,11 @@ def get_eq_stock_data():
 
 
 def update_daily():
-    """高频数据：行情快照 / 可转债 / 新闻 / 金属 / 行业 / 加密（目标 60s 内）
+    """高频数据：行情快照 / 可转债 / 新闻 / 金属 / 行业 / 加密 / 行业轮动
 
     注: get_ef_futures_data / get_eq_stock_data 属于实时快照, 默认不跑,
         需要时单独调用。
+    行业历史 K 线（2 并发）约 1 分钟，之后重算轮动榜约 1 秒。
     """
     get_ef_stock_data()
     get_ef_bond_data()
@@ -356,6 +360,10 @@ def update_daily():
     get_ak_fund_data()
     get_yf_market_data()
     get_yf_virtual_data()
+
+    # 行业历史放最后（依赖当日快照已更新），榜单再基于历史重算
+    build_industry_hist()
+    build_industry_rotation()
 
 
 if __name__ == "__main__":
