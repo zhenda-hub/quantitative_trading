@@ -138,6 +138,11 @@ layout = dbc.Container([
                                 marks={0: "0", 50: "50", 80: "80", 100: "100"},
                                 tooltip={"placement": "bottom"},
                             ),
+                            html.Small(
+                                "越高越强。80 = 只要最强的 20% 板块（按 20/60/120 日涨幅加权排名）；"
+                                "拉到 0 = 不限强弱。",
+                                className="text-muted d-block mt-4",
+                            ),
                         ], md=6),
                         dbc.Col([
                             html.Label("PE 分位 ≤（国证静态 PE）", className="fw-bold small mb-1"),
@@ -146,6 +151,11 @@ layout = dbc.Container([
                                 min=0, max=100, step=5, value=DEFAULT_PE,
                                 marks={0: "0", 20: "20", 50: "50", 100: "100"},
                                 tooltip={"placement": "bottom"},
+                            ),
+                            html.Small(
+                                "越低越便宜。20 = 只要历史上最便宜的 20%；100 = 不限估值。"
+                                "仅 145/496 个板块有分位（东财板块名与国证行业名对不上）。",
+                                className="text-muted d-block mt-4",
                             ),
                         ], md=6),
                     ], className="mb-2"),
@@ -158,6 +168,10 @@ layout = dbc.Container([
                                 value=[],
                                 switch=True,
                                 className="small",
+                            ),
+                            html.Small(
+                                "不勾：只在有估值的板块里筛（默认 5 个）；勾上：这 351 个不受 PE 条件限制，命中会大幅增加（同条件下 53 个）。",
+                                className="text-muted d-block",
                             ),
                         ], md=8),
                         dbc.Col([
