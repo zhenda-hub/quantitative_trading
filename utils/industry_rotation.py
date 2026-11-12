@@ -28,6 +28,11 @@ BOARD = Path("datas/raw/stocks/ef_行业板块.csv")
 ETF_MAP = Path("datas/reference/industry_etf_map.csv")
 PE_HIST = Path("datas/processed/n_indexes/industry_pe_cninfo.csv")
 OUTPUT = Path("datas/processed/n_indexes/industry_rotation.csv")
+PICKS = Path("datas/processed/n_indexes/industry_rotation_picks.csv")
+
+# 候选池默认阀值：动量分位 ≥ 80 且 PE 分位 ≤ 20
+PICK_MOMENTUM = 80.0
+PICK_PE = 20.0
 
 WINDOWS = (20, 60, 120)
 WEIGHTS = {20: 0.5, 60: 0.3, 120: 0.2}
@@ -43,7 +48,11 @@ def load_benchmark() -> pd.Series:
 
 
 def momentum_one(path: Path, bench: pd.Series) -> dict | None:
-    """读一个行业的历史，算各周期涨幅与 RS"""
+    """读一个行业的历史，算各周期涨幅与 RS
+
+    关键：行业与基准必须按【共同交易日】对齐后再算涨幅，
+    否则基准数据滞后时（例如沪深300 只更新到上周）两边区间会错位、RS 失真。
+    """
     df = pd.read_csv(path)
     if len(df) < max(WINDOWS) + 1:
         return None
@@ -54,16 +63,20 @@ def momentum_one(path: Path, bench: pd.Series) -> dict | None:
         return None
 
     close = df.set_index("日期")["收盘"]
-    last_date = close.index[-1]
     code, name = path.stem.split("_", 1)
 
+    # 只保留两边都有数据的交易日
+    common = close.index.intersection(bench.index)
+    if len(common) < max(WINDOWS) + 1:
+        return None
+    close = close.reindex(common)
+    bench_aligned = bench.reindex(common)
+
+    last_date = common[-1]
     result = {"板块代码": code, "板块": name, "K线日期": last_date.date().isoformat()}
     for window in WINDOWS:
         industry_ret = close.iloc[-1] / close.iloc[-1 - window] - 1
-        bench_window = bench[bench.index <= last_date].tail(window + 1)
-        bench_ret = (
-            bench_window.iloc[-1] / bench_window.iloc[0] - 1 if len(bench_window) > window else float("nan")
-        )
+        bench_ret = bench_aligned.iloc[-1] / bench_aligned.iloc[-1 - window] - 1
         result[f"{window}日涨幅"] = round(industry_ret * 100, 2)
         result[f"RS{window}"] = round((industry_ret - bench_ret) * 100, 2)
     return result
@@ -104,6 +117,37 @@ def match_pe(board_name: str, pe_map: dict, used: set) -> float | None:
         return None
     candidates.sort(reverse=True)
     return pe_map[candidates[0][1]]
+
+
+def filter_picks(
+    df: pd.DataFrame,
+    momentum_min: float = PICK_MOMENTUM,
+    pe_max: float = PICK_PE,
+    output: Path = PICKS,
+) -> pd.DataFrame:
+    """按「动量分位 ≥ 阈值 且 PE 分位 ≤ 阈值」筛出候选池
+
+    注意：PE 分位只有约 29% 的板块有值（东财板块与国证行业名称体系不同），
+    没有分位的板块不会进入候选池 —— 这是数据可匹配性的限制，不是它们不合格。
+    """
+    if df.empty:
+        return df
+
+    picked = df[
+        (df["动量分位"] >= momentum_min)
+        & df["PE分位"].notna()
+        & (df["PE分位"] <= pe_max)
+    ].copy()
+    picked = picked.sort_values("动量分位", ascending=False)
+    picked.insert(0, "序号", range(1, len(picked) + 1))
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+    picked.to_csv(output, index=False, encoding="utf-8-sig")
+    logger.info(
+        f"{output} 已生成: {len(picked)} 个板块"
+        f"（动量分位 ≥ {momentum_min:.0f} 且 PE分位 ≤ {pe_max:.0f}）"
+    )
+    return picked
 
 
 def build(output: Path = OUTPUT) -> pd.DataFrame:
@@ -162,6 +206,9 @@ def build(output: Path = OUTPUT) -> pd.DataFrame:
         f"{output} 已生成: {len(merged)} 行 x {len(merged.columns)} 列 | "
         f"K线日期 {merged['K线日期'].mode().iloc[0]}"
     )
+
+    # 候选池（动量强 + 估值低）
+    filter_picks(merged)
     return merged
 
 
