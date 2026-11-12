@@ -1,16 +1,19 @@
 """行业轮动页
 
 表1「行业轮动榜」：datas/processed/n_indexes/industry_rotation.csv
-    动量（20/60/120 日）+ 相对强弱（RS vs 沪深300）+ 当日热度 + 估值分位 + 可买 ETF
-表2「行业估值分位」：datas/processed/n_indexes/industry_pe_cninfo.csv
-    国证 293 行业的静态 PE 在近 3 年 / 近 1 年历史中的位置
+    - 动量（20/60/120 日）+ 相对强弱（RS vs 沪深300）+ 当日热度 + 估值分位 + 可买 ETF
+    - 支持滑块筛选：动量分位下限、PE 分位上限，可选是否包含无 PE 分位的行业
+表2「行业估值分位」：国证口径全量（折叠收起，需要交叉验证时展开）
 
-两张表来自不同口径（东财板块 / 国证行业），并列展示，不做硬合并。
+口径说明：
+- 动量分位、RS：有完整历史（496 板块 × 近 3 年日线）
+- PE 分位：国证静态 PE（829 个交易日历史），名称匹配到东财板块，覆盖约 29%
+- 动态 PE：当日快照，只能横向比较，无历史算不出分位
 """
 from pathlib import Path
 
 import pandas as pd
-from dash import dash_table, html
+from dash import Input, Output, callback, dash_table, dcc, html
 import dash
 import dash_bootstrap_components as dbc
 
@@ -18,29 +21,31 @@ dash.register_page(__name__, path="/rotation")
 
 ROTATION_CSV = Path("datas/processed/n_indexes/industry_rotation.csv")
 PE_CSV = Path("datas/processed/n_indexes/industry_pe_cninfo.csv")
+PICKS_CSV = Path("datas/processed/n_indexes/industry_rotation_picks.csv")
 
 COLD, HOT = 20.0, 80.0
 TRADING_DAYS_1Y = 244
 
+# 默认筛选阈值（与脚本 picks 一致）
+DEFAULT_MOMENTUM = 80
+DEFAULT_PE = 20
 
-def num(column_id, name, spec=".2f", sortable=True):
+
+def num(column_id, name, spec=".2f"):
     return {"id": column_id, "name": name, "type": "numeric", "format": {"specifier": spec}}
 
 
-def load_rotation() -> tuple[pd.DataFrame, str, str]:
-    """行业轮动榜（动量 + RS + 热度 + 估值 + ETF）"""
+def load_rotation() -> tuple[pd.DataFrame, str]:
     if not ROTATION_CSV.exists():
-        return pd.DataFrame(), "无数据", "无数据"
+        return pd.DataFrame(), "无数据"
     df = pd.read_csv(ROTATION_CSV, dtype={"板块代码": str})
     kline_date = str(df["K线日期"].mode().iloc[0]) if "K线日期" in df else "未知"
-    return df, kline_date, ""
+    return df, kline_date
 
 
 def load_pe_percentile() -> tuple[pd.DataFrame, str]:
-    """国证行业 PE 分位（近 3 年 / 近 1 年）"""
     if not PE_CSV.exists():
         return pd.DataFrame(), "无数据"
-
     df = pd.read_csv(PE_CSV, dtype={"行业编码": str})
     df["静态市盈率-加权平均"] = pd.to_numeric(df["静态市盈率-加权平均"], errors="coerce")
     df = df.dropna(subset=["静态市盈率-加权平均"])
@@ -52,17 +57,15 @@ def load_pe_percentile() -> tuple[pd.DataFrame, str]:
         series = group.sort_values("日期")["静态市盈率-加权平均"].values
         if len(series) < 60:
             continue
-        current = series[-1]
         window_1y = series[-TRADING_DAYS_1Y:]
         rows.append({
             "行业": name,
             "层级": int(level),
-            "最新PE": round(float(current), 2),
-            "近3年分位": round(float((series <= current).mean() * 100), 1),
-            "近1年分位": round(float((window_1y <= current).mean() * 100), 1),
+            "最新PE": round(float(series[-1]), 2),
+            "近3年分位": round(float((series <= series[-1]).mean() * 100), 1),
+            "近1年分位": round(float((window_1y <= series[-1]).mean() * 100), 1),
             "样本期数": len(series),
         })
-
     result = pd.DataFrame(rows)
     result["分档"] = pd.cut(
         result["近3年分位"], bins=[-1, COLD, HOT, 101], labels=["偏冷", "中性", "偏热"]
@@ -70,19 +73,29 @@ def load_pe_percentile() -> tuple[pd.DataFrame, str]:
     return result.sort_values("近3年分位"), latest_day
 
 
-rotation, kline_date, _ = load_rotation()
+def picks_count() -> int:
+    if not PICKS_CSV.exists():
+        return 0
+    try:
+        return len(pd.read_csv(PICKS_CSV, dtype={"板块代码": str}))
+    except Exception:  # noqa: BLE001
+        return 0
+
+
+rotation, kline_date = load_rotation()
 pe_table, pe_date = load_pe_percentile()
+script_picks = picks_count()
 
 rotation_columns = [
-    {"id": "排名", "name": "排名", "type": "numeric"},
+    {"id": "序号", "name": "#", "type": "numeric"},
     {"id": "板块", "name": "板块"},
     num("动量分位", "动量分位", ".1f"),
-    num("20日涨幅", "20日 %", ".2f"),
-    num("60日涨幅", "60日 %", ".2f"),
-    num("120日涨幅", "120日 %", ".2f"),
-    num("RS20", "RS20 (超额)", ".2f"),
-    num("今日涨幅", "今日 %", ".2f"),
-    num("换手率", "换手 %", ".2f"),
+    num("20日涨幅", "20日 %"),
+    num("60日涨幅", "60日 %"),
+    num("120日涨幅", "120日 %"),
+    num("RS20", "RS20 (超额)"),
+    num("今日涨幅", "今日 %"),
+    num("换手率", "换手 %"),
     num("成交额(亿)", "成交额(亿)", ",.1f"),
     num("动态PE", "动态PE", ".1f"),
     num("PE分位", "PE分位 %", ".1f"),
@@ -93,7 +106,7 @@ rotation_columns = [
 pe_columns = [
     {"id": "行业", "name": "行业"},
     {"id": "层级", "name": "层级", "type": "numeric"},
-    num("最新PE", "最新PE", ".2f"),
+    num("最新PE", "最新PE"),
     num("近3年分位", "近3年分位 %", ".1f"),
     num("近1年分位", "近1年分位 %", ".1f"),
     {"id": "分档", "name": "分档"},
@@ -105,14 +118,58 @@ layout = dbc.Container([
         dbc.Col([
             html.H3("行业轮动", className="text-center mt-4 mb-1"),
             html.P(
-                "表1：动量定强弱（买强的还是买弱的，自己判断）+ 估值定贵贱 + ETF 落地。"
-                "表2：国证口径的 PE 历史分位，供交叉验证。",
+                "动量定强弱 + 估值定贵贱 + ETF 落地。拖下面的滑块筛候选池。",
                 className="text-center text-muted mb-4",
             ),
         ])
     ]),
 
-    # 表1：行业轮动榜
+    # 筛选控件
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    dbc.Row([
+                        dbc.Col([
+                            html.Label("动量分位 ≥", className="fw-bold small mb-1"),
+                            dcc.Slider(
+                                id="momentum-min",
+                                min=0, max=100, step=5, value=DEFAULT_MOMENTUM,
+                                marks={0: "0", 50: "50", 80: "80", 100: "100"},
+                                tooltip={"placement": "bottom"},
+                            ),
+                        ], md=6),
+                        dbc.Col([
+                            html.Label("PE 分位 ≤（国证静态 PE）", className="fw-bold small mb-1"),
+                            dcc.Slider(
+                                id="pe-max",
+                                min=0, max=100, step=5, value=DEFAULT_PE,
+                                marks={0: "0", 20: "20", 50: "50", 100: "100"},
+                                tooltip={"placement": "bottom"},
+                            ),
+                        ], md=6),
+                    ], className="mb-2"),
+                    dbc.Row([
+                        dbc.Col([
+                            dbc.Checklist(
+                                id="include-no-pe",
+                                options=[{"label": " 包含「无 PE 分位」的行业（约 351 个，名称未匹配上）",
+                                          "value": "yes"}],
+                                value=[],
+                                switch=True,
+                                className="small",
+                            ),
+                        ], md=8),
+                        dbc.Col([
+                            html.Div(id="pick-count", className="text-end fw-bold small"),
+                        ], md=4),
+                    ]),
+                ])
+            ], className="border-0 shadow-sm")
+        ], width=12)
+    ], className="mb-3"),
+
+    # 表1
     dbc.Row([
         dbc.Col([
             dbc.Card([
@@ -120,26 +177,28 @@ layout = dbc.Container([
                     html.Div([
                         html.H5("① 行业轮动榜", className="mb-0"),
                         html.Small(
-                            f"{len(rotation)} 个东财板块 · K线至 {kline_date} · 点击表头排序",
+                            f"{len(rotation)} 个东财板块 · K线至 {kline_date} · "
+                            f"脚本候选池（默认阈值）{script_picks} 个 · 点击表头排序",
                             className="text-muted",
                         ),
                     ], className="d-flex align-items-center gap-3 flex-wrap"),
                 ]),
                 dbc.CardBody([
                     html.P(
-                        "动量分位 = 20/60/120 日涨幅百分位的加权（0.5/0.3/0.2，0-100，越高越强）；"
-                        "RS20 = 20 日涨幅减沪深300 同期涨幅（pp）。PE 分位来自国证口径（名称匹配，"
-                        "未匹配留空），周期行业（煤炭/钢铁/有色/化工/航运/养殖）PE 分位易失真。",
+                        "动量分位 = 20/60/120 日涨幅百分位加权（0.5/0.3/0.2）；"
+                        "RS20 = 20 日涨幅 − 沪深300 同期（pp）。"
+                        "PE 分位用国证静态 PE（有 829 天历史），动态 PE 仅当日值、无历史分位。"
+                        "周期行业（煤炭/钢铁/有色/化工/航运/养殖）PE 分位易失真。",
                         className="text-muted small",
                     ),
                     dash_table.DataTable(
                         id="rotation-table",
                         columns=rotation_columns,
-                        data=rotation.to_dict("records"),
+                        data=[],
                         sort_action="native",
                         sort_by=[{"column_id": "动量分位", "direction": "desc"}],
                         page_action="native",
-                        page_size=25,
+                        page_size=20,
                         style_table={"overflowX": "auto"},
                         style_cell={"fontSize": 12, "padding": "4px 8px", "textAlign": "right"},
                         style_cell_conditional=[
@@ -161,21 +220,11 @@ layout = dbc.Container([
         ], width=12)
     ], className="mb-4"),
 
-    # 表2：行业估值分位
+    # 表2（折叠）
     dbc.Row([
         dbc.Col([
-            dbc.Card([
-                dbc.CardHeader([
-                    html.Div([
-                        html.H5("② 行业估值分位（国证口径）", className="mb-0"),
-                        html.Small(
-                            f"{len(pe_table)} 个行业 · 数据日 {pe_date} · "
-                            f"<{COLD:.0f}% 偏冷 / >{HOT:.0f}% 偏热",
-                            className="text-muted",
-                        ),
-                    ], className="d-flex align-items-center gap-3 flex-wrap"),
-                ]),
-                dbc.CardBody([
+            dbc.Accordion([
+                dbc.AccordionItem([
                     dash_table.DataTable(
                         id="pe-table",
                         columns=pe_columns,
@@ -196,9 +245,44 @@ layout = dbc.Container([
                             {"if": {"filter_query": "{层级} = 4"}, "color": "#adb5bd"},
                         ],
                     )
-                ]),
-            ], className="border-0 shadow-sm")
+                ], title=f"② 行业估值分位（国证口径，{len(pe_table)} 个行业 · 数据日 {pe_date}）"),
+            ], start_collapsed=True, flush=True),
         ], width=12)
     ]),
 
 ], fluid=True, className="py-4", style={"backgroundColor": "#f8f9fa"})
+
+
+@callback(
+    Output("rotation-table", "data"),
+    Output("pick-count", "children"),
+    Input("momentum-min", "value"),
+    Input("pe-max", "value"),
+    Input("include-no-pe", "value"),
+)
+def apply_filter(momentum_min, pe_max, include_no_pe):
+    """按动量下限 + PE 分位上限筛选轮动榜"""
+    if rotation.empty:
+        return [], "无数据"
+
+    momentum_min = DEFAULT_MOMENTUM if momentum_min is None else momentum_min
+    pe_max = DEFAULT_PE if pe_max is None else pe_max
+    has_pe = rotation["PE分位"].notna()
+
+    mask = rotation["动量分位"] >= momentum_min
+    if "yes" in (include_no_pe or []):
+        mask &= (~has_pe) | (rotation["PE分位"] <= pe_max)
+    else:
+        mask &= has_pe & (rotation["PE分位"] <= pe_max)
+
+    picked = rotation[mask].copy()
+    picked = picked.sort_values("动量分位", ascending=False)
+    picked.insert(0, "序号", range(1, len(picked) + 1))
+
+    with_etf = int(picked["ETF名称"].notna().sum()) if "ETF名称" in picked else 0
+    label = (
+        f"命中 {len(picked)} 个板块 · 其中 {with_etf} 个有 ETF 可买"
+        if len(picked)
+        else "无命中：放宽动量或 PE 阈值试试"
+    )
+    return picked.to_dict("records"), label
