@@ -343,6 +343,21 @@ def get_eq_stock_data():
     logger.info(f"eq股票数据: {filename} 已更新")
 
 
+@data_handler
+def get_benchmark_index_data():
+    """沪深300 日线（行业轮动算 RS 用的基准）
+
+    weekly 的 get_ak_index_global_data 会全量刷 56 个指数，但日频只跑这一只，
+    保证 RS 的基准与行业 K 线同日（实测 0.7 秒）。
+    """
+    df = safe_call(ak.index_global_hist_em, symbol="沪深300")
+    if df is not None and len(df):
+        filename = "datas/raw/indexes/ak_index_global_hist_em_沪深300.csv"
+        ensure_dir(filename)
+        df.to_csv(filename, index=False)
+        logger.info(f"基准指数沪深300: {filename} 已更新，共 {len(df)} 条")
+
+
 def update_daily():
     """高频数据：行情快照 / 可转债 / 新闻 / 金属 / 行业 / 加密 / 行业轮动
 
@@ -360,6 +375,9 @@ def update_daily():
     get_ak_fund_data()
     get_yf_market_data()
     get_yf_virtual_data()
+
+    # 基准指数必须在行业 K 线之前更新，否则 RS 会拿旧基准去比
+    get_benchmark_index_data()
 
     # 行业历史放最后（依赖当日快照已更新），榜单再基于历史重算
     build_industry_hist()
